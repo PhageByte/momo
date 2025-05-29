@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前额专注冥想指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            padding-bottom: 70px; /* Add padding to body to prevent player from covering content */
+        }
+        #content-container {
+            position: relative; 
+            overflow: hidden;
+            min-height: 800px; /* Set minimum height to ensure content is visible */
+        }
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%; 
+            background-color: white; 
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            opacity: 0;
+            transform: translateX(30px); 
+            visibility: hidden; 
+            pointer-events: none; 
+            min-height: 500px; 
+            display: flex; 
+            flex-direction: column; 
+            padding-top: 1rem; /* Reduced top padding */
+            padding-bottom: 0.5rem; /* Reduced bottom padding */
+        }
+        .page-content-wrapper { 
+            overflow-y: auto;
+            flex-grow: 1; 
+            padding-left: 1.5rem; 
+            padding-right: 1.5rem; 
+        }
+        @media (min-width: 768px) { 
+            .page-content-wrapper {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+
+        .page.active {
+            opacity: 1 !important;
+            transform: translateX(0) !important; 
+            visibility: visible !important; 
+            pointer-events: auto !important; 
+            z-index: 10;
+        }
+        .page.page-leave { 
+            opacity: 0;
+            transform: translateX(-30px); 
+            z-index: 5; 
+        }
+
+        .pulsing-dot {
+            width: 25px;
+            height: 25px;
+            background-color: #38bdf8; 
+            border-radius: 50%;
+            animation: pulse 2.5s infinite ease-in-out;
+            margin: 1rem auto; 
+            box-shadow: 0 0 5px #38bdf8, 0 0 10px #38bdf8, 0 0 15px #38bdf8;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 12px rgba(56, 189, 248, 0); }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #60a5fa; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+        button:focus, select:focus, input[type="range"]:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        }
+        .disabled-button { opacity: 0.6; cursor: not-allowed; }
+        .page-nav-button {
+            padding: 0.35rem 0.6rem; border-radius: 0.375rem;
+            transition: background-color 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s;
+            font-size: 0.8rem; font-weight: 600;
+            background-color: #e2e8f0; color: #475569; border: 1px solid #cbd5e1;
+            line-height: 1; min-width: 30px; text-align: center;
+            margin: 0 2px; /* Add margin to separate buttons */
+        }
+        .page-nav-button:hover { background-color: #cbd5e1; border-color: #94a3b8; }
+        .page-nav-button.active-page-button {
+            background-color: #38bdf8; color: white; border-color: #0ea5e9;
+        }
+        .svg-illustration {
+            width: 100%;
+            max-width: 280px; 
+            height: auto;
+            margin: 1rem auto; 
+            display: block;
+        }
+        
+        /* Add styles for nav controls to ensure they're visible */
+        .navigation-controls {
+            position: relative;
+            z-index: 10;
+            padding-bottom: 0.5rem; /* Reduced padding */
+            margin-top: 0; /* Remove top margin */
+        }
+
+        #audioPlayerContainer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 0.75rem;
+            box-shadow: 0 -4px 15px -3px rgba(0,0,0,0.1);
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-100 to-sky-100 text-slate-800 antialiased">
+
+    <div id="app-container" class="min-h-screen flex flex-col items-center justify-start py-4 sm:py-6 px-4 pb-24">
+        <div id="content-container" class="bg-white shadow-2xl rounded-xl w-full max-w-2xl flex flex-col">
+            <div id="page-1" class="page">
+                <div class="page-content-wrapper">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-sky-600 mb-6 text-center">前额专注冥想：开启内在宁静之旅</h2>
+                    <p class="text-slate-700 mb-4 leading-relaxed">您好！欢迎探索一种简单而强大的冥想方法。通过将注意力集中在前额区域，您可以体验到显著的身心益处。</p>
+                    <p class="text-slate-600 font-semibold mb-2">核心益处包括：</p>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600 mb-6">
+                        <li>注意力提升：精神更易集中，专注力增强。</li>
+                        <li>睡眠改善：睡眠质量得到提升。</li>
+                        <li>头脑清晰：思维敏捷，意识清明。</li>
+                        <li>执行力增强：行动更加果断有力。</li>
+                        <li>眼神清澈：内在平和的外在体现。</li>
+                    </ul>
+                    <button id="quickStartBtn" class="mt-6 mb-4 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-lg w-full sm:w-auto mx-auto block">快速开始10分钟冥想</button>
+                </div>
+            </div>
+
+            <div id="page-2" class="page">
+                <div class="page-content-wrapper">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-sky-600 mb-6 text-center">冥想准备</h2>
+                    <div class="space-y-4 text-slate-700 leading-relaxed">
+                        <p><strong class="text-sky-700">舒适姿势：</strong> 舒适地坐着或躺下，确保脊柱保持自然直立但不僵硬。轻轻闭上双眼。</p>
+                        <p><strong class="text-sky-700">初步集中：</strong> 将您的注意力引导并汇聚于<strong class="text-rose-500">前额区域</strong>，即眉心到发际线之间的这片区域。</p>
+                        <svg viewBox="0 0 200 150" class="svg-illustration" aria-labelledby="forehead-title" role="img">
+                            <title id="forehead-title">前额区域示意图</title>
+                            <defs>
+                                <radialGradient id="foreheadHighlight" cx="50%" cy="35%" r="30%" fx="50%" fy="35%">
+                                    <stop offset="0%" style="stop-color:#f0f9ff;stop-opacity:0.8" />
+                                    <stop offset="100%" style="stop-color:#38bdf8;stop-opacity:0.3" />
+                                </radialGradient>
+                            </defs>
+                            <path d="M100 10 C 70 10, 50 30, 50 60 C 50 90, 70 110, 100 120 C 130 110, 150 90, 150 60 C 150 30, 130 10, 100 10 Z" fill="#e0f2fe" stroke="#a5f3fc" stroke-width="2"/>
+                            <path d="M100 70 Q 105 85 100 95 Q 95 85 100 70" fill="#bae6fd" />
+                            <ellipse cx="100" cy="50" rx="35" ry="20" fill="url(#foreheadHighlight)" />
+                            <path d="M75 60 Q 100 50 125 60" stroke="#0ea5e9" stroke-width="1.5" fill="none" stroke-linecap="round" /> 
+                            <path d="M70 40 Q 100 30 130 40" stroke="#0ea5e9" stroke-width="1.5" fill="none" stroke-linecap="round" />
+                            <text x="100" y="140" font-family="Inter, sans-serif" font-size="10" fill="#0c4a6e" text-anchor="middle">前额区域</text>
+                        </svg>
+                        <p><strong class="text-sky-700">初期体验：</strong> 练习初期，注意力可能会有些涣散，容易在这片区域内游移不定。这是完全正常的现象，请保持耐心。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-3" class="page">
+                <div class="page-content-wrapper">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-sky-600 mb-6 text-center">核心专注法</h2>
+                    <div class="space-y-4 text-slate-700 leading-relaxed">
+                        <p><strong class="text-sky-700">深化专注：</strong> 随着持续的练习，您的注意力会逐渐凝聚，仿佛形成一个<strong class="text-rose-500">稳定的焦点</strong>，通常在眉心（双眉之间稍向上的位置）。</p>
+                        <div class="my-6 text-center">
+                            <p class="text-slate-600 mb-2">想象注意力汇聚于此：</p>
+                            <div class="pulsing-dot"></div>
+                        </div>
+                        <p><strong class="text-sky-700">细微感知：</strong> 当注意力高度集中时，您可能会在眉心处感受到一种<strong class="text-rose-500">轻微的温热感</strong>或其他细微的生理感受。这些都是专注加深的自然表现。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-4" class="page">
+                <div class="page-content-wrapper">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-sky-600 mb-6 text-center">如何对待思绪</h2>
+                    <div class="space-y-4 text-slate-700 leading-relaxed">
+                        <p><strong class="text-sky-700">念头浮现：</strong> 在冥想过程中，各种念头和想法自然会浮现。这是心智的正常活动，不必为此感到困扰。</p>
+                        <p><strong class="text-sky-700">不评判，不追随：</strong> 不要试图压制或驱赶它们，也不要深入探究其内容。关键在于<strong class="text-rose-500">不被它们带走</strong>。</p>
+                        <svg viewBox="0 0 200 120" class="svg-illustration" aria-labelledby="thoughts-title" role="img">
+                            <title id="thoughts-title">念头如浮云飘过</title>
+                            <defs>
+                                <linearGradient id="cloudGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#f0f9ff; stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#e0f2fe; stop-opacity:1" />
+                                </linearGradient>
+                                <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur in="SourceGraphic" stdDeviation="2"/>
+                                </filter>
+                            </defs>
+                            <g filter="url(#cloudBlur)">
+                                <path d="M50 70 Q40 50 60 40 Q80 30 100 45 Q120 35 140 50 Q160 60 145 80 Z" fill="url(#cloudGradient)" stroke="#a5f3fc" stroke-width="1"/>
+                                <path d="M80 90 Q70 75 90 70 Q110 65 120 75 Q130 85 115 95 Z" fill="url(#cloudGradient)" stroke="#a5f3fc" stroke-width="1" transform="translate(20, -15) scale(0.8)"/>
+                                <path d="M30 50 Q20 35 40 30 Q60 25 70 35 Q80 45 65 55 Z" fill="url(#cloudGradient)" stroke="#a5f3fc" stroke-width="1" transform="translate(-15, 10) scale(0.7)"/>
+                            </g>
+                             <text x="100" y="110" font-family="Inter, sans-serif" font-size="10" fill="#0c4a6e" text-anchor="middle">念头如浮云</text>
+                        </svg>
+                        <p><strong class="text-sky-700">温柔拉回：</strong> 允许这些念头和想法如同过客一般，在您的意识中自然流动，然后逐渐消散。每当意识到注意力偏离时，<strong class="text-rose-500">温和地</strong>将其拉回到前额的专注点。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-5" class="page justify-center">
+                 <div class="page-content-wrapper">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-sky-600 mb-6 text-center">冥想环节</h2>
+                    <div class="text-center">
+                        <div id="timerDisplay" class="text-5xl sm:text-6xl font-bold text-sky-500 my-6 sm:my-8">10:00</div>
+                        <button id="startTimerBtn" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-lg w-full max-w-xs mx-auto block">开始10分钟冥想</button>
+                        <div id="pulsingDotContainer" class="my-6 sm:my-8">
+                            <div class="pulsing-dot" style="width: 30px; height: 30px;"></div> 
+                        </div>
+                        <p id="timerMessage" class="text-slate-600 mt-4 min-h-[1.5em]">准备好了吗？点击上方按钮开始。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-6" class="page">
+                <div class="page-content-wrapper">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-sky-600 mb-6 text-center">练习时长与预期效果</h2>
+                    <div class="space-y-4 text-slate-700 leading-relaxed">
+                        <p><strong class="text-sky-700">建议时长：</strong> 保持这种专注的冥想状态约<strong class="text-rose-500">十分钟</strong>，或根据个人情况灵活调整。即使是短暂的几分钟，也能带来益处。</p>
+                        <p><strong class="text-sky-700">即时效果：</strong> 练习后，您通常会感受到大脑变得清醒，精神得到有效的放松和恢复。</p>
+                        <p><strong class="text-sky-700">长期益处：</strong> 规律练习有助于巩固前述的核心益处，如注意力提升、睡眠改善等。</p>
+                        <svg viewBox="0 0 200 150" class="svg-illustration" aria-labelledby="refreshed-title" role="img">
+                            <title id="refreshed-title">身心焕然一新</title>
+                            <defs>
+                                <radialGradient id="auraGradient" cx="50%" cy="50%" r="70%" fx="50%" fy="50%">
+                                    <stop offset="0%" style="stop-color:rgba(125, 211, 252, 0.6)" /> <stop offset="60%" style="stop-color:rgba(56, 189, 248, 0.3)" /> <stop offset="100%" style="stop-color:rgba(56, 189, 248, 0)" />
+                                </radialGradient>
+                                <linearGradient id="sparkleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#fbbf24" /> <stop offset="100%" stop-color="#f59e0b" /> </linearGradient>
+                            </defs>
+                             <ellipse cx="100" cy="70" rx="70" ry="50" fill="url(#auraGradient)"/>
+                            <circle cx="100" cy="50" r="15" fill="#0ea5e9"/> <path d="M85 70 C 85 90, 115 90, 115 70 C 115 50, 85 50, 85 70 Z M100 68 V 110 M 80 110 H 120 M100 110 L85 130 M100 110 L115 130" 
+                                  stroke="#0284c7" stroke-width="3" fill="#38bdf8" stroke-linecap="round" stroke-linejoin="round"/> <path d="M100 15 L98 20 L93 22 L98 24 L100 29 L102 24 L107 22 L102 20 Z" fill="url(#sparkleGradient)"/>
+                            <path d="M60 30 L58 35 L53 37 L58 39 L60 44 L62 39 L67 37 L62 35 Z" fill="url(#sparkleGradient)" transform="scale(0.8) translate(10,5)"/>
+                            <path d="M140 30 L138 35 L133 37 L138 39 L140 44 L142 39 L147 37 L142 35 Z" fill="url(#sparkleGradient)" transform="scale(0.8) translate(-10,5)"/>
+                            <text x="100" y="145" font-family="Inter, sans-serif" font-size="10" fill="#0c4a6e" text-anchor="middle">身心焕新</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-7" class="page">
+                <div class="page-content-wrapper">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-sky-600 mb-6 text-center">温馨提示</h2>
+                    <div class="space-y-4 text-slate-700 leading-relaxed">
+                        <p><strong class="text-sky-700">舒适自然：</strong> 整个冥想过程应当是自然且无任何不适感的。它是一种<strong class="text-rose-500">放松与专注并存</strong>的状态，并非刻意地紧绷精神或肌肉。</p>
+                        <p><strong class="text-sky-700">"轻握"的艺术：</strong> 如同用手轻轻握住一个物体，并非紧抓不放。您能清晰感知到专注点，有一种凝聚的"实感"，但又没有丝毫的紧张或僵硬。</p>
+                        <p><strong class="text-sky-700">维持与深化：</strong> 尝试让这种在眉心区域浮现的"凝聚感"尽可能清晰、稳定地维持。随着练习的深入，这种专注的稳定性和深度会自然提升。</p>
+                        <p><strong class="text-sky-700">耐心与规律：</strong> 任何冥想练习的效果都需要时间和持续的实践来显现和巩固。保持耐心，<strong class="text-rose-500">规律练习</strong>，逐步体验其带来的益处。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="page-8" class="page">
+                <div class="page-content-wrapper">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-sky-600 mb-6 text-center">关于冥想音频</h2>
+                    <div class="space-y-4 text-slate-700 leading-relaxed">
+                        <p>此应用内置了一段默认的冥想背景音频 (<code class="text-sm bg-slate-200 px-1 rounded">audio.m4a</code>)。您可以使用下方的播放器控制其播放、暂停、音量和播放速度。</p>
+                         <p class="bg-sky-100 border-l-4 border-sky-500 text-sky-700 p-4 rounded-md">
+                            <strong class="font-semibold">提示：</strong><br>
+                            1. 音频会在应用加载后自动准备播放。<br>
+                            2. 如果您希望在冥想时保持安静，只需暂停音频或将音量调至最低即可。<br>
+                            3. 音频播放器在页面切换时会<strong class="text-rose-500">持续播放</strong>，不会中断。
+                        </p>
+                        <p class="text-sm text-slate-500">祝您冥想愉快！</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation-controls p-3 border-t border-slate-200 bg-slate-50 flex justify-between items-center mt-auto">
+                <button id="prevBtn" class="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 disabled-button">上一页</button>
+                <div id="pageNavButtonsContainer" class="flex-grow flex justify-center items-center space-x-1 sm:space-x-2 px-2">
+                    </div>
+                <button id="nextBtn" class="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50">下一页</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="audioPlayerContainer" class="fixed bottom-0 left-0 right-0 bg-slate-800 text-slate-200 p-3 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.1)] z-50">
+        <div class="max-w-3xl mx-auto space-y-2">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <span id="audioTitle" class="text-xs text-slate-400 mr-1 hidden sm:inline">音频: audio.m4a</span>
+                    <button id="playPauseBtn" title="播放/暂停" class="p-2 rounded-full hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-75 disabled-button" disabled>
+                        <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 sm:w-6 sm:h-6"><path d="M8 5v14l11-7L8 5z"></path></svg>
+                        <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 hidden"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                    </button>
+                </div>
+                <div class="flex items-center space-x-1 sm:space-x-2 text-xs">
+                    <span id="currentTimeDisplay">00:00</span>
+                    <span>/</span>
+                    <span id="durationDisplay">00:00</span>
+                </div>
+            </div>
+            
+            <input type="range" id="seekBar" value="0" class="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-sky-500 disabled-button" disabled>
+            
+            <div class="flex items-center justify-between text-xs">
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <label for="speedControl" class="hidden sm:inline">速度:</label>
+                    <select id="speedControl" class="bg-slate-700 text-slate-200 border border-slate-600 rounded-md p-1 text-xs focus:ring-sky-500 focus:border-sky-500 disabled-button" disabled>
+                        <option value="0.5">0.5x</option> <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x</option> <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option> <option value="2">2x</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 sm:w-5 sm:h-5"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>
+                    <input type="range" id="volumeControl" title="音量" min="0" max="1" step="0.01" value="1" class="w-16 sm:w-20 h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-sky-500 disabled-button" disabled>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pages = document.querySelectorAll('.page');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageNavButtonsContainer = document.getElementById('pageNavButtonsContainer');
+            const quickStartBtn = document.getElementById('quickStartBtn');
+            const contentContainer = document.getElementById('content-container');
+            
+            let currentPageIndex = 0;
+            const totalPages = pages.length;
+            let pageButtons = []; 
+
+            // Set initial content container height based on first page
+            function updateContentHeight() {
+                const activePage = document.querySelector('.page.active');
+                if (activePage) {
+                    // Set minimum height to active page height plus some padding
+                    const activePageHeight = activePage.scrollHeight;
+                    const audioPlayerHeight = document.getElementById('audioPlayerContainer').offsetHeight;
+                    // Add a small buffer (10px) but avoid excessive space
+                    contentContainer.style.minHeight = `${Math.min(activePageHeight + 10, window.innerHeight - 150)}px`;
+                }
+            }
+
+            // Audio Player Elements
+            const audioElement = new Audio();
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const playIcon = document.getElementById('playIcon');
+            const pauseIcon = document.getElementById('pauseIcon');
+            const seekBar = document.getElementById('seekBar');
+            const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+            const durationDisplay = document.getElementById('durationDisplay');
+            const speedControl = document.getElementById('speedControl');
+            const volumeControl = document.getElementById('volumeControl');
+            const audioControls = [playPauseBtn, seekBar, speedControl, volumeControl];
+
+            // Timer variables
+            let timerInterval;
+            let timeLeft = 10 * 60; 
+            const initialTime = 10 * 60; 
+
+            function createPageNavigationButtons() {
+                pageNavButtonsContainer.innerHTML = ''; 
+                pageButtons = []; 
+                for (let i = 0; i < totalPages; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i + 1;
+                    button.classList.add('page-nav-button');
+                    button.addEventListener('click', () => {
+                        if (currentPageIndex === i) return; 
+                        currentPageIndex = i;
+                        updatePageDisplay();
+                    });
+                    pageNavButtonsContainer.appendChild(button);
+                    pageButtons.push(button);
+                }
+            }
+
+            function updatePageDisplay() {
+                pages.forEach((page, index) => {
+                    if (page.id === 'page-5' && index !== currentPageIndex) {
+                         const startTimerBtnElem = page.querySelector('#startTimerBtn');
+                         if (startTimerBtnElem && startTimerBtnElem.textContent.includes("停止冥想")) { 
+                            clearInterval(timerInterval);
+                            timerInterval = null; // Important to clear the interval ID
+                         }
+                    }
+
+                    if (index === currentPageIndex) {
+                        // First remove all classes that might affect visibility
+                        page.classList.remove('page-leave');
+                        // Make sure the page is visible first
+                        page.style.visibility = 'visible';
+                        // Add active class which will handle the transition
+                        page.classList.add('active');
+
+                        // Update container height after page is active
+                        setTimeout(updateContentHeight, 50);
+
+                        if (page.id === 'page-5') { 
+                            const timerDisplayElem = page.querySelector('#timerDisplay');
+                            const startTimerBtnElem = page.querySelector('#startTimerBtn');
+                            const timerMessageElem = page.querySelector('#timerMessage');
+                            
+                            if (!timerInterval || (startTimerBtnElem && startTimerBtnElem.textContent.includes("开始"))) { 
+                                clearInterval(timerInterval); 
+                                timerInterval = null; // Clear interval ID
+                                timeLeft = initialTime;
+                                if (timerDisplayElem) timerDisplayElem.textContent = formatTime(timeLeft);
+                                if (timerMessageElem) timerMessageElem.textContent = "准备好了吗？点击上方按钮开始。";
+                                if (startTimerBtnElem) {
+                                    startTimerBtnElem.disabled = false;
+                                    startTimerBtnElem.textContent = "开始10分钟冥想";
+                                    startTimerBtnElem.classList.remove('disabled-button', 'bg-red-500', 'hover:bg-red-600');
+                                    startTimerBtnElem.classList.add('bg-green-500', 'hover:bg-green-600');
+                                }
+                            }
+
+
+                            if (startTimerBtnElem && !startTimerBtnElem.dataset.listenerAttached) {
+                                startTimerBtnElem.addEventListener('click', function handleStartTimer() {
+                                    if (timeLeft <= 0 && (this.textContent.includes("开始") || this.textContent.includes("重新开始"))) {
+                                        timeLeft = initialTime; 
+                                    }
+
+                                    if (this.textContent.includes("开始") || this.textContent.includes("重新开始")) {
+                                        if (timerInterval) clearInterval(timerInterval);
+                                        if (timerDisplayElem) timerDisplayElem.textContent = formatTime(timeLeft);
+                                        if (timerMessageElem) timerMessageElem.textContent = "冥想进行中... 专注于您的前额。";
+                                        
+                                        this.textContent = "停止冥想";
+                                        this.classList.remove('bg-green-500', 'hover:bg-green-600');
+                                        this.classList.add('bg-red-500', 'hover:bg-red-600');
+                                        
+                                        timerInterval = setInterval(() => {
+                                            timeLeft--;
+                                            if (timerDisplayElem) timerDisplayElem.textContent = formatTime(timeLeft);
+                                            if (timeLeft <= 0) {
+                                                clearInterval(timerInterval);
+                                                timerInterval = null; 
+                                                if (timerMessageElem) timerMessageElem.textContent = "10分钟冥想结束。做得好！";
+                                                this.textContent = "重新开始冥想";
+                                                this.classList.remove('bg-red-500', 'hover:bg-red-600');
+                                                this.classList.add('bg-green-500', 'hover:bg-green-600');
+                                            }
+                                        }, 1000);
+                                    } else { 
+                                        clearInterval(timerInterval);
+                                        timerInterval = null; 
+                                        if (timerMessageElem) timerMessageElem.textContent = "冥想已暂停。您可以随时重新开始。";
+                                        this.textContent = "重新开始冥想";
+                                        this.classList.remove('bg-red-500', 'hover:bg-red-600');
+                                        this.classList.add('bg-green-500', 'hover:bg-green-600');
+                                    }
+                                });
+                                startTimerBtnElem.dataset.listenerAttached = 'true';
+                            }
+                        }
+                    } else { 
+                        if (page.classList.contains('active')) { 
+                            page.classList.add('page-leave');
+                            page.classList.remove('active');
+                            setTimeout(() => {
+                                page.style.visibility = 'hidden';
+                                page.classList.remove('page-leave');
+                            }, 500); 
+                        } else { 
+                            page.classList.remove('active', 'page-leave');
+                            page.style.visibility = 'hidden';
+                        }
+                    }
+                });
+                
+                prevBtn.disabled = currentPageIndex === 0;
+                nextBtn.disabled = currentPageIndex === totalPages - 1;
+                prevBtn.classList.toggle('disabled-button', currentPageIndex === 0);
+                nextBtn.classList.toggle('disabled-button', currentPageIndex === totalPages - 1);
+
+                pageButtons.forEach((btn, idx) => {
+                    btn.classList.toggle('active-page-button', idx === currentPageIndex);
+                    btn.setAttribute('aria-current', idx === currentPageIndex ? 'page' : 'false');
+                });
+            }
+
+            prevBtn.addEventListener('click', () => {
+                if (currentPageIndex > 0) { currentPageIndex--; updatePageDisplay(); }
+            });
+            nextBtn.addEventListener('click', () => {
+                if (currentPageIndex < totalPages - 1) { currentPageIndex++; updatePageDisplay(); }
+            });
+
+            if (quickStartBtn) {
+                quickStartBtn.addEventListener('click', () => {
+                    currentPageIndex = 4; 
+                    updatePageDisplay();
+                    
+                    setTimeout(() => {
+                        const timerPage = document.getElementById('page-5');
+                        if (timerPage && timerPage.classList.contains('active')) {
+                            const startBtn = timerPage.querySelector('#startTimerBtn');
+                            if (startBtn && (startBtn.textContent.includes("开始") || startBtn.textContent.includes("重新开始"))) {
+                                startBtn.click(); 
+                            }
+                        }
+                    }, 50); 
+                });
+            }
+            
+            // Try different audio files if primary one fails
+            function tryLoadAudio(audioSources) {
+                const currentSource = audioSources[0];
+                if (!currentSource) {
+                    console.error("无法加载任何音频文件");
+                    durationDisplay.textContent = "错误";
+                    playPauseBtn.title = "音频加载失败";
+                    audioControls.forEach(control => { 
+                        control.disabled = true;
+                        control.classList.add('disabled-button');
+                    });
+                    return;
+                }
+                
+                audioElement.src = currentSource;
+                
+                // Update displayed audio title
+                const audioTitle = document.getElementById('audioTitle');
+                if (audioTitle) {
+                    audioTitle.textContent = `音频: ${currentSource}`;
+                }
+                
+                audioElement.onerror = () => {
+                    console.log(`尝试加载下一个音频文件: ${currentSource} 失败`);
+                    tryLoadAudio(audioSources.slice(1));
+                };
+            }
+            
+            // Try to load available audio files
+            tryLoadAudio(["audio.m4a", "audio2.m4a", "audio3.m4a", "audio4.m4a"]);
+
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            function enableAudioControls() {
+                audioControls.forEach(control => {
+                    control.disabled = false;
+                    control.classList.remove('disabled-button');
+                });
+            }
+            
+            audioElement.addEventListener('canplaythrough', () => {
+                enableAudioControls();
+                if (isFinite(audioElement.duration)) {
+                    durationDisplay.textContent = formatTime(audioElement.duration);
+                    seekBar.max = audioElement.duration;
+                }
+            });
+            
+            audioElement.addEventListener('error', (e) => {
+                console.error("无法加载音频文件. 请确保文件与HTML在同一目录且文件名正确。", e);
+            });
+
+            playPauseBtn.addEventListener('click', () => {
+                if (!audioElement.src || audioElement.src.endsWith('#') || audioElement.readyState < 2) return; 
+                if (audioElement.paused) audioElement.play();
+                else audioElement.pause();
+            });
+            audioElement.addEventListener('play', () => { 
+                playIcon.classList.add('hidden'); 
+                pauseIcon.classList.remove('hidden'); 
+            });
+            audioElement.addEventListener('pause', () => { 
+                playIcon.classList.remove('hidden'); 
+                pauseIcon.classList.add('hidden'); 
+            });
+            
+            audioElement.addEventListener('loadedmetadata', () => { 
+                if (isFinite(audioElement.duration)) {
+                    durationDisplay.textContent = formatTime(audioElement.duration);
+                    seekBar.max = audioElement.duration;
+                    if (audioElement.readyState >= 2) enableAudioControls();
+                }
+            });
+            audioElement.addEventListener('timeupdate', () => {
+                if (isFinite(audioElement.currentTime)) {
+                    currentTimeDisplay.textContent = formatTime(audioElement.currentTime);
+                    seekBar.value = audioElement.currentTime;
+                }
+            });
+            seekBar.addEventListener('input', () => {
+                if (!audioElement.src || audioElement.src.endsWith('#') || audioElement.readyState < 2) return;
+                if (isFinite(parseFloat(seekBar.value))) {
+                    audioElement.currentTime = parseFloat(seekBar.value);
+                }
+            });
+            speedControl.addEventListener('change', () => {
+                if (!audioElement.src || audioElement.src.endsWith('#') || audioElement.readyState < 2) return;
+                audioElement.playbackRate = parseFloat(speedControl.value);
+            });
+            volumeControl.addEventListener('input', () => {
+                if (!audioElement.src || audioElement.src.endsWith('#') || audioElement.readyState < 2) return;
+                audioElement.volume = parseFloat(volumeControl.value);
+            });
+
+            // Set fixed height to prevent layout jumping
+            contentContainer.style.minHeight = '400px';
+            
+            // Ensure the application starts with the first page visible
+            createPageNavigationButtons();
+            updatePageDisplay();
+            
+            // Add this failsafe to ensure first page is visible
+            setTimeout(() => {
+                const firstPage = document.getElementById('page-1');
+                if (firstPage && !firstPage.classList.contains('active')) {
+                    currentPageIndex = 0;
+                    updatePageDisplay();
+                }
+                
+                // Additional force refresh of content height
+                updateContentHeight();
+            }, 300);
+            
+            // Handle window resize to adjust content height
+            window.addEventListener('resize', updateContentHeight);
+        });
+    </script>
+</body>
+</html>

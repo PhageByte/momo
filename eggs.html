@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小数乘法奇趣探险：0.3 × 50 的奥秘</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', 'Arial', sans-serif;
+            background-color: #f0f9ff; /* 淡蓝天空背景 */
+            color: #075985; /* 深蓝文字 */
+        }
+        .font-ma-shan {
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+        .content-card {
+            background-color: white;
+            border-radius: 1rem; /* 16px */
+            padding: 2rem; /* 32px */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border: 2px solid #60a5fa; /* 柔和蓝边框 */
+        }
+        .step-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2.5rem; /* 40px */
+            color: #1d4ed8; /* 鲜艳蓝 */
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #3b82f6; /* 活力蓝 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb; /* 深活力蓝 */
+            transform: translateY(-2px);
+        }
+        .hint-box {
+            background-color: #fffbeb; /* 淡黄提示背景 */
+            border: 2px dashed #facc15; /* 黄色虚线边框 */
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            color: #ca8a04; /* 暗黄文字 */
+        }
+        .hint-box strong {
+            color: #a16207; /* 更深黄 */
+        }
+        .egg {
+            display: inline-block;
+            width: 30px;
+            height: 40px;
+            background-color: #fef3c7; /* 淡黄色鸡蛋 */
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            margin: 5px;
+            box-shadow: inset -2px -2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.5s ease-out;
+        }
+        .coin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #fcd34d; /* 金色硬币 */
+            color: #b45309; /* 硬币文字颜色 */
+            border-radius: 50%;
+            margin: 5px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2), inset 0 0 5px rgba(255,255,255,0.5);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .decimal-number span {
+            display: inline-block;
+            transition: transform 0.5s ease-in-out, color 0.5s ease-in-out;
+            padding: 0 0.1em;
+        }
+        .audio-player-container {
+            background-color: #e0f2fe; /* 淡蓝背景 */
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            border: 1px solid #bae6fd;
+        }
+        .audio-player-container audio {
+            width: 100%;
+            max-width: 500px;
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-out forwards;
+        }
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease-out forwards;
+        }
+        .pop-in {
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="container mx-auto max-w-3xl">
+        <header class="text-center mb-12">
+            <h1 class="font-ma-shan text-5xl md:text-6xl text-amber-500">小数乘法奇趣探险</h1>
+            <p class="text-2xl text-sky-600 mt-2">解开 <span class="font-bold">0.3 × 50</span> 的奥秘！</p>
+        </header>
+
+
+        <div id="story-intro" class="content-card fade-in">
+            <p class="text-lg leading-relaxed">亲爱的小探险家，你好！今天，我们要和杨泽天同学一起，去鸡蛋市场进行一次数学探险！他遇到了一个问题：鸡蛋每颗 <span class="font-bold text-orange-500">0.3元</span>，买 <span class="font-bold text-orange-500">50颗</span> 一共需要多少钱呢？也就是计算 <span class="font-bold text-orange-500">0.3 × 50 = ?</span></p>
+            <p class="mt-4 text-lg">别担心，我们将一步一步揭开小数乘法的神秘面纱，让数学变得像寻宝一样有趣！准备好了吗？</p>
+            <div class="text-center mt-8">
+                <button id="startAdventureBtn" class="btn-primary text-xl">开始探险！</button>
+            </div>
+        </div>
+
+        <div id="step-1" class="content-card hidden">
+            <h2 class="step-title">第一站：认识新朋友 0.3元</h2>
+            <p class="text-lg">首先，我们来看看"0.3元"。这是什么意思呢？在我们国家，1元等于10角。那么，"0.3元"就是 <span class="font-bold text-green-600">3角</span> 钱！</p>
+            <div id="coins-visualization" class="my-6 text-center">
+                </div>
+            <div class="hint-box">
+                <strong>小提示：</strong> 想想看，0.3元用我们平时买东西说的"角"怎么表示呢？是不是一下子就熟悉多啦？
+            </div>
+            <div class="text-center mt-8">
+                <button class="btn-primary next-step">下一站！</button>
+            </div>
+        </div>
+
+        <div id="step-2" class="content-card hidden">
+            <h2 class="step-title">第二站：一盒鸡蛋多少钱？(0.3 × 10)</h2>
+            <p class="text-lg">杨泽天把鸡蛋分成了几盒，每盒有10颗。一颗鸡蛋0.3元，那一盒（10颗）鸡蛋是多少钱呢？就是算 <span class="font-bold text-purple-600">0.3 × 10</span>。</p>
+            
+            <div class="my-6">
+                <h3 class="font-ma-shan text-2xl text-sky-700 mb-2">方法一：用"角"来帮忙！</h3>
+                <p>0.3元是3角。那么 0.3元 × 10 就等于 <span id="jiaoCalc" class="font-bold text-red-500">3角 × 10 = ?</span></p>
+                <div id="jiao-multiply-animation" class="my-4 p-4 bg-sky-50 rounded-lg text-center">
+                    <p>想象一下，10次"3角钱"...</p>
+                </div>
+                <p class="text-center text-xl font-bold text-green-600 hidden" id="jiaoResult">所以，0.3 × 10 = 3元！</p>
+            </div>
+
+            <div class="my-6">
+                <h3 class="font-ma-shan text-2xl text-sky-700 mb-2">方法二：小数点的魔法！</h3>
+                <p>观察：<span class="font-bold text-red-500 decimal-number" id="decimalMagic">0 . 3</span> × 10 = <span class="font-bold text-green-600">3</span></p>
+                <p class="mt-2">小数点好像施了魔法，从 <code class="bg-gray-200 p-1 rounded">0.3</code> 变成了 <code class="bg-gray-200 p-1 rounded">3.0</code>。它向哪个方向移动了？移动了几位呢？</p>
+                <div id="decimal-move-animation" class="my-4 p-4 bg-amber-50 rounded-lg text-center">
+                    <span class="text-3xl font-mono decimal-number" id="animatedDecimal">
+                        <span>0</span><span class="text-red-500 font-bold">.</span><span>3</span>
+                    </span>
+                    <span class="text-3xl font-mono"> &nbsp; 👉 &nbsp; </span>
+                    <span class="text-3xl font-mono decimal-number" id="animatedDecimalResult">
+                        <span>_</span><span class="text-red-500 font-bold">.</span><span>_</span>
+                    </span>
+                </div>
+            </div>
+            <div class="hint-box">
+                <strong>小提示：</strong> 乘以10，小数点就像坐上了小火箭！它会往哪个方向飞，飞多远呢？是不是数字变大了10倍？
+            </div>
+            <div class="text-center mt-8">
+                <button class="btn-primary next-step">太棒了，继续！</button>
+            </div>
+        </div>
+        
+        <div id="step-3" class="content-card hidden">
+            <h2 class="step-title">第三站：50颗鸡蛋多少钱？(0.3 × 50)</h2>
+            <p class="text-lg">我们知道了1盒（10颗）鸡蛋是3元。杨泽天有50颗鸡蛋，也就是5盒。那么 <span class="font-bold text-indigo-600">0.3 × 50</span> 怎么算呢？</p>
+
+            <div class="my-6">
+                <h3 class="font-ma-shan text-2xl text-sky-700 mb-2">方法一：分步计算</h3>
+                <p>50颗鸡蛋是5盒，每盒3元。总价钱就是 <span id="stepByStepCalc" class="font-bold text-red-500">3元/盒 × 5盒 = ?</span></p>
+                <div id="boxes-animation" class="my-4 p-4 bg-lime-50 rounded-lg text-center">
+                    <p>想象5个装满鸡蛋的盒子，每个都标价3元...</p>
+                </div>
+                 <p class="text-center text-xl font-bold text-green-600 hidden" id="stepByStepResult">所以，0.3 × 50 = 15元！</p>
+            </div>
+            
+            <div class="my-6">
+                <h3 class="font-ma-shan text-2xl text-sky-700 mb-2">方法二：直接计算 (小数点先去玩一会儿)</h3>
+                <p>1. 暂时忘记小数点，把 <code class="bg-gray-200 p-1 rounded">0.3</code> 看作 <code class="bg-gray-200 p-1 rounded">3</code>。</p>
+                <p>2. 问题变成 <span class="font-bold text-red-500">3 × 50</span>。这个简单！<span id="integerMultiply" class="font-bold text-red-500">3 × 50 = ?</span></p>
+                <p>3. 现在把小数点请回来！<code class="bg-gray-200 p-1 rounded">0.3</code> 小数点后有 <span class="font-bold">1</span> 位数。所以在答案 <span id="integerProduct" class="font-bold text-red-500">150</span> 里，从右边数 <span class="font-bold">1</span> 位，点上小数点。</p>
+                <div id="decimal-return-animation" class="my-4 p-4 bg-pink-50 rounded-lg text-center">
+                     <span class="text-3xl font-mono" id="animatedProduct">150</span>
+                     <span class="text-3xl font-mono"> &nbsp; 👉 &nbsp; </span>
+                     <span class="text-3xl font-mono" id="finalProductWithDecimal">15.0</span>
+                </div>
+                <p class="text-center text-xl font-bold text-green-600">所以，0.3 × 50 = 15元！</p>
+            </div>
+
+            <div class="my-6">
+                <h3 class="font-ma-shan text-2xl text-sky-700 mb-2">方法三：巧妙分解来帮忙！</h3>
+                <p>我们知道 <span class="font-bold text-red-500">50</span> 可以看作 <span class="font-bold text-red-500">10 × 5</span>。</p>
+                <p>所以 <code class="bg-gray-200 p-1 rounded">0.3 × 50</code> 就等于 <code class="bg-gray-200 p-1 rounded">0.3 × 10 × 5</code>。</p>
+                <p>还记得 <code class="bg-gray-200 p-1 rounded">0.3 × 10</code> 等于多少吗？对啦，是 <span class="font-bold text-green-600">3</span>！</p>
+                <p>那么，<code class="bg-gray-200 p-1 rounded">0.3 × 10 × 5</code> 就等于 <span id="decomposeCalc" class="font-bold text-red-500">3 × 5 = ?</span></p>
+                 <p class="text-center text-xl font-bold text-green-600 hidden" id="decomposeResult">太棒了！0.3 × 50 = 15元！</p>
+            </div>
+             <div class="hint-box">
+                <strong>小提示：</strong> 小数点暂时去旅行了，算完我们再把它请回来。它应该回到哪里呢？数数原小数有几位小数就知道啦！或者，把大数字拆成几个好朋友（比如10的倍数），计算会更轻松哦！
+            </div>
+            <div class="text-center mt-8">
+                <button class="btn-primary next-step">我明白了！</button>
+            </div>
+        </div>
+
+        <div id="step-4" class="content-card hidden">
+            <h2 class="step-title">第四站：总结规律 (小数 × 整数)</h2>
+            <p class="text-lg">通过这次探险，我们发现计算小数乘以整数的通用方法：</p>
+            <ol class="list-decimal list-inside text-lg space-y-2 my-4 bg-sky-50 p-6 rounded-lg">
+                <li><span class="font-bold">先忽略小数点：</span>把小数看作整数。</li>
+                <li><span class="font-bold">整数乘法算：</span>按照整数乘法算出乘积。</li>
+                <li><span class="font-bold">数位点一点：</span>看原来的小数有几位小数，就在乘积中从右往左数出几位，点上小数点。（如果位数不够，用0在前面补足哦！）</li>
+            </ol>
+            <div class="hint-box">
+                <strong>小提示：</strong> 记住这三步曲："变整数，算乘积，点回点"，小数乘法就不难啦！
+            </div>
+            <div class="text-center mt-8">
+                <button class="btn-primary next-step">学到了！</button>
+            </div>
+        </div>
+
+        <div id="step-5" class="content-card hidden">
+            <h2 class="step-title">第五站：智慧的火花</h2>
+            <p class="text-lg">小朋友，解决杨泽天的问题，我们不仅学会了小数乘法，更重要的是，发现了学习数学的"小窍门"：</p>
+            <ul class="list-disc list-inside text-lg space-y-3 my-4 bg-amber-50 p-6 rounded-lg">
+                <li><span class="font-bold text-amber-700">数学就在身边：</span>多观察生活，数学很有趣！</li>
+                <li><span class="font-bold text-amber-700">动手画一画：</span>画图能帮我们理解问题。</li>
+                <li><span class="font-bold text-amber-700">大问题变小：</span>把复杂问题分解成简单的小问题。</li>
+                <li><span class="font-bold text-amber-700">寻找规律：</span>发现规律能让计算更快捷！</li>
+                <li><span class="font-bold text-amber-700">条条大路通罗马：</span>一个问题可以有多种解法。</li>
+                <li><span class="font-bold text-amber-700">明白"为什么"：</span>理解原理比死记硬背更重要。</li>
+                <li><span class="font-bold text-amber-700">练习是好朋友：</span>多练习才能熟练。</li>
+                <li><span class="font-bold text-amber-700">不怕犯错误：</span>错误是进步的机会。</li>
+                <li><span class="font-bold text-amber-700">勇敢提问：</span>不懂就问，通向知识的大门。</li>
+            </ul>
+            <p class="text-center text-xl font-bold text-green-600 mt-6">继续保持好奇心和探索精神，数学的世界还有更多奇妙等着你！</p>
+            <div class="text-center mt-8">
+                <button id="finishAdventureBtn" class="btn-primary text-xl">完成探险！</button>
+            </div>
+        </div>
+
+        <div class="audio-player-container">
+            <p class="text-lg font-semibold text-sky-700 mb-2">杨泽天卖鸡蛋的故事！</p>
+            <audio id="storyAudio" controls src="audio.m4a">
+                您的浏览器不支持播放音频。
+            </audio>
+            <p class="text-xs text-slate-500 mt-1">(如果无法播放，请检查音频文件路径是否正确)</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const startAdventureBtn = document.getElementById('startAdventureBtn');
+        const storyIntro = document.getElementById('story-intro');
+        const steps = [
+            document.getElementById('step-1'),
+            document.getElementById('step-2'),
+            document.getElementById('step-3'),
+            document.getElementById('step-4'),
+            document.getElementById('step-5'),
+        ];
+        const nextStepBtns = document.querySelectorAll('.next-step');
+        const finishAdventureBtn = document.getElementById('finishAdventureBtn');
+
+        let currentStepIndex = -1; // Start before the first step
+
+        // Function to show a specific step
+        function showStep(index) {
+            steps.forEach((step, i) => {
+                if (step) { // Check if step element exists
+                    step.classList.toggle('hidden', i !== index);
+                    if (i === index) {
+                        step.classList.remove('fade-in', 'slide-in-left', 'pop-in'); // Remove old animation classes
+                        // Apply different animations for variety, or a consistent one
+                        if (i % 3 === 0) step.classList.add('fade-in');
+                        else if (i % 3 === 1) step.classList.add('slide-in-left');
+                        else step.classList.add('pop-in');
+                        
+                        // Trigger animations for specific steps
+                        if (i === 0) triggerStep1Animations();
+                        if (i === 1) triggerStep2Animations();
+                        if (i === 2) triggerStep3Animations();
+                    }
+                }
+            });
+        }
+
+        // Event listener for starting the adventure
+        startAdventureBtn.addEventListener('click', () => {
+            storyIntro.classList.add('hidden');
+            currentStepIndex = 0;
+            showStep(currentStepIndex);
+        });
+
+        // Event listeners for "Next Step" buttons
+        nextStepBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (currentStepIndex < steps.length - 1) {
+                    currentStepIndex++;
+                    showStep(currentStepIndex);
+                }
+            });
+        });
+        
+        // Event listener for finishing adventure
+        finishAdventureBtn.addEventListener('click', () => {
+            alert('恭喜你完成了小数乘法奇趣探险！你真棒！');
+            // Optionally, reset to the beginning
+            currentStepIndex = -1;
+            storyIntro.classList.remove('hidden');
+            steps.forEach(step => step.classList.add('hidden'));
+        });
+
+        // Animations for Step 1
+        function triggerStep1Animations() {
+            const coinsContainer = document.getElementById('coins-visualization');
+            coinsContainer.innerHTML = ''; // Clear previous coins
+            for (let i = 0; i < 3; i++) {
+                const coin = document.createElement('div');
+                coin.classList.add('coin');
+                coin.textContent = '1角';
+                coin.style.opacity = '0';
+                coin.style.transform = 'scale(0.5)';
+                coinsContainer.appendChild(coin);
+                setTimeout(() => {
+                    coin.style.opacity = '1';
+                    coin.style.transform = 'scale(1)';
+                }, (i + 1) * 300);
+            }
+        }
+
+        // Animations for Step 2
+        function triggerStep2Animations() {
+            // Jiao calculation
+            const jiaoCalcEl = document.getElementById('jiaoCalc');
+            const jiaoResultEl = document.getElementById('jiaoResult');
+            const jiaoMultiplyAnimationEl = document.getElementById('jiao-multiply-animation');
+            
+            jiaoResultEl.classList.add('hidden');
+            jiaoCalcEl.innerHTML = '3角 × 10 = <span class="text-gray-400">?</span>';
+            jiaoMultiplyAnimationEl.innerHTML = '<p>1颗蛋0.3元(3角), 10颗蛋就是10个"3角"...</p>';
+            
+            setTimeout(() => {
+                jiaoMultiplyAnimationEl.innerHTML = '<p class="pop-in">3角, 6角, 9角 ... 一共是 <span class="font-bold text-red-500">30角</span>!</p>';
+            }, 1000);
+            setTimeout(() => {
+                jiaoMultiplyAnimationEl.innerHTML += '<p class="pop-in mt-2">因为10角 = 1元, 所以30角就是 <span class="font-bold text-green-600">3元</span>!</p>';
+                jiaoCalcEl.innerHTML = '3角 × 10 = <span class="font-bold text-green-600">30角 (3元)</span>';
+                jiaoResultEl.classList.remove('hidden');
+                jiaoResultEl.classList.add('pop-in');
+            }, 2500);
+
+            // Decimal point magic
+            const animatedDecimalEl = document.getElementById('animatedDecimal');
+            const animatedDecimalResultEl = document.getElementById('animatedDecimalResult');
+            const spans = animatedDecimalEl.children; // 0, ., 3
+            const resultSpans = animatedDecimalResultEl.children; // _, ., _
+
+            // Reset
+            spans[0].textContent = '0'; spans[1].textContent = '.'; spans[2].textContent = '3';
+            resultSpans[0].textContent = '_'; resultSpans[1].textContent = '.'; resultSpans[2].textContent = '_';
+            spans[1].style.transform = 'translateX(0px)';
+            spans[1].style.color = 'red';
+            spans[2].style.transform = 'translateX(0px)';
+
+
+            setTimeout(() => {
+                // Animate decimal point moving
+                spans[1].style.transform = 'translateX(1.1em)'; // Move '.' past '3'
+                spans[1].style.color = '#fbbf24'; // Change color during move
+                spans[2].style.transform = 'translateX(-1.1em)'; // Move '3' to the left of '.'
+            }, 1000);
+            setTimeout(() => {
+                resultSpans[0].textContent = '3';
+                resultSpans[0].classList.add('pop-in');
+            }, 1800);
+            setTimeout(() => {
+                resultSpans[2].textContent = '0';
+                resultSpans[2].classList.add('pop-in');
+                 // Final state display
+                animatedDecimalEl.innerHTML = `<span>0</span><span style="color: transparent;">.</span><span>3</span>`; // Visually hide original dot
+                animatedDecimalResultEl.innerHTML = `<span>3</span><span class="text-red-500 font-bold">.</span><span>0</span>`;
+            }, 2200);
+        }
+        
+        // Animations for Step 3
+        function triggerStep3Animations() {
+            // Method 1: Step-by-step
+            const stepByStepCalcEl = document.getElementById('stepByStepCalc');
+            const boxesAnimationEl = document.getElementById('boxes-animation');
+            const stepByStepResultEl = document.getElementById('stepByStepResult');
+
+            stepByStepResultEl.classList.add('hidden');
+            stepByStepCalcEl.innerHTML = '3元/盒 × 5盒 = <span class="text-gray-400">?</span>';
+            boxesAnimationEl.innerHTML = '';
+            for(let i=0; i<5; i++) {
+                const boxDiv = document.createElement('div');
+                boxDiv.textContent = `第${i+1}盒: 3元`;
+                boxDiv.classList.add('p-2', 'm-1', 'bg-lime-200', 'rounded', 'inline-block', 'opacity-0');
+                boxesAnimationEl.appendChild(boxDiv);
+                setTimeout(() => {
+                    boxDiv.classList.add('pop-in');
+                    boxDiv.style.opacity = '1';
+                }, (i+1)*300);
+            }
+            setTimeout(() => {
+                boxesAnimationEl.innerHTML += '<p class="mt-2 text-xl pop-in">总共：3+3+3+3+3 = <span class="font-bold text-red-500">15元</span></p>';
+                stepByStepCalcEl.innerHTML = '3元/盒 × 5盒 = <span class="font-bold text-green-600">15元</span>';
+                stepByStepResultEl.classList.remove('hidden');
+                stepByStepResultEl.classList.add('pop-in');
+            }, 2000);
+
+            // Method 2: Integer Multiply
+            const integerMultiplyEl = document.getElementById('integerMultiply');
+            const integerProductEl = document.getElementById('integerProduct');
+            const animatedProductEl = document.getElementById('animatedProduct');
+            const finalProductWithDecimalEl = document.getElementById('finalProductWithDecimal');
+
+            integerMultiplyEl.innerHTML = '3 × 50 = <span class="text-gray-400">?</span>';
+            integerProductEl.textContent = '_';
+            animatedProductEl.textContent = '___';
+            finalProductWithDecimalEl.textContent = '__._';
+
+            setTimeout(() => {
+                integerMultiplyEl.innerHTML = '3 × 50 = <span class="font-bold text-green-600">150</span>';
+                integerProductEl.textContent = '150';
+                animatedProductEl.textContent = '150';
+                animatedProductEl.classList.add('pop-in');
+            }, 1000);
+            setTimeout(() => {
+                // Animate placing decimal
+                finalProductWithDecimalEl.innerHTML = '15<span class="text-red-500 font-bold text-4xl pop-in">.</span>0';
+            }, 2000);
+            
+            // Method 3: Decompose
+            const decomposeCalcEl = document.getElementById('decomposeCalc');
+            const decomposeResultEl = document.getElementById('decomposeResult');
+            decomposeResultEl.classList.add('hidden');
+            decomposeCalcEl.innerHTML = '3 × 5 = <span class="text-gray-400">?</span>';
+            setTimeout(() => {
+                decomposeCalcEl.innerHTML = '3 × 5 = <span class="font-bold text-green-600">15</span>';
+                decomposeResultEl.classList.remove('hidden');
+                decomposeResultEl.classList.add('pop-in');
+            }, 1500);
+        }
+
+        // Initial setup - hide all steps except intro
+        steps.forEach(step => step.classList.add('hidden'));
+
+    </script>
+</body>
+</html>

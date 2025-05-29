@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式篮球24秒规则讲解 - 深度思考版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Blue */
+            --secondary-color: #6366f1; /* Indigo */
+            --accent-color: #34d399; /* Emerald */
+            --text-dark: #1f2937;
+            --text-medium: #4b5563;
+            --text-light: #6b7280;
+            --bg-light: #f0f9ff;
+            --bg-white: white;
+            --border-light: #e5e7eb;
+            --border-medium: #cbd5e1;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-medium);
+        }
+        .content-card {
+            background-color: var(--bg-white);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInSlideUp 0.6s ease-out forwards;
+        }
+        .content-card:hover {
+            transform: translateY(-6px) scale(1.01); /* 轻微放大 */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes fadeInSlideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .question-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0c4a6e; /* 深蓝 */
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .question-title svg {
+            width: 28px;
+            height: 28px;
+            margin-right: 10px;
+            color: #38bdf8; /* 亮蓝 */
+        }
+        .explanation-text {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            line-height: 1.8;
+            margin-bottom: 18px;
+        }
+        /* 用于问题1-3的思考步骤 */
+        .thinking-process-item {
+            background-color: #e0f2fe; /* 更浅的蓝 */
+            border-left: 4px solid var(--primary-color);
+            padding: 14px 18px;
+            margin-bottom: 14px;
+            border-radius: 8px;
+            font-size: 1rem; /* 稍大 */
+            color: #1e3a8a;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .thinking-process-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* 用于转换器步骤的 <p> 标签 */
+        .converter-step {
+            margin: 12px 0;
+            padding: 10px 15px;
+            border-left: 4px solid var(--secondary-color); /* 紫色边框 */
+            background-color: #f5f3ff; /* 淡紫色背景 */
+            border-radius: 6px;
+            color: #4338ca; /* 深紫色文字 */
+            font-size: 1rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .converter-step.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .converter-step strong { /* 步骤标题加粗 */
+             font-weight: 600;
+             color: #5b21b6; /* 更深的紫色 */
+             display: block; /* 标题占一行 */
+             margin-bottom: 5px;
+        }
+         .converter-step .math-formula { 
+             font-weight: bold; 
+             color: var(--text-dark); 
+             margin: 8px 0; 
+             display: block; 
+             text-align: center; 
+             font-size: 1.1em;
+         }
+         .converter-step .result-value { 
+             color: var(--accent-color); 
+             font-weight: bold; 
+             font-size: 1.2em; 
+         }
+         /* 隐藏元素 */
+         .hidden {
+             display: none;
+         }
+
+        /* 最终答案样式 */
+        .answer-text { 
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #065f46; /* 深绿 */
+            padding: 14px;
+            background-color: #d1fae5; /* 浅绿 */
+            border-radius: 8px;
+            margin-top: 20px; 
+            display: inline-block;
+            border: 2px solid var(--accent-color);
+            opacity: 0; 
+            transform: translateY(10px); 
+            transition: opacity 0.6s ease-out 0.2s, transform 0.6s ease-out 0.2s; 
+        }
+        .answer-text.visible { 
+             opacity: 1;
+             transform: translateY(0);
+        }
+
+        .interactive-button {
+            background-image: linear-gradient(to right, var(--primary-color), #60a5fa);
+            color: white;
+            font-weight: 600;
+            padding: 14px 28px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .interactive-button:hover {
+            background-image: linear-gradient(to right, #2563eb, var(--primary-color));
+            transform: translateY(-3px) scale(1.03); 
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+        .answer-content { /* 用于问题1-3的答案容器 */
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transform: translateY(-10px);
+            transition: max-height 0.7s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.5s ease-out 0.1s, 
+                        transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                        margin-top 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 0 !important;
+        }
+        .answer-content.visible {
+            max-height: 1500px; 
+            opacity: 1;
+            transform: translateY(0);
+            margin-top: 1.2rem !important;
+        }
+        .fraction-bar-container {
+            width: 100%;
+            height: 35px; 
+            background-color: #e0e7ff;
+            border-radius: 8px;
+            margin: 15px 0; 
+            display: flex;
+            overflow: hidden;
+            border: 1px solid #c7d2fe;
+            opacity: 0; /* Start hidden for animation */
+            transition: opacity 0.5s ease-out; /* Animate opacity */
+        }
+        .fraction-bar-container.visible {
+             opacity: 1;
+        }
+        .fraction-bar-fill {
+            height: 100%;
+            background-color: var(--secondary-color);
+            width: 0%;
+            transition: width 1s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem; 
+        }
+        .simplification-step { margin: 10px 0; padding: 8px; background-color: #f3f4f6; border-radius: 6px; }
+        .unit-block-container { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; padding: 12px; background-color: #e0f2fe; border-radius: 10px; }
+        .unit-block { width: 38px; height: 38px; border: 2px solid #a5f3fc; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 0.75rem; font-weight: 600; color: #0e7490; background-color: #f0f9ff; opacity: 0; transform: scale(0.3) rotate(-20deg); transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.6s ease-in-out, border-color 0.6s ease-in-out, color 0.6s ease-in-out; }
+        .unit-block.visible { opacity: 1; transform: scale(1) rotate(0deg); }
+        .unit-block.filled { background-color: #22d3ee; border-color: #06b6d4; color: white; }
+        .unit-block.added { background-color: var(--accent-color); border-color: #10b981; color: white; }
+        .unit-block.target-empty { background-color: #e0e7ff; border-color: #a5b4fc; color: #4338ca; }
+        
+        /* 时间转换器样式 */
+        .converter-container { margin-top: 20px; }
+        .toggle-switch-container { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; background-color: #e5e7eb; border-radius: 30px; padding: 5px; width: fit-content; margin-left: auto; margin-right: auto;}
+        .switch-label { padding: 8px 16px; cursor: pointer; color: var(--text-medium); font-weight: 500; border-radius: 25px; transition: background-color 0.3s ease, color 0.3s ease; }
+        .switch-label.active { background-color: var(--primary-color); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+        .input-group input[type="number"] { flex-grow: 1; padding: 12px 16px; border: 2px solid var(--border-medium); border-radius: 8px; font-size: 1rem; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+        .input-group input[type="number"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); outline: none; }
+        .custom-converter-result { 
+            margin-top: 20px; 
+            padding: 16px; 
+            background-color: #eef2ff; /* 淡紫色背景，与步骤区分 */
+            border-radius: 8px; 
+            border-left: 5px solid var(--secondary-color); /* 紫色边框 */
+            opacity: 0; 
+            transform: translateY(10px); 
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out; 
+            min-height: 50px; 
+        }
+        .custom-converter-result.visible { opacity: 1; transform: translateY(0); }
+        .custom-converter-result > p:first-of-type { /* 起始说明文本 */
+             margin-bottom: 15px; 
+             font-size: 1.1rem; 
+             color: #4338ca; /* 深紫色 */
+             font-weight: 600;
+        }
+         /* 确保转换器步骤和最终答案在容器内显示 */
+        .custom-converter-result .converter-step,
+        .custom-converter-result .answer-text {
+             /* Styles defined above will apply */
+        }
+
+        .custom-converter-result .highlight { font-weight: 700; color: var(--accent-color); } /* 结果高亮 */
+
+        /* 消息框样式 */
+        .message-box-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.65); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .message-box-overlay.visible { opacity: 1; visibility: visible; }
+        .message-box { background-color: white; padding: 35px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center; max-width: 420px; width: 90%; }
+        .message-box h3 { font-size: 1.6rem; color: #1e40af; margin-bottom: 18px; }
+        .message-box p { font-size: 1.05rem; color: var(--text-medium); margin-bottom: 28px; }
+        .message-box button { background-color: #2563eb; color: white; padding: 14px 28px; border: none; border-radius: 30px; font-size: 1rem; cursor: pointer; transition: background-color 0.2s ease; }
+        .message-box button:hover { background-color: #1d4ed8; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto">
+        <header class="mb-10 text-center content-card" style="animation-delay: 0s;">
+             <h1 class="text-3xl md:text-4xl font-bold text-sky-700">🏀 篮球24秒规则与小数探秘 🤔</h1>
+             <p class="text-slate-600 mt-3 text-lg">一步一步，解开数学的奥秘！</p>
+         </header>
+
+         <div class="content-card" style="animation-delay: 0.1s;">
+              <h2 class="question-title">
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" /></svg>
+                 什么是篮球“24秒进攻”规则？
+             </h2>
+             <p class="explanation-text">
+                 在篮球比赛中，当一支队伍获得球权后（从接触球的那一刻开始算起），他们必须在<strong>24秒</strong>内尝试投篮进攻。如果超过24秒没有投篮，就会被判“24秒进攻违例”，球权就要交给对方了。这个规则是为了让比赛节奏更快、更精彩！
+             </p>
+             <p class="explanation-text">
+                 这个规则是丹尼 (Danny Biasone) 在1954年提出的，他希望通过限制每次进攻的时间来增加比赛的投篮次数和观赏性。
+             </p>
+         </div>
+
+         <div class="content-card" style="animation-delay: 0.2s;">
+             <h2 class="question-title">
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
+                 问题一：24秒是多少分钟呢？ (思考过程全解析)
+             </h2>
+             <p class="explanation-text">
+                 我们需要把24秒转换成以“分”为单位的小数。
+                 <br>关键信息：<strong>1 分钟 = 60 秒</strong>。
+             </p>
+             <button id="q1Button" class="interactive-button">开始逐步思考与计算</button>
+             <div id="q1Answer" class="answer-content">
+                 <div class="thinking-process-item" id="q1_step1">
+                     <strong>思考步骤1：理解问题</strong>
+                     <p>我们要把“秒”变成“分钟”。因为1分钟有60秒，所以24秒肯定是不到1分钟的，它只是1分钟的“一部分”。</p>
+                 </div>
+                 <div class="thinking-process-item" id="q1_step2">
+                     <strong>思考步骤2：建立分数关系</strong>
+                     <p>24秒是60秒中的一部分，我们可以用分数来表示这个关系： $\frac{24}{60}$ 分钟。
+                     <br>想象一个长条代表1分钟 (60秒)，我们取了其中的24秒：</p>
+                     <div class="fraction-bar-container">
+                         <div id="q1_fraction_bar" class="fraction-bar-fill"></div>
+                     </div>
+                     <p id="q1_fraction_text" class="text-sm text-center text-indigo-700 font-semibold"></p>
+                 </div>
+                 <div class="thinking-process-item" id="q1_step3">
+                     <strong>思考步骤3：化简分数（让数字更简单）</strong>
+                     <p>分数 $\frac{24}{60}$ 可以化简。我们可以用以下思路：</p>
+                     <div id="q1_simplification_steps">
+                         </div>
+                 </div>
+                 <div class="thinking-process-item" id="q1_step4">
+                     <strong>思考步骤4：分数转小数（题目要求）</strong>
+                     <p>根据上面的化简结果，$\frac{24}{60}$ 等于 $\frac{2}{5}$ 或 $\frac{4}{10}$。要把分数转换成小数，我们用分子除以分母：</p>
+                     <p id="q1_division_result" class="mt-2 text-lg font-bold text-emerald-700"></p>
+                 </div>
+                 <p class="answer-text" id="q1_final_answer">所以，24秒是 0.4 分。</p>
+             </div>
+         </div>
+
+         <div class="content-card" style="animation-delay: 0.3s;">
+             <h2 class="question-title">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                 问题二：0.4 这个小数的计数单位是什么？
+             </h2>
+             <p class="explanation-text">
+                 小数的“计数单位”指的是这个小数最右边一位代表的是什么。
+             </p>
+             <button id="q2Button" class="interactive-button">探索计数单位</button>
+             <div id="q2Answer" class="answer-content">
+                 <div class="thinking-process-item" id="q2_step1">
+                     <strong>思考步骤1：观察小数的位数</strong>
+                     <p>我们的小数是 <strong>0.4</strong>。小数点后面有几位数字呢？只有一位，就是数字“4”。</p>
+                 </div>
+                 <div class="thinking-process-item" id="q2_step2">
+                     <strong>思考步骤2：理解小数位代表的意义</strong>
+                     <p> - 小数点后第一位，我们称之为“十分位”，它的计数单位是“十分之一”（也就是0.1）。
+                     <br> - 如果是小数点后第二位，比如0.05，那叫“百分位”，计数单位是“百分之一”（0.01）。</p>
+                 </div>
+                 <div class="thinking-process-item" id="q2_step3">
+                     <strong>思考步骤3：确定0.4的计数单位</strong>
+                     <p>因为0.4的小数点后只有一位，在十分位上，所以它的计数单位就是“十分之一”。</p>
+                     <p class="mt-2">我们可以把0.4想象成把“1”分成了10小份，我们取了其中的4份。每一小份就是0.1。</p>
+                     <div class="text-2xl font-bold text-center my-4">
+                         0 . <span id="q2_highlight_digit" class="text-blue-600 p-1 rounded bg-blue-100 transition-all duration-500">4</span>
+                         <p id="q2_unit_explanation" class="text-sm font-normal text-gray-600 mt-1 opacity-0 transition-opacity duration-500"> (这里的 "4" 在十分位上)</p>
+                     </div>
+                 </div>
+                 <p class="answer-text" id="q2_final_answer">所以，0.4 的计数单位是 <strong>十分之一</strong> (或写作 <strong>0.1</strong>)。</p>
+             </div>
+         </div>
+
+         <div class="content-card" style="animation-delay: 0.4s;">
+             <h2 class="question-title">
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                 问题三：再添上多少个这样的计数单位 (0.1) 就等于1？
+             </h2>
+             <p class="explanation-text">
+                 我们现在有0.4，它表示有4个0.1。我们的目标是凑成1。
+                 <br>关键信息： <strong>1 等于 10 个 0.1</strong> (因为 $1 = \frac{10}{10}$)。
+             </p>
+             <p class="explanation-text"><strong>可视化思考：</strong> 想象我们有一个可以放10个小方块的盒子 (代表整数“1”)，每个小方块代表0.1。</p>
+             <div class="unit-block-container" id="unitBlocks">
+                 </div>
+             <button id="q3Button" class="interactive-button">开始添加方块看看</button>
+             <div id="q3Answer" class="answer-content">
+                 <div class="thinking-process-item" id="q3_step1">
+                     <strong>思考步骤1：我们现在有多少？</strong>
+                     <p>我们有0.4，这相当于已经有 <strong>4个</strong> 0.1的小方块被填满了。</p>
+                 </div>
+                 <div class="thinking-process-item" id="q3_step2">
+                     <strong>思考步骤2：我们的目标是多少？</strong>
+                     <p>我们的目标是凑成“1”。因为1等于10个0.1，所以我们的目标是填满全部 <strong>10个</strong> 小方块。</p>
+                 </div>
+                 <div class="thinking-process-item" id="q3_step3">
+                     <strong>思考步骤3：还差多少？</strong>
+                     <p>要从4个方块变成10个方块，我们还需要： $10 - 4 = 6$ 个方块。</p>
+                     <p>或者用小数计算：目标是1，我们有0.4，还差 $1 - 0.4 = 0.6$。
+                     <br>因为每个方块是0.1，所以0.6里面有 $0.6 \div 0.1 = 6$ 个方块。</p>
+                 </div>
+                 <p class="answer-text" id="q3_final_answer">所以，再添上 <strong>6</strong> 个这样的计数单位 (0.1) 就等于1。</p>
+             </div>
+         </div>
+
+        <div class="content-card" style="animation-delay: 0.5s;">
+            <h2 class="question-title">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l-2.25-4.5m-2.25 4.5V18c0 .966.784 1.75 1.75 1.75h.5A1.75 1.75 0 0 0 18 18v-2.25m-7.5 0V18c0 .966.784 1.75 1.75 1.75h.5A1.75 1.75 0 0 0 13.5 18v-2.25m-7.5 0V18c0 .966.784 1.75 1.75 1.75h.5A1.75 1.75 0 0 0 7.5 18v-2.25M3 12h18M3 12l-2.25-4.5M21 12l-2.25-4.5" />
+                </svg>
+                自由探索：时间单位转换器
+            </h2>
+            <p class="explanation-text">
+                选择转换方向，输入时间，看看结果和计算过程吧！
+            </p>
+
+            <div class="converter-container">
+                <div class="toggle-switch-container">
+                    <span id="switchSecToMin" class="switch-label active" data-direction="secToMin">秒 → 分钟</span>
+                    <span id="switchMinToSec" class="switch-label" data-direction="minToSec">分钟 → 秒</span>
+                </div>
+
+                <div class="input-group">
+                    <input type="number" id="customTimeInput" placeholder="输入秒数 (例如: 75)" class="text-slate-700" step="any">
+                    <button id="customConvertButton" class="interactive-button">转换</button>
+                </div>
+
+                <div id="customConverterResult" class="custom-converter-result" style="display: none;">
+                    <p id="converterStartText"></p> 
+                    
+                    <div id="secToMinSteps" class="hidden">
+                        <p class="converter-step" id="secToMin_step1_p"></p>
+                        <p class="converter-step" id="secToMin_step2_p"></p>
+                        <p class="converter-step" id="secToMin_step3_p"></p>
+                        <p class="converter-step" id="secToMin_step4_p">
+                            <span id="secToMin_step4_content"></span> 
+                        </p>
+                        <p class="converter-step" id="secToMin_step5_p">
+                            <span id="secToMin_step5_content"></span>
+                            <div class="fraction-bar-container hidden" id="customFractionBarContainer_sec">
+                                <div id="custom_fraction_bar_sec" class="fraction-bar-fill"></div>
+                            </div>
+                            <span id="customFractionExplanation_sec" class="text-sm text-center text-indigo-700 font-semibold block mt-2"></span>
+                        </p>
+                        <p class="answer-text" id="secToMin_final_answer_p"></p>
+                    </div>
+
+                    <div id="minToSecSteps" class="hidden">
+                        <p class="converter-step" id="minToSec_step1_p"></p>
+                        <p class="converter-step" id="minToSec_step2_p"></p>
+                        <p class="converter-step" id="minToSec_step3_p"></p> 
+                        <p class="converter-step" id="minToSec_step4_p"></p>
+                        <p class="answer-text" id="minToSec_final_answer_p"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center mt-12 mb-8">
+            <p class="text-slate-500 text-sm">希望这个交互式讲解能帮助你更好地理解数学的思考过程！</p>
+        </footer>
+    </div>
+
+    <div id="messageBoxOverlay" class="message-box-overlay">
+        <div class="message-box">
+            <h3 id="messageBoxTitle">提示</h3>
+            <p id="messageBoxText">这里是消息内容。</p>
+            <button id="messageBoxButton">好的</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 辅助函数 ---
+        function showMessage(title, text) {
+            document.getElementById('messageBoxTitle').textContent = title;
+            document.getElementById('messageBoxText').textContent = text;
+            document.getElementById('messageBoxOverlay').classList.add('visible');
+        }
+        document.getElementById('messageBoxButton').addEventListener('click', () => {
+            document.getElementById('messageBoxOverlay').classList.remove('visible');
+        });
+
+        window.MathJax = {
+            tex: { 
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                processEscapes: true 
+            },
+            svg: { fontCache: 'global' },
+            startup: { 
+                ready: () => { 
+                    MathJax.startup.defaultReady(); 
+                } 
+            }
+        };
+
+        // 改进的 typesetMath 函数
+        function typesetMath(element) {
+            if (typeof MathJax !== 'undefined' && MathJax.typesetPromise && element && document.body.contains(element)) {
+                requestAnimationFrame(() => {
+                    MathJax.typesetPromise([element]).catch((err) => console.error('MathJax typesetting error:', err));
+                });
+            } else if (typeof MathJax !== 'undefined' && MathJax.typesetPromise && element) {
+                 setTimeout(() => typesetMath(element), 50); 
+            }
+        }
+
+
+        // 动画函数
+        function animateElement(element, delay = 0) {
+             if(!element) return; 
+            // 确保元素先是隐藏的，移除 visible 类
+            element.classList.remove('visible');
+            // 强制浏览器重绘，确保移除生效
+             void element.offsetWidth; 
+            // 延迟后添加 visible 类以触发动画
+            setTimeout(() => {
+                element.classList.add('visible');
+            }, delay);
+        }
+        
+        // --- 问题1-3的逻辑 (保持不变, 但确保调用 animateElement 和 typesetMath) ---
+        // 问题一逻辑
+        const q1Button = document.getElementById('q1Button');
+        const q1Answer = document.getElementById('q1Answer');
+        q1Button.dataset.defaultText = '开始逐步思考与计算';
+        q1Button.addEventListener('click', () => {
+            const isNowVisible = !q1Answer.classList.contains('visible');
+            q1Answer.classList.toggle('visible');
+            q1Button.textContent = isNowVisible ? '隐藏思考过程' : q1Button.dataset.defaultText;
+
+            if (isNowVisible) {
+                let delay = 0;
+                const step1 = document.getElementById('q1_step1');
+                const step2 = document.getElementById('q1_step2');
+                const step3 = document.getElementById('q1_step3');
+                const step4 = document.getElementById('q1_step4');
+                const finalAnswerEl = document.getElementById('q1_final_answer');
+                
+                // 隐藏所有步骤和答案，准备动画
+                [step1, step2, step3, step4, finalAnswerEl].forEach(el => el?.classList.remove('visible'));
+
+                if(step1) animateElement(step1, delay); delay += 700;
+                if(step2) animateElement(step2, delay); 
+                setTimeout(() => {
+                    const bar = document.getElementById('q1_fraction_bar');
+                    const barText = document.getElementById('q1_fraction_text');
+                    if(bar && barText){ 
+                        bar.style.width = (24/60)*100 + '%';
+                        bar.textContent = '24/60';
+                        barText.textContent = '进度条显示了60份中的24份';
+                    }
+                    typesetMath(step2); 
+                }, delay + 200);
+                delay += 1500; 
+
+                if(step3) animateElement(step3, delay);
+                const simplificationDiv = document.getElementById('q1_simplification_steps');
+                if(simplificationDiv){ 
+                    simplificationDiv.innerHTML = ''; // 清空旧内容
+                    const steps = [
+                        {text: "<strong>思路1 (直接约分):</strong> 找到24和60的最大公因数12。", result: "$\\frac{24 \\div 12}{60 \\div 12} = \\frac{2}{5}$"},
+                        {text: "<strong>思路2 (先约成小数友好的分母):</strong> 先同时除以6。", result: "$\\frac{24 \\div 6}{60 \\div 6} = \\frac{4}{10}$"},
+                        {text: "<strong>思路3 (分解因数):</strong> $\\frac{24}{60} = \\frac{2 \\times 2 \\times 2 \\times 3}{2 \\times 2 \\times 3 \\times 5} = \\require{cancel}\\frac{\\cancel{2} \\times \\cancel{2} \\times 2 \\times \\cancel{3}}{\\cancel{2} \\times \\cancel{2} \\times \\cancel{3} \\times 5} = \\frac{2}{5}$", result: ""}
+                    ];
+                     let simplificationDelay = delay;
+                    steps.forEach((step, index) => {
+                        setTimeout(() => {
+                            const p = document.createElement('p');
+                            p.className = 'simplification-step';
+                            p.innerHTML = step.text + (step.result ? ` <span class="font-bold">${step.result}</span>` : '');
+                            simplificationDiv.appendChild(p);
+                            typesetMath(p); // 渲染每个步骤
+                        }, simplificationDelay + index * 1200);
+                    });
+                    delay += steps.length * 1200;
+                    typesetMath(step3); // 确保步骤3容器也被渲染
+                }
+
+
+                if(step4) animateElement(step4, delay);
+                setTimeout(() => {
+                    const divisionResultEl = document.getElementById('q1_division_result');
+                     if(divisionResultEl){ 
+                        divisionResultEl.innerHTML = "$\\frac{2}{5} = 2 \\div 5 = 0.4$ 或 $\\frac{4}{10} = 0.4$";
+                        typesetMath(divisionResultEl);
+                     }
+                     typesetMath(step4); // 渲染步骤4容器
+                }, delay + 500);
+                delay += 1000;
+                
+                if(finalAnswerEl) {
+                     animateElement(finalAnswerEl, delay);
+                 }
+
+            } else { 
+                q1Answer.querySelectorAll('.thinking-process-item, .answer-text').forEach(el => el.classList.remove('visible'));
+                const bar = document.getElementById('q1_fraction_bar');
+                const barText = document.getElementById('q1_fraction_text');
+                const simplificationDiv = document.getElementById('q1_simplification_steps');
+                const divisionResultEl = document.getElementById('q1_division_result');
+                
+                if(bar) bar.style.width = '0%';
+                if(bar) bar.textContent = '';
+                if(barText) barText.textContent = '';
+                if(simplificationDiv) simplificationDiv.innerHTML = '';
+                if(divisionResultEl) divisionResultEl.innerHTML = '';
+            }
+        });
+
+        // 问题二逻辑
+        const q2Button = document.getElementById('q2Button');
+        const q2Answer = document.getElementById('q2Answer');
+        q2Button.dataset.defaultText = '探索计数单位';
+        q2Button.addEventListener('click', () => {
+            const isNowVisible = !q2Answer.classList.contains('visible');
+            q2Answer.classList.toggle('visible');
+            q2Button.textContent = isNowVisible ? '隐藏探索过程' : q2Button.dataset.defaultText;
+            if (isNowVisible) {
+                let delay = 0;
+                const step1 = document.getElementById('q2_step1');
+                const step2 = document.getElementById('q2_step2');
+                const step3 = document.getElementById('q2_step3');
+                const finalAnswerEl = document.getElementById('q2_final_answer');
+
+                // 隐藏所有步骤和答案，准备动画
+                [step1, step2, step3, finalAnswerEl].forEach(el => el?.classList.remove('visible'));
+
+                if(step1) animateElement(step1, delay); delay += 700;
+                if(step2) animateElement(step2, delay); delay += 700;
+                if(step3) animateElement(step3, delay); 
+                setTimeout(() => {
+                     const highlightDigit = document.getElementById('q2_highlight_digit');
+                     const unitExplanation = document.getElementById('q2_unit_explanation');
+                     if(highlightDigit) {
+                         highlightDigit.style.transform = 'scale(1.5)';
+                         highlightDigit.style.fontWeight = 'bold';
+                     }
+                     if(unitExplanation) unitExplanation.style.opacity = '1';
+                }, delay + 300);
+                delay += 1000;
+                 if(finalAnswerEl) {
+                     animateElement(finalAnswerEl, delay);
+                 }
+                 typesetMath(q2Answer); // 统一渲染
+            } else {
+                 q2Answer.querySelectorAll('.thinking-process-item, .answer-text').forEach(el => el.classList.remove('visible'));
+                 const highlightDigit = document.getElementById('q2_highlight_digit');
+                 const unitExplanation = document.getElementById('q2_unit_explanation');
+                 if(highlightDigit) {
+                     highlightDigit.style.transform = 'scale(1)';
+                     highlightDigit.style.fontWeight = 'normal';
+                 }
+                 if(unitExplanation) unitExplanation.style.opacity = '0';
+            }
+        });
+
+        // 问题三逻辑
+        const q3Button = document.getElementById('q3Button');
+        const q3Answer = document.getElementById('q3Answer');
+        const unitBlocksContainer = document.getElementById('unitBlocks');
+        const totalUnits = 10;
+        const initialFilledUnits = 4;
+        q3Button.dataset.defaultText = '开始添加方块看看';
+
+        function renderUnitBlocks(isAnswerRevealed = false, animateTransition = false) {
+            if(!unitBlocksContainer) return; 
+            unitBlocksContainer.innerHTML = ''; 
+            for (let i = 0; i < totalUnits; i++) {
+                const block = document.createElement('div');
+                block.classList.add('unit-block');
+                block.textContent = '0.1';
+
+                if (i < initialFilledUnits) {
+                    block.classList.add('filled');
+                } else if (isAnswerRevealed && i >= initialFilledUnits) {
+                    if (animateTransition) { 
+                         block.classList.add('target-empty');
+                    } else { 
+                         block.classList.add('target-empty');
+                    }
+                } else { 
+                     block.classList.add('target-empty');
+                }
+                unitBlocksContainer.appendChild(block);
+                void block.offsetWidth; 
+                setTimeout(() => { 
+                    block.classList.add('visible');
+                    if (isAnswerRevealed && animateTransition && i >= initialFilledUnits) {
+                        setTimeout(() => {
+                            block.classList.remove('target-empty'); 
+                            block.classList.add('added'); 
+                        }, 500 + i * 50); 
+                    }
+                }, i * 70 + 50); 
+            }
+        }
+        
+        renderUnitBlocks(false); 
+
+        q3Button.addEventListener('click', () => {
+            const isNowVisible = !q3Answer.classList.contains('visible');
+            q3Answer.classList.toggle('visible');
+            q3Button.textContent = isNowVisible ? '隐藏思考过程' : q3Button.dataset.defaultText;
+
+            if (isNowVisible) {
+                renderUnitBlocks(true, true); 
+                typesetMath(q3Answer); 
+                let delay = 0;
+                const step1 = document.getElementById('q3_step1');
+                const step2 = document.getElementById('q3_step2');
+                const step3 = document.getElementById('q3_step3');
+                const finalAnswerEl = document.getElementById('q3_final_answer');
+
+                 // 隐藏所有步骤和答案，准备动画
+                [step1, step2, step3, finalAnswerEl].forEach(el => el?.classList.remove('visible'));
+
+                if(step1) animateElement(step1, delay); delay += 700;
+                if(step2) animateElement(step2, delay); delay += 700;
+                if(step3) animateElement(step3, delay); delay += 700; 
+                 if(finalAnswerEl) {
+                     animateElement(finalAnswerEl, delay);
+                 }
+            } else {
+                renderUnitBlocks(false); 
+                q3Answer.querySelectorAll('.thinking-process-item, .answer-text').forEach(el => el.classList.remove('visible'));
+            }
+        });
+
+        // --- 时间转换器逻辑 ---
+        const customTimeInput = document.getElementById('customTimeInput');
+        const customConvertButton = document.getElementById('customConvertButton');
+        const customConverterResultDiv = document.getElementById('customConverterResult');
+        const switchSecToMin = document.getElementById('switchSecToMin');
+        const switchMinToSec = document.getElementById('switchMinToSec');
+        const secToMinStepsContainer = document.getElementById('secToMinSteps');
+        const minToSecStepsContainer = document.getElementById('minToSecSteps');
+        const converterStartText = document.getElementById('converterStartText');
+
+        let currentConversionDirection = 'secToMin'; // 默认方向
+
+        // 切换转换方向
+        function setConversionDirection(direction) {
+            currentConversionDirection = direction;
+            customConverterResultDiv.style.display = 'none'; // 切换时隐藏旧结果
+            customConverterResultDiv.classList.remove('visible');
+            converterStartText.innerHTML = ''; // 清空起始文本
+            secToMinStepsContainer.classList.add('hidden'); // 隐藏所有步骤容器
+            minToSecStepsContainer.classList.add('hidden'); 
+            // 隐藏所有步骤内容
+            customConverterResultDiv.querySelectorAll('.converter-step, .answer-text').forEach(el => el.classList.add('hidden'));
+
+
+            if (direction === 'secToMin') {
+                switchSecToMin.classList.add('active');
+                switchMinToSec.classList.remove('active');
+                customTimeInput.placeholder = '输入秒数 (例如: 75)';
+                customTimeInput.step = "1"; 
+            } else {
+                switchSecToMin.classList.remove('active');
+                switchMinToSec.classList.add('active');
+                customTimeInput.placeholder = '输入分钟数 (例如: 1.75)';
+                 customTimeInput.step = "any"; 
+            }
+             customTimeInput.value = ''; // 清空输入框
+        }
+
+        switchSecToMin.addEventListener('click', () => setConversionDirection('secToMin'));
+        switchMinToSec.addEventListener('click', () => setConversionDirection('minToSec'));
+
+        // 转换按钮点击事件
+        customConvertButton.addEventListener('click', () => {
+            const inputValue = customTimeInput.value;
+            if (inputValue === '' || isNaN(inputValue)) {
+                showMessage('输入错误', '请输入有效的时间数值！');
+                customConverterResultDiv.style.display = 'none';
+                customConverterResultDiv.classList.remove('visible');
+                return;
+            }
+
+            const timeValue = parseFloat(inputValue);
+            if (timeValue < 0) {
+                showMessage('输入错误', '时间不能为负数！');
+                customConverterResultDiv.style.display = 'none';
+                customConverterResultDiv.classList.remove('visible');
+                return;
+            }
+
+            // 清空并准备结果区域
+            converterStartText.innerHTML = ''; // 清空起始文本
+            secToMinStepsContainer.classList.add('hidden'); // 隐藏所有步骤容器
+            minToSecStepsContainer.classList.add('hidden'); 
+             // 隐藏所有步骤内容，并移除 visible 类以重置动画
+            customConverterResultDiv.querySelectorAll('.converter-step, .answer-text').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('visible');
+            });
+            customConverterResultDiv.style.display = 'block'; // 显示结果容器
+
+            if (currentConversionDirection === 'secToMin') {
+                secToMinStepsContainer.classList.remove('hidden'); // 显示秒->分步骤容器
+                convertSecondsToMinutesAnimated(timeValue);
+            } else {
+                minToSecStepsContainer.classList.remove('hidden'); // 显示分->秒步骤容器
+                convertMinutesToSecondsAnimated(timeValue);
+            }
+            
+            // 触发结果区域容器动画
+            customConverterResultDiv.classList.remove('visible'); 
+            void customConverterResultDiv.offsetWidth; 
+            customConverterResultDiv.classList.add('visible');
+            
+            // 全局渲染一次结果区域，确保所有动态添加的 MathJax 内容都被处理
+            setTimeout(() => {
+                 typesetMath(customConverterResultDiv);
+            }, 50); // 略微延迟以确保DOM更新
+
+        });
+
+        // 秒 -> 分钟 的转换和显示逻辑 (使用 HTML 结构和动画)
+        function convertSecondsToMinutesAnimated(seconds) {
+            const minutes = seconds / 60;
+            const fullMinutes = Math.floor(minutes);
+            const fractionalMinute = minutes - fullMinutes;
+            const minutesString = parseFloat(minutes.toFixed(5)).toString(); 
+
+            let delay = 0;
+            
+             // 起始说明
+            converterStartText.innerHTML = `开始计算 <span class="highlight">${seconds}</span> 秒等于多少分钟...`;
+            delay += 500;
+
+            // 获取步骤元素
+            const step1P = document.getElementById('secToMin_step1_p');
+            const step2P = document.getElementById('secToMin_step2_p');
+            const step3P = document.getElementById('secToMin_step3_p');
+            const step4P = document.getElementById('secToMin_step4_p');
+            const step4Content = document.getElementById('secToMin_step4_content');
+            const step5P = document.getElementById('secToMin_step5_p');
+            const step5Content = document.getElementById('secToMin_step5_content');
+            const barContainer = document.getElementById('customFractionBarContainer_sec');
+            const bar = document.getElementById('custom_fraction_bar_sec');
+            const explanation = document.getElementById('customFractionExplanation_sec');
+            const finalAnswerP = document.getElementById('secToMin_final_answer_p');
+
+            // 填充并动画步骤1
+            if(step1P) {
+                step1P.innerHTML = `<strong>第1步：理解目标</strong>我们要把 ${seconds} 秒换算成分钟。关键在于知道 <strong>1 分钟 = 60 秒</strong>，所以我们需要用秒数除以 60。`;
+                step1P.classList.remove('hidden');
+                animateElement(step1P, delay);
+                delay += 1200;
+            }
+
+            // 填充并动画步骤2
+            if(step2P) {
+                step2P.innerHTML = `<strong>第2步：列出算式</strong>计算方法是：<span class="math-formula">$${seconds} \\text{ 秒} \\div 60 \\frac{\\text{秒}}{\\text{分钟}} = ?$</span>`;
+                step2P.classList.remove('hidden');
+                // typesetMath(step2P); // MathJax will be called on the parent later
+                animateElement(step2P, delay);
+                delay += 1500;
+            }
+
+            // 填充并动画步骤3
+            if(step3P) {
+                step3P.innerHTML = `<strong>第3步：计算结果</strong>执行除法运算：<span class="math-formula">${seconds} ÷ 60 = <span class="result-value">${minutesString}</span></span>`;
+                step3P.classList.remove('hidden');
+                // typesetMath(step3P); 
+                animateElement(step3P, delay);
+                delay += 1500;
+            }
+
+            // 填充并动画步骤4 (分数化简)
+            // if(step4P && step4Content) {
+            //      step4Content.innerHTML = `刚才的除法 $${seconds} \\div 60$ 其实就是分数 $\\frac{${seconds}}{60}$。我们可以化简这个分数：<br>
+            //      <strong>思路1:</strong> 直接找最大公因数 (如果容易找)。例如 $\\frac{24}{60} = \\frac{24 \\div 12}{60 \\div 12} = \\frac{2}{5}$。<br>
+            //      <strong>思路2:</strong> 先约分成小数友好的分母 (如10, 100)。例如 $\\frac{24}{60} = \\frac{24 \\div 6}{60 \\div 6} = \\frac{4}{10}$。<br>
+            //      <strong>思路3:</strong> 分解因数 $\\frac{24}{60} = \\frac{\\cancel{6} \\times 4}{\\cancel{6} \\times 10} = \\frac{4}{10}$。<br>
+            //      化简后的分数 $\\frac{2}{5}$ 或 $\\frac{4}{10}$ 都等于小数 <span class="result-value">${(seconds/60).toFixed(3)}</span>。`;
+            //     step4P.innerHTML = `<strong>第4步：(思考) 分数形式与化简</strong>` + step4Content.innerHTML; // Combine title and content
+            //     step4P.classList.remove('hidden');
+            //     // typesetMath(step4P); 
+            //     animateElement(step4P, delay);
+            //     delay += 2500; 
+            // }
+
+            // 填充并动画步骤5 (结果解释和可视化)
+            //  if(step5P && step5Content && barContainer && bar && explanation) {
+            //      step5Content.innerHTML = `计算结果是 ${minutesString} 分钟。
+            //      ${fullMinutes > 0 ? `这表示有 <span class="text-blue-600 font-bold">${fullMinutes}</span> 个完整的分钟。` : ''}
+            //      ${fractionalMinute > 0.00001 ? `小数点后面的 <span class="text-purple-600 font-bold">${(fractionalMinute).toFixed(3)}</span> 代表不足一个完整分钟的部分。` : (seconds > 0 ? '这正好是整数分钟。' : '也就是0分钟。')}
+            //     `;
+            //     step5P.innerHTML = `<strong>第4步：理解结果</strong>` + step5Content.innerHTML;
+            //     step5P.classList.remove('hidden');
+            //     animateElement(step5P, delay);
+            //     delay += 1000; 
+
+            //      // 处理进度条
+            //      if (fractionalMinute > 0.00001) {
+            //          barContainer.classList.remove('hidden'); 
+            //          bar.style.width = '0%'; 
+            //          explanation.textContent = ''; 
+
+            //          setTimeout(() => { 
+            //              animateElement(barContainer, 0); 
+            //              setTimeout(() => { 
+            //                  bar.style.width = (fractionalMinute * 100) + '%';
+            //                  let percentageString = (fractionalMinute * 100).toFixed(1);
+            //                  if (parseFloat(percentageString) === Math.floor(parseFloat(percentageString))) {
+            //                       percentageString = Math.floor(parseFloat(percentageString)).toString();
+            //                  }
+            //                  bar.textContent = `${percentageString}%`;
+
+            //                  if (fullMinutes > 0) {
+            //                      explanation.textContent = `(可视化：相当于 ${fullMinutes} 个完整分钟 + 下一分钟的 ${percentageString}%)`;
+            //                  } else {
+            //                      explanation.textContent = `(可视化：相当于下一分钟的 ${percentageString}%)`;
+            //                  }
+            //              }, 500); 
+            //          }, delay); 
+            //          delay += 1200; 
+            //      } else {
+            //          barContainer.classList.add('hidden'); 
+            //          explanation.textContent = ''; 
+            //          delay += 500; 
+            //      }
+            //  }
+
+
+            // 填充并动画最终答案
+            if(finalAnswerP) {
+                finalAnswerP.innerHTML = `最终答案：${seconds} 秒等于 <span class="highlight">${minutesString}</span> 分钟。`;
+                finalAnswerP.classList.remove('hidden');
+                animateElement(finalAnswerP, delay);
+            }
+        }
+
+
+        // 分钟 -> 秒 的转换和显示逻辑 (使用 HTML 结构和动画)
+        function convertMinutesToSecondsAnimated(minutes) {
+            const totalSeconds = minutes * 60;
+            const fullMinutes = Math.floor(minutes);
+            const fractionalMinute = minutes - fullMinutes;
+            const secondsFromFull = fullMinutes * 60;
+            const secondsFromFraction = parseFloat((fractionalMinute * 60).toFixed(5)); 
+
+            let delay = 0;
+
+            // 起始说明
+            converterStartText.innerHTML = `开始计算 <span class="highlight">${minutes}</span> 分钟等于多少秒...`;
+            delay += 500;
+
+            // 获取步骤元素
+            const step1P = document.getElementById('minToSec_step1_p');
+            const step2P = document.getElementById('minToSec_step2_p');
+            const step3P = document.getElementById('minToSec_step3_p');
+            const step4P = document.getElementById('minToSec_step4_p');
+            const finalAnswerP = document.getElementById('minToSec_final_answer_p');
+
+            // 填充并动画步骤1
+            if(step1P) {
+                let step1Content = '';
+                if (fractionalMinute > 0.00001) { 
+                     step1Content = `我们将 ${minutes} 分钟拆成两部分：<br><span class='text-center block text-lg'><span class='text-blue-600 font-bold'>${fullMinutes}</span> 个完整分钟 + <span class='text-purple-600 font-bold'>${fractionalMinute.toFixed(3)}</span> 分钟 (小数部分)</span>`;
+                } else {
+                     step1Content = `我们有 ${fullMinutes} 个完整分钟。`;
+                }
+                step1P.innerHTML = `<strong>${fractionalMinute > 0.00001 ? '第1步：分解时间' : '第1步：整数分钟'}</strong>${step1Content}`;
+                step1P.classList.remove('hidden');
+                animateElement(step1P, delay);
+                delay += 1200; 
+            }
+
+            // 填充并动画步骤2 (转换整数分钟)
+            if(step2P) {
+                 step2P.classList.add('hidden'); 
+                 if (fullMinutes > 0) {
+                     step2P.innerHTML = `<strong>第2步：转换完整分钟</strong>每个完整分钟有60秒，所以：<span class="math-formula">$${fullMinutes} \\text{ 分钟} \\times 60 \\frac{\\text{秒}}{\\text{分钟}} = ${secondsFromFull} \\text{ 秒}$</span>`;
+                     step2P.classList.remove('hidden');
+                     // typesetMath(step2P); 
+                     animateElement(step2P, delay);
+                     delay += 1500;
+                 } else if (fractionalMinute <= 0.00001) { 
+                      step2P.innerHTML = `<strong>第2步：转换分钟</strong>0分钟自然就是...<span class="math-formula">$0 \\text{ 分钟} \\times 60 \\frac{\\text{秒}}{\\text{分钟}} = 0 \\text{ 秒}$</span>`;
+                      step2P.classList.remove('hidden');
+                      // typesetMath(step2P);
+                      animateElement(step2P, delay);
+                      delay += 1500;
+                 }
+            }
+            
+
+            // 填充并动画步骤3 (转换小数分钟)
+            if(step3P) {
+                 step3P.classList.add('hidden'); 
+                 if (fractionalMinute > 0.00001) {
+                     let fractionString = '';
+                     if (Math.abs(fractionalMinute - 0.5) < 0.001) fractionString = "\\frac{1}{2}";
+                     else if (Math.abs(fractionalMinute - 0.25) < 0.001) fractionString = "\\frac{1}{4}";
+                     else if (Math.abs(fractionalMinute - 0.75) < 0.001) fractionString = "\\frac{3}{4}";
+                     else if (Math.abs(fractionalMinute - 1/3) < 0.001) fractionString = "\\frac{1}{3}";
+                     else if (Math.abs(fractionalMinute - 2/3) < 0.001) fractionString = "\\frac{2}{3}";
+                     else if (Math.abs(fractionalMinute - 0.2) < 0.001) fractionString = "\\frac{1}{5}";
+                     else if (Math.abs(fractionalMinute - 0.4) < 0.001) fractionString = "\\frac{2}{5}";
+                     else if (Math.abs(fractionalMinute - 0.6) < 0.001) fractionString = "\\frac{3}{5}";
+                     else if (Math.abs(fractionalMinute - 0.8) < 0.001) fractionString = "\\frac{4}{5}";
+                     
+                     let secondsFromFractionString = secondsFromFraction.toFixed(1);
+                     if (secondsFromFraction === Math.floor(secondsFromFraction)) {
+                         secondsFromFractionString = secondsFromFraction.toString();
+                     }
+
+                     const step3Content = `现在处理小数部分 ${fractionalMinute.toFixed(3)} 分钟：
+                                          ${fractionString ? `<br>(这大约等于分数 ${fractionString})` : ''}
+                                          <span class="math-formula">$${fractionalMinute.toFixed(3)} \\text{ 分钟} \\times 60 \\frac{\\text{秒}}{\\text{分钟}} = ${secondsFromFractionString} \\text{ 秒}$</span>`;
+                     step3P.innerHTML = `<strong>第${fullMinutes > 0 ? 3 : 2}步：转换小数分钟</strong>${step3Content}`; 
+                     step3P.classList.remove('hidden');
+                     // typesetMath(step3P); 
+                     animateElement(step3P, delay);
+                     delay += 1800; 
+                 }
+            }
+
+            // 填充并动画步骤4 (合并结果)
+            if(step4P) {
+                let combineFormula = '';
+                let finalTotalSecondsString = totalSeconds.toFixed(1); 
+                if (totalSeconds === Math.floor(totalSeconds)) {
+                    finalTotalSecondsString = totalSeconds.toString();
+                }
+                
+                let secondsFromFractionStringFormatted = secondsFromFraction.toFixed(1);
+                 if (secondsFromFraction === Math.floor(secondsFromFraction)){
+                     secondsFromFractionStringFormatted = secondsFromFraction.toString();
+                 }
+
+                if (fullMinutes > 0 && fractionalMinute > 0.00001) {
+                    combineFormula = `${secondsFromFull} \\text{ 秒} + ${secondsFromFractionStringFormatted} \\text{ 秒} = ${finalTotalSecondsString} \\text{ 秒}`;
+                } else if (fullMinutes > 0) {
+                     combineFormula = `${secondsFromFull} \\text{ 秒}`;
+                     finalTotalSecondsString = secondsFromFull.toString(); 
+                } else if (fractionalMinute > 0.00001) {
+                     combineFormula = `${secondsFromFractionStringFormatted} \\text{ 秒}`;
+                     finalTotalSecondsString = secondsFromFractionStringFormatted; 
+                } else { 
+                     combineFormula = `0 \\text{ 秒}`;
+                     finalTotalSecondsString = '0';
+                }
+                
+                let mergeStepNumber = 2; 
+                if (fullMinutes > 0 && fractionalMinute > 0.00001) mergeStepNumber = 4;
+                else if (fullMinutes > 0 || fractionalMinute > 0.00001) mergeStepNumber = 3;
+
+                step4P.innerHTML = `<strong>第${mergeStepNumber}步：合并结果</strong>${(fullMinutes > 0 && fractionalMinute > 0.00001) ? '把两部分得到的秒数加起来：' : '最终结果就是：'}
+                     <span class="math-formula">$${combineFormula}$</span>`;
+                step4P.classList.remove('hidden');
+                // typesetMath(step4P); 
+                animateElement(step4P, delay);
+                delay += 1500;
+            }
+
+            // 填充并动画最终答案
+            if(finalAnswerP) {
+                 let finalTotalSecondsString = totalSeconds.toFixed(1); 
+                 if (totalSeconds === Math.floor(totalSeconds)) {
+                    finalTotalSecondsString = totalSeconds.toString();
+                 }
+                finalAnswerP.innerHTML = `最终答案：${minutes} 分钟等于 <span class="highlight">${finalTotalSecondsString}</span> 秒。`;
+                finalAnswerP.classList.remove('hidden');
+                animateElement(finalAnswerP, delay);
+            }
+        }
+
+        // --- 初始化 ---
+        document.addEventListener('DOMContentLoaded', () => {
+             setConversionDirection('secToMin'); // 初始化转换器状态
+        });
+
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</body>
+</html>
+                const block = document.createElement('div');

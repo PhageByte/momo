@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小探险家成长指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            scroll-behavior: smooth;
+            padding-bottom: 100px; /* Space for fixed audio player */
+        }
+        .kid-block {
+            border: 3px solid #333;
+            box-shadow: 5px 5px 0px #333;
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        #breathing-circle {
+            transition: transform 1.5s ease-in-out, background-color 0.5s ease-in-out;
+        }
+
+        nav a.active-nav {
+            background-color: #fbbf24; /* amber-400 */
+            color: #1f2937; /* gray-800 */
+            font-weight: bold;
+        }
+
+        /* Custom styles for audio player */
+        .audio-player-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #1f2937; /* gray-800 */
+            color: white;
+            padding: 10px 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .audio-player-container .controls, .audio-player-container .progress-time-speed {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+         .audio-player-container .progress-time-speed {
+            justify-content: space-between;
+         }
+        .audio-player-container button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        .audio-player-container input[type="range"] {
+            flex-grow: 1;
+            cursor: pointer;
+            accent-color: #3b82f6; /* blue-500 */
+        }
+        .audio-player-container .time-display {
+            font-size: 0.9em;
+            min-width: 90px; /* Prevents layout shift */
+            text-align: center;
+        }
+        .audio-player-container select {
+            background-color: #374151; /* gray-700 */
+            color: white;
+            border: 1px solid #4b5563; /* gray-600 */
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 0.9em;
+        }
+
+        /* SVG icons for player */
+        .player-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+    </style>
+</head>
+<body class="bg-sky-100 text-gray-800">
+
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-3 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex flex-wrap justify-center md:justify-between items-center gap-x-2 gap-y-1 text-sm md:text-base">
+            <a href="#" class="nav-link py-1 px-2 md:py-2 md:px-3 hover:bg-blue-700 rounded" onclick="showPage('landing')">🚀 首页</a>
+            <a href="#" class="nav-link py-1 px-2 md:py-2 md:px-3 hover:bg-blue-700 rounded" onclick="showPage('mission1')">发现超能力</a>
+            <a href="#" class="nav-link py-1 px-2 md:py-2 md:px-3 hover:bg-blue-700 rounded" onclick="showPage('mission2')">快乐引擎</a>
+            <a href="#" class="nav-link py-1 px-2 md:py-2 md:px-3 hover:bg-blue-700 rounded" onclick="showPage('mission3')">数学小英雄</a>
+            <a href="#" class="nav-link py-1 px-2 md:py-2 md:px-3 hover:bg-blue-700 rounded" onclick="showPage('mission4')">鼓励咒语</a>
+            <a href="#" class="nav-link py-1 px-2 md:py-2 md:px-3 hover:bg-blue-700 rounded" onclick="showPage('mission5')">超级伙伴</a>
+            <a href="#" class="nav-link py-1 px-2 md:py-2 md:px-3 hover:bg-blue-700 rounded" onclick="showPage('mission6')">好心情怪兽</a>
+            <a href="#" class="nav-link py-1 px-2 md:py-2 md:px-3 bg-teal-500 hover:bg-teal-600 rounded" onclick="showPage('pomodoro')">专注时钟 🍅</a>
+            <a href="#" class="nav-link py-1 px-2 md:py-2 md:px-3 bg-purple-500 hover:bg-purple-600 rounded" onclick="showPage('meditation')">心灵之旅 🧘</a>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Landing Page -->
+        <div id="landing" class="page active text-center">
+            <header class="bg-yellow-300 p-8 rounded-lg shadow-xl kid-block mb-8">
+                <h1 class="text-4xl md:text-5xl font-bold text-blue-700 mb-4">嘿，小探险家！</h1>
+                <p class="text-lg md:text-xl text-gray-700 mb-6">准备好开启一场充满智慧与勇气的奇趣宝藏探险了吗？这里有超酷的秘密任务和神奇工具，帮助你发现自己超厉害的潜能！</p>
+                <button class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-full text-xl shadow-md transform hover:scale-105 transition-transform" onclick="showPage('mission1')">
+                    开始探险！🚀
+                </button>
+            </header>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-green-400 p-6 rounded-lg shadow-lg kid-block">
+                    <h2 class="text-2xl font-bold text-white mb-2">🗺️ 秘密任务</h2>
+                    <p class="text-green-900">六大神秘任务等你挑战，每个任务都藏着一个“人生宝藏”！</p>
+                </div>
+                <div class="bg-indigo-400 p-6 rounded-lg shadow-lg kid-block"> <!-- Changed color for variety -->
+                    <h2 class="text-2xl font-bold text-white mb-2">🛠️ 探险工具箱</h2>
+                    <p class="text-indigo-900">专注时钟和心灵之旅，是你冒险路上的好帮手！</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mission 1: Inner Superpower -->
+        <div id="mission1" class="page bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-teal-600 mb-6">任务一：发现你内心的“超能力”！🦸</h2>
+            <p class="mb-4">每个小探险家都有自己独特的“超能力”，就像漫画里的英雄一样！它可能不是飞天遁地，但一样酷！</p>
+            <div class="bg-teal-100 p-4 rounded-md mb-4">
+                <h3 class="font-bold text-teal-700">什么是“超能力”？</h3>
+                <ul class="list-disc list-inside text-teal-800">
+                    <li>特别会讲故事，让大家都爱听？</li>
+                    <li>画画特别棒，能画出心中的世界？</li>
+                    <li>对数字特别敏感，一眼看出规律？（数学小英雄的潜质哦！）</li>
+                    <li>特别有爱心，小动物都喜欢你？</li>
+                    <li>观察力超强，能发现别人忽略的细节？</li>
+                </ul>
+            </div>
+            <p class="mb-4">你的任务是：<strong class="text-teal-700">仔细观察自己，发现至少一个你特别擅长或喜欢做的事情。</strong> 那就是你的超能力种子！</p>
+            <div class="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+                <p><strong class="font-bold">探险家小贴士：</strong> 别怕尝试新事物！画画、唱歌、搭积木、讲笑话、帮助家人……你的超能力可能就藏在里面！</p>
+            </div>
+            <div class="mission-pagination mt-8 flex justify-end">
+                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" onclick="navigateToMission('next')">下一页 →</button>
+            </div>
+        </div>
+
+        <!-- Mission 2: Happy Engine -->
+        <div id="mission2" class="page bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-pink-600 mb-6">任务二：让你的“快乐引擎”发动起来！😄</h2>
+            <p class="mb-4">你知道吗？快乐就像一个引擎，能给我们带来满满的能量！有时候它会没油，但我们可以学会给它加油！</p>
+            <div class="bg-pink-100 p-4 rounded-md mb-4">
+                <h3 class="font-bold text-pink-700">如何给“快乐引擎”加油？</h3>
+                <ul class="list-disc list-inside text-pink-800">
+                    <li><strong class="text-pink-700">做喜欢的事：</strong> 玩你最爱的游戏、看有趣的动画片、和好朋友一起疯跑！</li>
+                    <li><strong class="text-pink-700">帮助别人：</strong> 帮妈妈做家务，给小伙伴分享零食，看到别人开心，你也会更开心！</li>
+                    <li><strong class="text-pink-700">感恩小事：</strong> 感谢爸爸妈妈的照顾，感谢今天的好天气，感谢吃到美味的冰淇淋！</li>
+                    <li><strong class="text-pink-700">大声笑出来：</strong> 看个搞笑的视频，讲个笑话，哈哈大笑是最好的燃料！</li>
+                </ul>
+            </div>
+            <p class="mb-4">你的任务是：<strong class="text-pink-700">今天做三件能让自己或别人开心的小事，并把它们记下来！</strong></p>
+             <div class="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+                <p><strong class="font-bold">探险家小贴士：</strong> 快乐是可以传染的！把你的快乐分享给别人，世界会变得更美好！</p>
+            </div>
+            <div class="mission-pagination mt-8 flex justify-between">
+                <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onclick="navigateToMission('prev')">← 上一页</button>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" onclick="navigateToMission('next')">下一页 →</button>
+            </div>
+        </div>
+
+        <!-- Mission 3: Math Hero -->
+        <div id="mission3" class="page bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-indigo-600 mb-6">任务三：成为“数学小英雄”！🔢🛡️</h2>
+            <p class="mb-4">数学王国里藏着好多秘密和宝藏！有时候，我们可能会遇到“数学焦虑怪兽”或者“迷糊浓雾”，但别怕，数学小英雄有办法打败它们！</p>
+            
+            <div class="bg-indigo-100 p-4 rounded-md mb-6">
+                <h3 class="font-bold text-indigo-700 mb-2">数学小英雄的超酷装备：</h3>
+                <details class="mb-2 bg-white p-3 rounded shadow">
+                    <summary class="font-semibold cursor-pointer text-indigo-600">🦸 积极心态斗篷：</summary>
+                    <p class="mt-2 text-sm text-indigo-800">告诉自己：“我能行！错了也没关系，从错误中学习更酷！” 努力比聪明更重要！</p>
+                </details>
+                <details class="mb-2 bg-white p-3 rounded shadow">
+                    <summary class="font-semibold cursor-pointer text-indigo-600">🗺️ 解题地图（写下步骤）：</summary>
+                    <p class="mt-2 text-sm text-indigo-800">把思考过程写下来，就像画地图一样，思路会更清晰！比如：<br>1. 读懂题目问什么？<br>2. 我知道了哪些信息？<br>3. 用什么方法算？<br>4. 开始计算！<br>5. 检查一下对不对？</p>
+                </details>
+                <details class="mb-2 bg-white p-3 rounded shadow">
+                    <summary class="font-semibold cursor-pointer text-indigo-600">🔨 数字分解锤（化整为零）：</summary>
+                    <p class="mt-2 text-sm text-indigo-800">遇到大数字或复杂问题？用分解锤把它们敲成小块！<br>例如：计算 37 + 8，可以先把8分成3和5，那么 37 + 3 = 40，40 + 5 = 45。是不是简单多了？<br>或者 9 + 5，可以把5分成1和4，9 + 1 = 10，10 + 4 = 14。</p>
+                </details>
+                <details class="mb-2 bg-white p-3 rounded shadow">
+                    <summary class="font-semibold cursor-pointer text-indigo-600">🎤 魔法歌谣（助记口诀）：</summary>
+                    <p class="mt-2 text-sm text-indigo-800">像乘法口诀，或者“括号指数乘除加减”（PEMDAS/BODMAS）这样的运算顺序，编成小歌谣唱出来，记得更快！</p>
+                </details>
+                 <details class="mb-2 bg-white p-3 rounded shadow">
+                    <summary class="font-semibold cursor-pointer text-indigo-600">🧱 万能积木（形象化工具）：</summary>
+                    <p class="mt-2 text-sm text-indigo-800">用积木、小珠子、画图来帮忙理解分数、加减法。比如分数：一个大饼切成几块，每块就是几分之一。</p>
+                </details>
+            </div>
+
+            <h3 class="font-bold text-indigo-700 mb-2 text-xl">挑战：数学谜题时间！</h3>
+            <div class="bg-yellow-100 p-4 rounded-md mb-4 border-l-4 border-yellow-500">
+                <p class="text-yellow-800"><strong>谜题1：</strong>探险家小明有3袋糖果，每袋有8颗。他想分给他的4个好朋友，每人能分到几颗糖？</p>
+                <button onclick="alert('答案：小明一共有 3 x 8 = 24 颗糖。分给4个朋友，每人得到 24 ÷ 4 = 6 颗糖！你算对了吗？')" class="mt-2 bg-indigo-500 hover:bg-indigo-600 text-white py-1 px-3 rounded text-sm">查看答案</button>
+            </div>
+             <div class="bg-green-100 p-4 rounded-md mb-4 border-l-4 border-green-500">
+                <p class="text-green-800"><strong>谜题2：</strong>一个神秘宝箱的密码是“先算括号里的，然后乘法，最后加法”： 5 + (3 x 4) = ? </p>
+                <button onclick="alert('答案：先算括号里的 3 x 4 = 12。然后 5 + 12 = 17。密码是17！')" class="mt-2 bg-indigo-500 hover:bg-indigo-600 text-white py-1 px-3 rounded text-sm">查看答案</button>
+            </div>
+            <p class="mb-4">你的任务是：<strong class="text-indigo-700">用今天学到的“数学小英雄装备”，解决一道你觉得有点难的数学题！</strong> 也可以尝试用“数字分解锤”来计算一些加减法！</p>
+             <div class="mt-6 p-4 bg-orange-100 border-l-4 border-orange-500 text-orange-700">
+                <p><strong class="font-bold">数学小英雄宣言：</strong> 我不怕难题，我爱思考！每次解开一个谜题，我就变得更强大！</p>
+            </div>
+            <div class="mission-pagination mt-8 flex justify-between">
+                <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onclick="navigateToMission('prev')">← 上一页</button>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" onclick="navigateToMission('next')">下一页 →</button>
+            </div>
+        </div>
+        
+        <!-- Mission 4: Encouragement Spells -->
+        <div id="mission4" class="page bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-purple-600 mb-6">任务四：你的“神奇鼓励咒语”！✨🗣️</h2>
+            <p class="mb-4">遇到困难和失败的时候，别灰心！我们可以对自己念一些“鼓励咒语”，它们有神奇的力量，能让我们变得更勇敢，更有信心！</p>
+            <div class="bg-purple-100 p-4 rounded-md mb-4">
+                <h3 class="font-bold text-purple-700">超给力鼓励咒语：</h3>
+                <ul class="list-disc list-inside text-purple-800">
+                    <li>“这有点难，但我会尽力试试！”</li>
+                    <li>“失败是成功的小台阶，我从中学到了东西！”</li>
+                    <li>“我很棒，我能搞定它！”</li>
+                    <li>“深呼吸，再试一次！”</li>
+                    <li>“我为我的努力感到骄傲！”</li>
+                </ul>
+            </div>
+            <p class="mb-4">你的任务是：<strong class="text-purple-700">想一句你自己的专属“鼓励咒语”。下次遇到挑战时，大声对自己说出来！</strong> 也可以把它写下来，贴在你能看到的地方。</p>
+            <div class="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+                <p><strong class="font-bold">探险家小贴士：</strong> 想象一下“最坏的情况”会怎么样？通常你会发现，其实也没那么可怕！这能帮你减少害怕的感觉。</p>
+            </div>
+            <div class="mission-pagination mt-8 flex justify-between">
+                <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onclick="navigateToMission('prev')">← 上一页</button>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" onclick="navigateToMission('next')">下一页 →</button>
+            </div>
+        </div>
+
+        <!-- Mission 5: Super Pal Secrets -->
+        <div id="mission5" class="page bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-green-600 mb-6">任务五：成为“超级伙伴”的秘诀！🤝🌟</h2>
+            <p class="mb-4">探险的路上，有好伙伴一起才更精彩！成为一个“超级伙伴”，意味着懂得关心别人、和大家一起合作。</p>
+            <div class="bg-green-100 p-4 rounded-md mb-4">
+                <h3 class="font-bold text-green-700">超级伙伴技能包：</h3>
+                <ul class="list-disc list-inside text-green-800">
+                    <li><strong class="text-green-700">共情力（懂你的心）：</strong> 尝试理解别人的感受。“你看起来有点不开心，发生什么事了吗？”</li>
+                    <li><strong class="text-green-700">团队合作（一起努力）：</strong> 和小伙伴一起完成任务，每个人都出一份力！</li>
+                    <li><strong class="text-green-700">分享（好东西一起享用）：</strong> 分享你的零食、玩具，或者有趣的想法。</li>
+                    <li><strong class="text-green-700">解决小矛盾（和平大使）：</strong> 如果和朋友吵架了，试着好好沟通，找到解决办法。</li>
+                </ul>
+            </div>
+            <p class="mb-4">你的任务是：<strong class="text-green-700">今天主动帮助一个同学或家人，或者和朋友一起合作完成一件事。</strong> 感受一下做“超级伙伴”的快乐吧！</p>
+             <div class="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+                <p><strong class="font-bold">探险家小贴士：</strong> 仔细观察别人的表情和动作，猜猜他们可能在想什么、感觉怎么样。这能帮你更好地理解他们！</p>
+            </div>
+            <div class="mission-pagination mt-8 flex justify-between">
+                <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onclick="navigateToMission('prev')">← 上一页</button>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded" onclick="navigateToMission('next')">下一页 →</button>
+            </div>
+        </div>
+
+        <!-- Mission 6: Mood Monsters -->
+        <div id="mission6" class="page bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-red-600 mb-6">任务六：甩掉“坏情绪怪兽”！😠➡️😌</h2>
+            <p class="mb-4">有时候，我们心里会跑出来一些“坏情绪怪兽”，比如愤怒的火龙、伤心的乌云、害怕的影子。感到生气或难过是正常的，但我们可以学会不让它们控制我们！</p>
+            <div class="bg-red-100 p-4 rounded-md mb-4">
+                <h3 class="font-bold text-red-700">驯服怪兽小技巧：</h3>
+                <ul class="list-disc list-inside text-red-800">
+                    <li><strong class="text-red-700">给怪兽起名字：</strong> “哦，是‘愤怒火龙’来了！” 清晰地知道是什么情绪。</li>
+                    <li><strong class="text-red-700">找到它的“弱点”：</strong> 想想是什么让这个怪兽出现的？（比如：因为玩具被抢了，所以愤怒火龙来了。）</li>
+                    <li><strong class="text-red-700">“冷静洞穴”：</strong> 找一个能让你平静下来的地方，比如你的房间角落，或者想象一个安静的森林。</li>
+                    <li><strong class="text-red-700">深呼吸大法：</strong> 慢慢吸气，再慢慢呼气，像给气球充气再放气一样。（我们的“心灵之旅”工具可以帮你练习哦！）</li>
+                    <li><strong class="text-red-700">AVP护盾（承认-确认-允许）：</strong>
+                        <ul>
+                            <li><strong>承认：</strong> “我看到你了，愤怒火龙。”</li>
+                            <li><strong>确认：</strong> “我知道你出现是因为玩具被抢了，这让你感觉不公平。”</li>
+                            <li><strong>允许：</strong> “你可以暂时待一会儿，但我不会让你乱发脾气。”</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <p class="mb-4">你的任务是：<strong class="text-red-700">下次感觉“坏情绪怪兽”要来的时候，试试上面的一个技巧来帮助自己平静下来。</strong></p>
+            <div class="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+                <p><strong class="font-bold">探险家小贴士：</strong> 平静的情绪是可以传染的！当你学会让自己平静，也能帮助身边的小伙伴哦！</p>
+            </div>
+             <div class="mission-pagination mt-8 flex justify-start">
+                <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onclick="navigateToMission('prev')">← 上一页</button>
+            </div>
+        </div>
+        
+        <!-- Pomodoro Timer -->
+        <div id="pomodoro" class="page bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-cyan-600 mb-6">专注时钟（番茄法）🍅⏱️</h2>
+            <p class="mb-4 text-gray-700">想让学习和做作业更有效率吗？试试“专注时钟”吧！它就像一个魔法工具，帮你集中注意力，还能保证你有足够的休息时间。</p>
+            <div class="bg-cyan-50 p-4 rounded-lg shadow mb-6">
+                <h3 class="font-semibold text-cyan-700 mb-2">怎么用“专注时钟”？</h3>
+                <ol class="list-decimal list-inside text-cyan-800 space-y-1">
+                    <li>设置一个“专注时间”（比如25分钟），在这段时间里，一心一意做你的任务，不要分心哦！</li>
+                    <li>专注时间结束后，铃声会响。太棒了！你完成了一个“番茄钟”！</li>
+                    <li>设置一个“休息时间”（比如5分钟），好好放松一下，站起来走走，喝口水。</li>
+                    <li>休息结束后，开始下一个“番茄钟”。每完成3-4个“番茄钟”，可以来个长一点的休息（比如15-30分钟）。</li>
+                </ol>
+                <p class="mt-3 text-sm text-cyan-600"><strong>小提示：</strong> 开始前，把可能让你分心的东西（比如玩具、电视声音）都收起来或关掉。</p>
+            </div>
+
+            <div class="bg-gray-100 p-6 rounded-lg shadow-inner text-center">
+                <div id="pomodoro-timer-display" class="text-6xl font-bold text-cyan-700 mb-4">25:00</div>
+                <div id="pomodoro-status" class="text-lg text-gray-600 mb-6">准备开始专注！</div>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
+                    <div>
+                        <label for="work-duration" class="block text-sm font-medium text-gray-700">专注 (分钟):</label>
+                        <input type="number" id="work-duration" value="25" min="1" class="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-24 text-center">
+                    </div>
+                    <div>
+                        <label for="break-duration" class="block text-sm font-medium text-gray-700">休息 (分钟):</label>
+                        <input type="number" id="break-duration" value="5" min="1" class="mt-1 p-2 border border-gray-300 rounded-md shadow-sm w-24 text-center">
+                    </div>
+                </div>
+                <div class="space-x-2">
+                    <button id="start-pomodoro" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">开始</button>
+                    <button id="pause-pomodoro" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">暂停</button>
+                    <button id="reset-pomodoro" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">重置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meditation Guide -->
+        <div id="meditation" class="page bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-emerald-600 mb-6">心灵之旅（深呼吸练习）🧘‍♂️🌬️</h2>
+            <p class="mb-4 text-gray-700">学习累了？心里有点乱？或者想为接下来的挑战做准备？来一场“心灵之旅”吧！通过简单的深呼吸，可以让你的大脑休息一下，身体放松，心情也会变好哦。</p>
+            <div class="bg-emerald-50 p-4 rounded-lg shadow mb-6">
+                <h3 class="font-semibold text-emerald-700 mb-2">为什么要做“心灵之旅”？</h3>
+                <ul class="list-disc list-inside text-emerald-800 space-y-1">
+                    <li>帮助你平静下来，赶走紧张和不安。</li>
+                    <li>提高专注力，学习时更容易集中精神。</li>
+                    <li>更好地了解自己的身体和感受。</li>
+                    <li>就像给大脑洗个澡，感觉焕然一新！</li>
+                </ul>
+                 <h3 class="font-semibold text-emerald-700 mt-4 mb-2">怎么开始“心灵之旅”？</h3>
+                <ol class="list-decimal list-inside text-emerald-800 space-y-1">
+                    <li>找一个舒服安静的地方坐下或躺下。</li>
+                    <li>轻轻闭上眼睛（如果你愿意的话）。</li>
+                    <li>点击下方的“开始旅程”按钮。</li>
+                    <li>仔细听声音提示，跟着它一起：深深吸气... 憋住气... 慢慢呼气...</li>
+                    <li>感受空气进入和离开你的身体。</li>
+                    <li>如果走神了，没关系，轻轻把注意力带回到呼吸上就好。</li>
+                    <li>想停下来的时候，随时可以点击“结束旅程”。</li>
+                </ol>
+            </div>
+
+            <div class="bg-gray-100 p-6 rounded-lg shadow-inner text-center">
+                <div id="breathing-circle-container" class="mb-6 flex justify-center items-center h-40">
+                    <div id="breathing-circle" class="w-24 h-24 bg-emerald-400 rounded-full opacity-80"></div>
+                </div>
+                <div id="breathing-instruction" class="text-2xl font-semibold text-emerald-700 mb-6">准备好了吗？</div>
+                <div class="space-x-2">
+                    <button id="start-meditation" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-4 rounded">开始旅程</button>
+                    <button id="stop-meditation" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded" disabled>结束旅程</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Global Audio Player -->
+    <div class="audio-player-container" id="global-audio-player-controls">
+        <audio id="global-audio" src="audio3.m4a" preload="metadata"></audio>
+        <div class="controls">
+            <button id="audio-play-pause">
+                <svg class="player-icon" id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                <svg class="player-icon" id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+            </button>
+            <input type="range" id="audio-seek-slider" value="0" step="0.1" class="flex-grow">
+        </div>
+        <div class="progress-time-speed">
+            <span id="audio-time" class="time-display">0:00 / 0:00</span>
+            <div class="flex items-center gap-2">
+                <label for="audio-speed" class="text-xs">速度:</label>
+                <select id="audio-speed">
+                    <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const pages = document.querySelectorAll('.page');
+        const navLinks = document.querySelectorAll('nav a.nav-link');
+        let currentPageId = 'landing'; // Keep track of the current page
+        const missionPageIds = ['mission1', 'mission2', 'mission3', 'mission4', 'mission5', 'mission6'];
+
+
+        function updateActiveNavLink(pageId) {
+            navLinks.forEach(link => {
+                link.classList.remove('active-nav');
+                if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(`showPage('${pageId}')`)) {
+                    link.classList.add('active-nav');
+                }
+            });
+        }
+
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+                if (page.id === pageId) {
+                    page.classList.add('active');
+                    currentPageId = pageId; // Update current page
+                }
+            });
+            window.scrollTo(0, 0); 
+            updateActiveNavLink(pageId);
+        }
+
+        function navigateToMission(direction) {
+            const currentIndex = missionPageIds.indexOf(currentPageId);
+            if (direction === 'next') {
+                if (currentIndex < missionPageIds.length - 1) {
+                    showPage(missionPageIds[currentIndex + 1]);
+                }
+            } else if (direction === 'prev') {
+                if (currentIndex > 0) {
+                    showPage(missionPageIds[currentIndex - 1]);
+                }
+            }
+        }
+        
+        showPage('landing');
+
+
+        // --- Pomodoro Timer Logic ---
+        const timerDisplay = document.getElementById('pomodoro-timer-display');
+        const statusDisplay = document.getElementById('pomodoro-status');
+        const workDurationInput = document.getElementById('work-duration');
+        const breakDurationInput = document.getElementById('break-duration');
+        const startPomodoroButton = document.getElementById('start-pomodoro');
+        const pausePomodoroButton = document.getElementById('pause-pomodoro');
+        const resetPomodoroButton = document.getElementById('reset-pomodoro');
+
+        let pomodoroInterval;
+        let timeLeft; 
+        let isWorkTime = true;
+        let isPomodoroPaused = false;
+        let workDuration = parseInt(workDurationInput.value) * 60;
+        let breakDuration = parseInt(breakDurationInput.value) * 60;
+        
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playPomodoroSound(frequency = 440, duration = 0.2, type = 'sine') {
+            if (!audioCtx) return;
+            try {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime); 
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); 
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.error("Error playing pomodoro sound:", e);
+            }
+        }
+
+
+        function updatePomodoroDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startPomodoroTimer() {
+            if (isPomodoroPaused) {
+                isPomodoroPaused = false;
+            } else {
+                workDuration = parseInt(workDurationInput.value) * 60;
+                breakDuration = parseInt(breakDurationInput.value) * 60;
+                timeLeft = isWorkTime ? workDuration : breakDuration;
+            }
+            
+            statusDisplay.textContent = isWorkTime ? "专注时间！💪" : "休息一下～🧘";
+            startPomodoroButton.disabled = true;
+            pausePomodoroButton.disabled = false;
+            workDurationInput.disabled = true;
+            breakDurationInput.disabled = true;
+
+            clearInterval(pomodoroInterval); 
+            pomodoroInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updatePomodoroDisplay();
+                } else {
+                    clearInterval(pomodoroInterval);
+                    playPomodoroSound(isWorkTime ? 660 : 880, 0.5); 
+                    isWorkTime = !isWorkTime;
+                    timeLeft = isWorkTime ? workDuration : breakDuration;
+                    statusDisplay.textContent = isWorkTime ? "专注时间！💪" : "休息一下～🧘";
+                    updatePomodoroDisplay();
+                    startPomodoroTimer(); 
+                }
+            }, 1000);
+        }
+
+        function pausePomodoroTimer() {
+            clearInterval(pomodoroInterval);
+            isPomodoroPaused = true;
+            startPomodoroButton.disabled = false;
+            pausePomodoroButton.disabled = true;
+            statusDisplay.textContent += " (已暂停)";
+        }
+
+        function resetPomodoroTimer() {
+            clearInterval(pomodoroInterval);
+            isWorkTime = true;
+            isPomodoroPaused = false;
+            workDuration = parseInt(workDurationInput.value) * 60;
+            timeLeft = workDuration;
+            updatePomodoroDisplay();
+            statusDisplay.textContent = "准备开始专注！";
+            startPomodoroButton.disabled = false;
+            pausePomodoroButton.disabled = true;
+            workDurationInput.disabled = false;
+            breakDurationInput.disabled = false;
+        }
+
+        startPomodoroButton.addEventListener('click', startPomodoroTimer);
+        pausePomodoroButton.addEventListener('click', pausePomodoroTimer);
+        resetPomodoroButton.addEventListener('click', resetPomodoroTimer);
+        workDurationInput.addEventListener('change', () => {
+            if (!pomodoroInterval && !isPomodoroPaused) resetPomodoroTimer(); 
+        });
+        breakDurationInput.addEventListener('change', () => {
+             if (!pomodoroInterval && !isPomodoroPaused) resetPomodoroTimer(); 
+        });
+        resetPomodoroTimer(); 
+
+        // --- Meditation Guide Logic ---
+        const startMeditationButton = document.getElementById('start-meditation');
+        const stopMeditationButton = document.getElementById('stop-meditation');
+        const breathingInstruction = document.getElementById('breathing-instruction');
+        const breathingCircle = document.getElementById('breathing-circle');
+
+        let meditationTimeout; // Changed from interval to timeout for more control
+        let breathPhase = 0; 
+        const inhaleTime = 4000; 
+        const holdTime = 3000; 
+        const exhaleTime = 5000; 
+
+        function meditationCycle() {
+            switch (breathPhase) {
+                case 0: // Inhale
+                    breathingInstruction.textContent = "深深吸气...";
+                    playPomodoroSound(261.63, 0.3, 'triangle'); // C4
+                    breathingCircle.style.transform = 'scale(1.8)'; // Grow
+                    breathingCircle.style.backgroundColor = '#34d399'; // emerald-400
+                    meditationTimeout = setTimeout(() => {
+                        breathPhase = 1;
+                        meditationCycle();
+                    }, inhaleTime);
+                    break;
+                case 1: // Hold
+                    breathingInstruction.textContent = "轻轻憋住气...";
+                    playPomodoroSound(329.63, 0.3, 'square'); // E4
+                    // Circle stays scaled up
+                    breathingCircle.style.backgroundColor = '#fbbf24'; // amber-400
+                    meditationTimeout = setTimeout(() => {
+                        breathPhase = 2;
+                        meditationCycle();
+                    }, holdTime);
+                    break;
+                case 2: // Exhale
+                    breathingInstruction.textContent = "慢慢呼气...";
+                    playPomodoroSound(440.00, 0.3, 'sawtooth'); // A4
+                    breathingCircle.style.transform = 'scale(0.2)'; // Shrink
+                    breathingCircle.style.backgroundColor = '#60a5fa'; // blue-400
+                    meditationTimeout = setTimeout(() => {
+                        breathPhase = 0;
+                        meditationCycle();
+                    }, exhaleTime);
+                    break;
+            }
+        }
+
+        startMeditationButton.addEventListener('click', () => {
+            startMeditationButton.disabled = true;
+            stopMeditationButton.disabled = false;
+            breathPhase = 0;
+            meditationCycle();
+        });
+
+        stopMeditationButton.addEventListener('click', () => {
+            clearTimeout(meditationTimeout);
+            startMeditationButton.disabled = false;
+            stopMeditationButton.disabled = true;
+            breathingInstruction.textContent = "旅程结束，感觉怎么样？";
+            breathingCircle.style.transform = 'scale(1)'; // Reset size
+            breathingCircle.style.backgroundColor = '#34d399'; // emerald-400
+        });
+
+        // --- Global Audio Player Logic ---
+        const audioPlayer = document.getElementById('global-audio');
+        const playPauseButton = document.getElementById('audio-play-pause');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const seekSlider = document.getElementById('audio-seek-slider');
+        const timeDisplay = document.getElementById('audio-time');
+        const speedSelect = document.getElementById('audio-speed');
+
+        playPauseButton.addEventListener('click', () => {
+            if (audioPlayer.paused || audioPlayer.ended) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        });
+
+        audioPlayer.addEventListener('play', () => {
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'inline-block';
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            playIcon.style.display = 'inline-block';
+            pauseIcon.style.display = 'none';
+        });
+
+        audioPlayer.addEventListener('loadedmetadata', () => {
+            seekSlider.max = audioPlayer.duration;
+            updateAudioTime();
+        });
+        
+        audioPlayer.addEventListener('timeupdate', () => {
+            seekSlider.value = audioPlayer.currentTime;
+            updateAudioTime();
+        });
+
+        seekSlider.addEventListener('input', () => {
+            audioPlayer.currentTime = seekSlider.value;
+        });
+
+        speedSelect.addEventListener('change', () => {
+            audioPlayer.playbackRate = parseFloat(speedSelect.value);
+        });
+
+        function formatTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${min}:${sec}`;
+        }
+
+        function updateAudioTime() {
+            if (isNaN(audioPlayer.duration)) {
+                 timeDisplay.textContent = `${formatTime(audioPlayer.currentTime)} / --:--`;
+            } else {
+                 timeDisplay.textContent = `${formatTime(audioPlayer.currentTime)} / ${formatTime(audioPlayer.duration)}`;
+            }
+        }
+        // Initial time update for cases where metadata loads but time is 0
+        updateAudioTime();
+
+
+    </script>
+</body>
+</html>

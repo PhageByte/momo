@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赋能母亲，启迪男孩成长</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f9ff; /* 淡蓝色背景 */
+            color: #1e293b; /* 深蓝灰色文字 */
+            transition: background-color 0.5s ease;
+            padding-top: 60px; /* Add padding to body to prevent content from being hidden by sticky header */
+        }
+        .header-sticky {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background-color: white; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .audio-player-sticky {
+            position: sticky;
+            top: 60px; /* Height of the header */
+            z-index: 49; 
+            background-color: #f8fafc; 
+            padding: 0.75rem 1rem; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-weight: 500;
+        }
+        .nav-item:hover, .nav-item.active {
+            background-color: #38bdf8; 
+            color: white;
+        }
+        .nav-item.active {
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
+        }
+        .page-content {
+            display: none;
+            padding: 20px;
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.7s ease-out;
+            margin-top: 20px; 
+            margin-bottom: 80px; /* Add margin to bottom to prevent overlap with chapter nav */
+        }
+        .page-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        h1, h2, h3 {
+            color: #0f769e; 
+            font-weight: 600;
+        }
+        h1 { font-size: 2.25rem; margin-bottom: 1.5rem; text-align: center; }
+        h2 { font-size: 1.75rem; margin-bottom: 1rem; border-bottom: 2px solid #38bdf8; padding-bottom: 0.5rem; }
+        h3 { font-size: 1.25rem; margin-bottom: 0.75rem; color: #1e3a8a; }
+        p {
+            line-height: 1.8;
+            margin-bottom: 1rem;
+            color: #334155;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        ul li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 0.75rem;
+            line-height: 1.7;
+        }
+        ul li::before {
+            content: "\f00c"; 
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: #38bdf8;
+            position: absolute;
+            left: 0;
+            top: 4px;
+            transition: transform 0.3s ease;
+        }
+        ul li:hover::before {
+            transform: scale(1.2);
+        }
+        .button-primary {
+            background-color: #0ea5e9; 
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+        .button-primary:hover {
+            background-color: #0284c7; 
+            transform: translateY(-2px);
+        }
+        .button-secondary {
+            background-color: #f0f9ff;
+            color: #0ea5e9;
+            border: 1px solid #0ea5e9;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .button-secondary:hover {
+            background-color: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #67e8f9, #0ea5e9);
+            color: white;
+            padding: 60px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+        }
+        .hero-section h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .hero-section p {
+            color: #e0f2fe; 
+            font-size: 1.125rem;
+            max-width: 700px;
+            margin: 0 auto 1.5rem auto;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            color: #64748b; 
+            font-size: 0.875rem;
+            border-top: 1px solid #e2e8f0; 
+        }
+        
+        #mobile-menu-button {
+            display: none; 
+        }
+        #mobile-nav-items {
+            display: none; 
+            flex-direction: column;
+            width: 100%;
+            background-color: #0f769e; 
+            position: absolute;
+            top: 100%; 
+            left: 0;
+            z-index: 40; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        #mobile-nav-items .nav-item {
+            width: 100%;
+            text-align: center;
+            border-bottom: 1px solid #1e3a8a; 
+            color: white;
+        }
+        #mobile-nav-items .nav-item:last-child {
+            border-bottom: none;
+        }
+        #mobile-nav-items .nav-item:hover, #mobile-nav-items .nav-item.active {
+            background-color: #38bdf8; 
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000; 
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .modal-close-button:hover {
+            color: #374151;
+        }
+        .breathing-circle {
+            width: 100px;
+            height: 100px;
+            background-color: #67e8f9;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: transform 4s ease-in-out; 
+        }
+        .breathing-circle.inhale {
+            transform: scale(1.5);
+        }
+        .breathing-circle.exhale {
+            transform: scale(1);
+        }
+        .affirmation-text {
+            font-size: 1.125rem;
+            color: #1e3a8a;
+            margin: 20px 0;
+            min-height: 50px; 
+        }
+        .header-button { 
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            margin-left: 10px; 
+        }
+        .calm-down-button-header {
+            background-color: #22c55e; 
+        }
+        .calm-down-button-header:hover {
+            background-color: #16a34a; 
+        }
+        
+        .home-reminder-section {
+            background-color: #e0f2fe; 
+            border: 2px solid #38bdf8; 
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 40px; 
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.15);
+        }
+        .home-reminder-section h2 {
+            font-size: 1.8rem; 
+            color: #0f769e; 
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        .home-reminder-section p {
+            font-size: 1.1rem; 
+            color: #1e293b; 
+            line-height: 1.9;
+            margin-bottom: 1.2rem;
+        }
+        .home-reminder-section .highlight {
+            color: #0ea5e9; 
+            font-weight: 600;
+        }
+        .home-reminder-section .important-note {
+            background-color: #fffbe6; 
+            border-left: 4px solid #f59e0b; 
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            text-align: left; 
+        }
+        .home-reminder-section .important-note p {
+            color: #78350f; 
+            margin-bottom: 0.5rem;
+        }
+
+        #customAudioPlayerContainer { }
+        #customAudioPlayerContainer button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #0ea5e9; 
+            transition: color 0.2s ease;
+        }
+        #customAudioPlayerContainer button:hover {
+            color: #0284c7; 
+        }
+        #seekBar {
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e5e7eb; 
+            border-radius: 9999px; 
+            outline: none;
+            width: 100%;
+        }
+        #seekBar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #0ea5e9; 
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        #seekBar::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #0ea5e9;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        #playbackSpeedSelect {
+            background-color: white;
+            border: 1px solid #d1d5db; 
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.875rem;
+            color: #374151; 
+        }
+
+        /* Chapter Bottom Navigation Styles */
+        .chapter-bottom-nav-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            padding: 10px 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 48; 
+            display: none; 
+        }
+        .chapter-bottom-nav-container.visible {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chapter-nav-button {
+            background-color: #38bdf8;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, opacity 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1; 
+            margin: 0 5px; 
+        }
+        .chapter-nav-button:hover {
+            background-color: #0f769e;
+        }
+        .chapter-nav-button.disabled {
+            background-color: #cbd5e1; 
+            color: #64748b;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .chapter-nav-button i {
+            font-size: 0.8rem; 
+        }
+
+
+        @media (max-width: 768px) {
+            body { padding-top: 50px; } 
+            .header-sticky { height: 50px; } 
+            .audio-player-sticky { top: 50px; } 
+
+            #desktop-nav {
+                display: none; 
+            }
+            #mobile-menu-button {
+                display: block; 
+            }
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            .hero-section p {
+                font-size: 1rem;
+            }
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.5rem; }
+            h3 { font-size: 1.1rem; }
+            
+            .header-button { 
+                margin-left: 0;
+                margin-top: 0; 
+                width: 100%; 
+                display: block;
+                text-align: center;
+                padding: 12px 20px;
+                border-radius: 0; 
+                border-bottom: 1px solid #1e3a8a;
+            }
+            #mobile-nav-items .calm-down-button-header {
+                background-color: #22c55e;
+            }
+            #mobile-nav-items .calm-down-button-header:hover {
+                 background-color: #16a34a;
+            }
+            
+            .home-reminder-section h2 {
+                font-size: 1.5rem;
+            }
+            .home-reminder-section p {
+                font-size: 1rem;
+            }
+            #customAudioPlayerContainer .flex.items-center.justify-between > .flex.items-center { 
+                margin-left: 0.5rem; 
+            }
+            #customAudioPlayerContainer .flex-grow.mx-4 { 
+                margin-left: 0.5rem;
+                margin-right: 0.5rem;
+            }
+            .chapter-nav-button {
+                padding: 8px 10px; 
+                font-size: 0.85rem;
+            }
+            .page-content {
+                 margin-bottom: 70px; 
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="header-sticky">
+        <div class="container mx-auto px-4 h-full flex justify-between items-center">
+            <div class="text-2xl font-bold text-[#0f769e]">
+                <i class="fas fa-hands-helping mr-2"></i>赋能母爱之旅
+            </div>
+            <nav id="desktop-nav" class="hidden md:flex items-center space-x-2"> 
+                <a class="nav-item active" onclick="showPage('home')">首页</a>
+                <a class="nav-item" onclick="showPage('empowerment')">理解赋能</a>
+                <a class="nav-item" onclick="showPage('boysWorld')">男孩的内心</a>
+                <a class="nav-item" onclick="showPage('emotionsLearning')">情绪与学习</a>
+                <a class="nav-item" onclick="showPage('feedback')">积极反馈</a>
+                <a class="nav-item" onclick="showPage('unconditionalLove')">无条件的爱</a>
+                <a class="nav-item" onclick="showPage('selfCare')">母亲的关怀</a>
+                <a class="nav-item" onclick="showPage('guide')">实践指南</a>
+                <a class="nav-item" onclick="showPage('myths')">育儿误区</a>
+                <button class="header-button calm-down-button-header" onclick="openCalmDownModal()">
+                    <i class="fas fa-wind mr-1"></i>冷静一刻
+                </button>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-2xl text-[#0f769e]">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div id="mobile-nav-items" class="md:hidden">
+            <a class="nav-item active" onclick="showPage('home'); toggleMobileMenu();">首页</a>
+            <a class="nav-item" onclick="showPage('empowerment'); toggleMobileMenu();">理解赋能</a>
+            <a class="nav-item" onclick="showPage('boysWorld'); toggleMobileMenu();">男孩的内心</a>
+            <a class="nav-item" onclick="showPage('emotionsLearning'); toggleMobileMenu();">情绪与学习</a>
+            <a class="nav-item" onclick="showPage('feedback'); toggleMobileMenu();">积极反馈</a>
+            <a class="nav-item" onclick="showPage('unconditionalLove'); toggleMobileMenu();">无条件的爱</a>
+            <a class="nav-item" onclick="showPage('selfCare'); toggleMobileMenu();">母亲的关怀</a>
+            <a class="nav-item" onclick="showPage('guide'); toggleMobileMenu();">实践指南</a>
+            <a class="nav-item" onclick="showPage('myths'); toggleMobileMenu();">育儿误区</a>
+            <button class="header-button calm-down-button-header" onclick="openCalmDownModal(); toggleMobileMenu();">
+                <i class="fas fa-wind mr-1"></i>冷静一刻
+            </button>
+        </div>
+    </header>
+
+    <div id="customAudioPlayerContainer" class="audio-player-sticky container mx-auto">
+        <div class="flex items-center justify-between">
+            <button id="audioPlayPauseBtn" class="p-2 text-xl md:text-2xl">
+                <i class="fas fa-play"></i>
+            </button>
+            <div class="flex-grow mx-2 md:mx-4">
+                <input type="range" id="seekBar" value="0" class="w-full align-middle">
+                <div class="flex justify-between text-xs text-gray-500 mt-1 px-1">
+                    <span id="currentTimeDisplay">0:00</span>
+                    <span id="totalTimeDisplay">0:00</span>
+                </div>
+            </div>
+            <div class="flex items-center">
+                <label for="playbackSpeedSelect" class="hidden sm:inline text-xs md:text-sm text-gray-700 mr-1 md:mr-2">倍速:</label>
+                <select id="playbackSpeedSelect" class="text-xs md:text-sm border border-gray-300 rounded p-1 focus:ring-sky-500 focus:border-sky-500">
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <audio id="globalAudioPlayer" src="audio2.m4a" preload="metadata"></audio>
+
+
+    <main class="container mx-auto px-4 py-5">
+        <div id="home" class="page-content active">
+            <div class="hero-section">
+                <h1>赋能母亲，启迪男孩成长</h1>
+                <p>一段充满爱、挑战与无限可能的旅程。与我们一同探索赋能式教育，陪伴男孩们走过关键成长岁月，并关照母亲自身，汲取力量与智慧。</p>
+                <button class="button-primary" onclick="showPage('empowerment')">
+                    开启赋能之旅 <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                <div class="card">
+                    <h3><i class="fas fa-lightbulb mr-2 text-yellow-400"></i>赋能的真谛</h3>
+                    <p>赋能式教育是点燃孩子内在的火焰，培养其内在驱动力、自主性与责任感。</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-child mr-2 text-blue-400"></i>理解男孩</h3>
+                    <p>走进8-16岁男孩的内心世界，理解他们的渴望、困惑与成长风貌。</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-heart-pulse mr-2 text-red-400"></i>情绪的力量</h3>
+                    <p>积极情绪能开阔思路，启迪智慧。母亲的情绪对孩子有深远影响。</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-comments mr-2 text-green-400"></i>沟通的艺术</h3>
+                    <p>学习有效倾听，掌握与青春期男孩沟通的技巧，建立稳固的情感连接。</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-shield-alt mr-2 text-indigo-400"></i>母亲的自我关怀</h3>
+                    <p>破解“道理都懂，但忍不住”的困局，关注母亲自身的情绪调适与成长。</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-book-open-reader mr-2 text-purple-400"></i>实践与智慧</h3>
+                    <p>将理念融入日常，辨析传统观念，用科学与爱共绘成长蓝图。</p>
+                </div>
+            </div>
+
+            <div class="home-reminder-section">
+                <h2>《最好的教育在于赋能》</h2>
+                <p><span class="highlight">孩子开心才能思路开阔，思路开阔才能启迪智慧。</span></p>
+                <p>如果您是一位普通的父母，</p>
+                <p>或许觉得自己拥有的资源不那么多，</p>
+                <p>或者感觉自身学识经验可能有限，</p>
+                <p>不太确定如何才是最适合孩子的教育方法，</p>
+                <p>那么，请更多地去<span class="highlight">鼓励</span>孩子、<span class="highlight">认可</span>他、适时<span class="highlight">表扬</span>他，</p>
+                <p>去<span class="highlight">理解</span>他、<span class="highlight">包容</span>他、坚定<span class="highlight">支持</span>他。</p>
+                <div class="important-note">
+                    <p><i class="fas fa-exclamation-triangle mr-2 text-amber-500"></i>重要的是，请留意<span class="font-semibold">不要</span>将自己的认知焦虑、恐惧、愤怒或委屈，不自觉地传递给孩子。</p>
+                    <p>这，或许就是对孩子<span class="font-semibold">最好的教育</span>。</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="empowerment" class="page-content">
+            <h1><i class="fas fa-rocket mr-2"></i>第一章：理解赋能式教育</h1>
+            <h2>点燃男孩心中的“英雄之旅”</h2>
+            <div class="card">
+                <h3>超越授权：赋能的真正核心</h3>
+                <p>真正的赋能，其核心在于培养孩子的内在驱动力，而非仅仅给予外部的自由。这包括：</p>
+                <ul>
+                    <li>培育内在驱动力 (Intrinsic Motivation)：因行为本身带来的愉悦感和满足感而产生的动力。</li>
+                    <li>涵养自主性与主人翁意识 (Autonomy and Ownership)：给予孩子选择和决定的机会，培养其主人翁意识。</li>
+                    <li>发展责任感与问题解决能力 (Responsibility and Problem-Solving Skills)：鼓励独立思考和解决问题，允许犯错。</li>
+                </ul>
+                <p>赋能并非放任自流，而是在提供支持和框架的前提下，有意识地培养男孩的核心心理需求。</p>
+            </div>
+            <div class="card">
+                <h3>发展心理学与认知科学的视角</h3>
+                <p>埃里克森的社会心理发展阶段理论为我们提供了重要参考：</p>
+                <ul>
+                    <li><strong>“勤奋对自卑”阶段 (约7-11岁)</strong>：核心任务是学习新技能，发展勤奋感和胜任感。</li>
+                    <li><strong>“身份对角色混乱”阶段 (约11-19岁)</strong>：面临“我是谁”的身份认同挑战，需要探索和形成稳定自我认知。</li>
+                </ul>
+                <p>自我决定理论 (Self-Determination Theory, SDT) 强调自主、胜任和归属三大基本心理需求对内在驱动力的核心作用。</p>
+                <p>认知科学启示我们，成长型思维模式与内在驱动力紧密相关。</p>
+            </div>
+             <div class="card">
+                <h3>文化底蕴与母亲的智慧：引导儿子探寻“天命”</h3>
+                <p>中华传统文化中对男孩的期许，如“大丈夫当如是也”、“天行健，君子以自强不息”，蕴含着对品格与作为的崇高理想。</p>
+                <ul>
+                    <li><strong>从“成龙”到“成人”</strong>：品格健全、内心丰盈是成为“龙”的前提。</li>
+                    <li><strong>将“自强不息”内化为成长动力</strong>：鼓励儿子超越昨天的自己。</li>
+                    <li><strong>发现并支持儿子的“使命感”</strong>：鼓励探索热爱的事业，赋予意义感和价值感。</li>
+                </ul>
+                <p>母亲的智慧在于“引”而非“压”，帮助儿子开启属于他自己的“英雄之旅”。</p>
+            </div>
+        </div>
+
+        <div id="boysWorld" class="page-content">
+            <h1><i class="fas fa-brain mr-2"></i>第二章：走进8-16岁男孩的内心世界</h1>
+            <h2>理解与连接</h2>
+            <div class="card">
+                <h3>成长风貌：重要的发展里程碑</h3>
+                <h4>小学高年级 (8-12岁) – 规则、逻辑、公平、胜任与伙伴</h4>
+                <ul>
+                    <li>规则意识增强，对公平敏感。</li>
+                    <li>逻辑思维发展，渴望胜任感与成就感。</li>
+                    <li>伙伴关系重要性凸显。</li>
+                </ul>
+                <h4>青春期 (12-16岁) – 风暴、独立、寻伴与思辨</h4>
+                <ul>
+                    <li>生理巨变带来的困惑与冲动。</li>
+                    <li>情绪波动大，被称为“暴风骤雨期”。</li>
+                    <li>独立意识与叛逆心理并存。</li>
+                    <li>极度寻求同伴认同。</li>
+                    <li>抽象思维与批判性思维发展，开始思考“我是谁”。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>解读男孩常见的行为模式及背后需求</h3>
+                <p>许多看似“叛逆”的行为，是男孩在特定发展阶段，用尚不成熟的方式表达内在需求。</p>
+                <ul>
+                    <li><strong>“不听话”</strong>: 可能寻求自主与控制，测试界限。需求：被尊重、被理解、自主权。</li>
+                    <li><strong>沉迷游戏</strong>: 可能满足胜任感、成就感、自主选择、社交连接或应对压力。需求：成就感、掌控感、乐趣。</li>
+                    <li><strong>不爱沟通</strong>: 可能寻求个人空间、处理情绪、避免冲突。需求：尊重隐私、情感安全、被理解。</li>
+                    <li><strong>冲动易怒</strong>: 可能源于生理发育、压力累积、应对技巧不足。需求：理解生理变化、情绪管理技能。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>与此阶段男孩有效沟通的艺术</h3>
+                <ul>
+                    <li><strong>倾听</strong>：专注、不打断、不评判、共情式回应，听懂“弦外之音”。</li>
+                    <li><strong>提问</strong>：多用开放式问题激发思考，避免质问，引导他自己找到答案。</li>
+                    <li><strong>把握“管”与“放”</strong>：清晰底线与灵活边界，信任是“放”的基础，允许犯错。权威型教养模式。</li>
+                    <li><strong>应对“沉默期”与“顶嘴期”</strong>：保持耐心，不强迫；保持冷静，不升级冲突，事后沟通。</li>
+                </ul>
+                <p>中华文化中“慈威并济”的平衡艺术，以及对“男儿有泪不轻弹”文化烙印的理解与疏导，都为母亲提供了智慧。</p>
+            </div>
+        </div>
+
+        <div id="emotionsLearning" class="page-content">
+            <h1><i class="fas fa-smile-beam mr-2"></i>第三章：情绪与学习的科学关联</h1>
+            <h2>传统养心之道及母子情绪的共振</h2>
+            <div class="card">
+                <h3>“孩子开心才能思路开阔，思路开阔才能启迪智慧”的科学解码</h3>
+                <p>积极情绪对认知功能有显著促进作用。</p>
+                <ul>
+                    <li><strong>布罗德-构建理论 (Broaden-and-Build Theory)</strong>：积极情绪（快乐、兴趣等）能扩展个体的思想行为组合，使其更具创造性、灵活性。</li>
+                    <li><strong>神经科学证据</strong>：积极情绪与大脑多巴胺系统活动相关，激活与学习、记忆相关的脑区。</li>
+                    <li><strong>对探索欲和问题解决能力的影响</strong>：积极情绪体验激发探索欲望和求知热情，使男孩更敢于冒险尝试。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>母亲情绪的涟漪：母子情绪的共振效应</h3>
+                <p>母亲的情绪状态对儿子有直接而深远的影响，称为“情绪共振”或“情绪传染”。</p>
+                <ul>
+                    <li><strong>情绪传染机制</strong>：情绪通过语气、表情、肢体语言等传递。</li>
+                    <li><strong>对儿子情绪发展的影响</strong>：儿子会模仿母亲处理情绪的方式，母亲稳定积极的情绪有助于建立儿子的安全感。</li>
+                    <li><strong>母亲压力对儿子的传递</strong>：母亲的压力可能通过情绪共振传递给儿子，影响其身心健康。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>传统“养心”智慧：营造积极家庭情绪场</h3>
+                <p>中国传统文化中的“养心”智慧为现代母亲调适情绪提供了借鉴。</p>
+                <ul>
+                    <li><strong>“境由心造”</strong>：内心状态决定外在环境，母亲的“心境”是家庭情绪氛围的主要营造者。</li>
+                    <li><strong>“心平气和”</strong>：内心平静与和谐是情绪稳定的基石。</li>
+                    <li><strong>“养心” (Yang Xin) 的实践</strong>：通过道德修养、反思内省、顺应自然等方式调养心性，达到内心和谐。母亲可以通过学习情绪管理、培养积极心态、寻求内在宁静、建立社会支持系统等方式“养心”。</li>
+                </ul>
+                <p>当母亲致力于自身的“养心”，就能为儿子营造一个充满爱、安全和支持的成长环境。</p>
+            </div>
+        </div>
+
+        <div id="feedback" class="page-content">
+            <h1><i class="fas fa-thumbs-up mr-2"></i>第四章：积极反馈的艺术</h1>
+            <h2>塑造男孩的“胜任感”与“价值感”</h2>
+            <div class="card">
+                <h3>为何积极反馈对男孩尤其重要</h3>
+                <ul>
+                    <li>连接“胜任感” (Sense of Competence)：强化“我能行”的信念。</li>
+                    <li>积极引导“好胜心” (Competitive Spirit)：将好胜心转化为持续进步的动力。</li>
+                    <li>建立“价值感” (Sense of Value)：感受到被重视，形成积极的自我概念。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>有效表扬与鼓励的技巧</h3>
+                <ul>
+                    <li><strong>具体化，而非泛泛之谈</strong>：清晰指出具体哪个行为或努力值得肯定。</li>
+                    <li><strong>关注过程与努力，而不仅仅是结果</strong>：培养成长型思维，明白努力和方法的重要性。</li>
+                    <li><strong>真诚走心，避免敷衍</strong>：表扬应基于真实的观察和感受。</li>
+                    <li><strong>及时反馈</strong>：及时的肯定能更好地强化行为。</li>
+                    <li><strong>区分鼓励与表扬</strong>：鼓励更关注过程、努力和潜力，激发内在动力。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>从失败中学习：培养“抗挫力”与成长型思维</h3>
+                <ul>
+                    <li>将错误和失败视为学习的契机，引导分析原因。</li>
+                    <li>肯定面对挫折的勇气和毅力。</li>
+                    <li>强调“尚未”的力量，相信能力可以通过努力发展。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>文化底蕴与母亲的智慧：“玉不琢不成器”的新解</h3>
+                <p>“玉不琢不成器”强调教育和磨砺的重要性。现代诠释应融合积极心理学：</p>
+                <ul>
+                    <li>“琢”是精心雕琢、细致打磨，包括设定规则、耐心教导、建设性反馈和支持引导。</li>
+                    <li>母亲的鼓励和肯定是打磨过程中的“润滑剂”。</li>
+                    <li>母亲的慧眼：发现并赞赏儿子的“璞玉”之美，包括与众不同的特质。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="unconditionalLove" class="page-content">
+            <h1><i class="fas fa-heart mr-2"></i>第五章：无条件积极关注的重要性</h1>
+            <h2>成为男孩最坚实的“后方基地”</h2>
+            <div class="card">
+                <h3>卡尔·罗杰斯的核心理念：无条件积极关注 (UPR)</h3>
+                <p>UPR指一种全然的、不带任何附加条件的接纳和爱。无论儿子表现如何，母亲都始终如一地爱他、接纳他，珍视他作为一个独立个体的内在价值。</p>
+                <p>与“价值条件” (Conditions of Worth) 相对，后者指父母的爱和认可取决于孩子是否满足特定条件，易导致孩子压抑真实自我，内心焦虑。</p>
+            </div>
+            <div class="card">
+                <h3>UPR 对男孩成长的关键作用</h3>
+                <ul>
+                    <li>建立稳固的安全感与信任基石。</li>
+                    <li>培育健康的自尊心与自信心。</li>
+                    <li>激发独立探索的勇气。</li>
+                    <li>促进情绪的健康发展。</li>
+                    <li>应对青春期困惑的“定海神针”。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>如何在实践中体现无条件积极关注</h3>
+                <ul>
+                    <li><strong>区分行为与个体本身</strong>：批评的是行为，而不是不爱这个人。</li>
+                    <li><strong>积极倾听与共情理解</strong>：努力倾听内心的声音，理解感受和需求。</li>
+                    <li><strong>始终如一的爱与支持</strong>：即使在犯错、失败时，爱依然在那里。</li>
+                    <li><strong>相信他的潜能与向好之心</strong>：坚信他内心向善，有能力变得更好。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>文化底蕴与母亲的智慧：“慈母手中线”的新时代演绎</h3>
+                <p>“慈母手中线”象征母亲深沉、无私的爱与牵挂，与UPR精神内核相通。</p>
+                <ul>
+                    <li><strong>情感的丝线，而非控制的缰绳</strong>：爱与支持应滋养心灵，而非束缚。</li>
+                    <li><strong>信任的目光，而非焦虑的注视</strong>：相信儿子有能力应对挑战。</li>
+                    <li><strong>智慧的放手，而非无尽的包办</strong>：鼓励独立，培养独立人格。</li>
+                    <li><strong>成为他永远的“后方基地”</strong>：家永远是可以安心回归的港湾。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="selfCare" class="page-content">
+            <h1><i class="fas fa-spa mr-2"></i>第六 & 七章：母亲的自我关怀与情绪管理</h1>
+            <h2>破解“道理都懂，但忍不住”的困局</h2>
+            <div class="card">
+                <h3>母亲情绪状态对儿子的“隐形”影响</h3>
+                <ul>
+                    <li><strong>情绪的模仿与习得</strong>：儿子可能习得母亲消极的情绪反应模式。</li>
+                    <li><strong>对儿子性别角色与自我认同形成的冲击</strong>：可能导致情感压抑或过度敏感/反叛。</li>
+                    <li><strong>对女性和亲密关系的认知塑造</strong>：母亲的情绪表达方式影响儿子未来对女性的看法。</li>
+                </ul>
+                <p>母亲不自觉传递的焦虑、失望、愤怒等负面情绪，可能侵蚀儿子的自信，使其价值感迷失，缺乏安全感。</p>
+            </div>
+            <div class="card">
+                <h3>传统文化中的女性修养智慧：“坤厚载物”与“静以修身”</h3>
+                <ul>
+                    <li><strong>“坤厚载物”</strong>：启示母亲内在的力量源于宽厚、坚韧与包容。</li>
+                    <li><strong>“静以修身”</strong>：通过内心的宁静、专注与反思来修炼自身，更从容应对外界纷扰。</li>
+                </ul>
+                <p>借鉴传统智慧，并非刻板模仿，而是汲取灵感，找到温柔而有力的内在成长路径。</p>
+            </div>
+            <div class="card">
+                <h3>理解妈妈“忍不住”的背后：看见真实的焦虑与疲惫</h3>
+                <ul>
+                    <li>对儿子未来发展的深层焦虑与文化压力。</li>
+                    <li>与青春期儿子沟通的挫败感与无力感。</li>
+                    <li>担心儿子“学坏”的深切恐惧。</li>
+                    <li>自身精力被大量消耗后的生理与心理疲惫。</li>
+                    <li>过往经历与未被满足的需求被触发。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>情绪的“暂停键”与妈妈的“喘息空间”：即时调控技巧</h3>
+                <p><strong>“暂停-思考-回应” (Pause-Think-Respond)</strong>：</p>
+                <ol class="list-decimal list-inside">
+                    <li><strong>暂停 (Pause)</strong>：察觉警报信号，立刻停止互动，深呼吸或暂时离开。</li>
+                    <li><strong>思考 (Think)</strong>：自我觉察（感受、触发点、冲动反应、后果、目标、更建设性方式）。</li>
+                    <li><strong>回应 (Respond)</strong>：选择更符合理念和目标的回应方式。</li>
+                </ol>
+                <p>简易静心技巧：专注呼吸、五感观察法、身体扫描。</p>
+            </div>
+            <div class="card">
+                <h3>重塑认知与行为：“转念”的智慧与“慈悲”的力量</h3>
+                <ul>
+                    <li>识别与挑战非理性信念 (如“男孩就应该坚强”，“他这样做就是故意跟我作对”)。</li>
+                    <li>培养自我慈悲：像对待好朋友那样给予自己理解、善意和支持。</li>
+                    <li>对儿子的慈悲：看见行为背后的“善意”或需求。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>建立新的沟通习惯：借鉴“非暴力沟通” (NVC)</h3>
+                <p>NVC核心四要素：观察、感受、需要、请求。</p>
+                <p>母亲的共情天赋是NVC的灵魂，努力“听见”儿子语言背后未被满足的需求和情绪。</p>
+            </div>
+            <div class="card">
+                <h3>妈妈的自我关怀与传统“悦己”文化的现代实践</h3>
+                <ul>
+                    <li>自我关怀不是自私，而是负责。</li>
+                    <li>“悦己”新解：“为自己而悦”，追求自身的愉悦与价值实现。</li>
+                    <li>实践“悦己”：培养兴趣、社交、运动、睡眠、独处、学习成长。</li>
+                    <li>拥有自己的生活，是给儿子最好的榜样之一。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="guide" class="page-content">
+            <h1><i class="fas fa-cogs mr-2"></i>第八章：实践指南与家庭行动计划</h1>
+            <h2>融入母爱的日常育儿方略 (聚焦8-16岁男孩)</h2>
+            <div class="card">
+                <h3>针对小学高年级男孩 (8-12岁)</h3>
+                <ul>
+                    <li><strong>规则制定与责任培养</strong>：共同参与，解释逻辑，明确具体，强调“我的责任”。</li>
+                    <li><strong>初步职业启蒙与兴趣引导</strong>：拓宽视野，连接兴趣。</li>
+                    <li><strong>情感与友谊引导</strong>：识别与表达情绪，学习共情与解决冲突。</li>
+                    <li><strong>青春期预备教育</strong>：适时开启对话，提供科学信息，强调正常与接纳。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>针对青春期男孩 (12-16岁)</h3>
+                <ul>
+                    <li><strong>规则协商与自主深化</strong>：从“命令”到“协商”，权利与责任对等。</li>
+                    <li><strong>责任深化与能力培养</strong>：时间管理，生活技能，社会实践。</li>
+                    <li><strong>生涯探索与规划辅导</strong>：自我探索，信息搜集，开放讨论。</li>
+                    <li><strong>异性相处与健康关系教育</strong>：尊重平等，健康表达，理解吸引与爱，同意的重要性，识别不健康关系。</li>
+                    <li><strong>应对青春期困惑与心理支持</strong>：常态化沟通，接纳情绪波动，关注心理健康信号。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>融入母爱的日常互动方略</h3>
+                <ul>
+                    <li><strong>高质量的陪伴</strong>：专注的陪伴，共同做喜欢的事。</li>
+                    <li><strong>共同参与家庭事务</strong>：培养责任感，增进凝聚力。</li>
+                    <li><strong>鼓励表达与分享的家庭文化</strong>：营造开放、安全、尊重的氛围。</li>
+                    <li><strong>共同的兴趣与爱好</strong>：成为母子间独特的连接纽带。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>文化底蕴与母亲的智慧：传统仪式与活动的现代应用</h3>
+                <ul>
+                    <li><strong>活用中国传统节日</strong>：了解习俗，讲述故事，传递美德。</li>
+                    <li><strong>男孩“成人礼”的现代思考与实践</strong>：借鉴传统“冠礼”意义，创新形式，赋予深刻意义——标志过渡，肯定成长，引导责任。</li>
+                    <li><strong>家风家训的传承与塑造</strong>：传递积极价值观，塑造健康新家风。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="myths" class="page-content">
+            <h1><i class="fas fa-question-circle mr-2"></i>第九章：破除常见育儿误区</h1>
+            <h2>以现代科学与母性智慧辨析传统观念 (针对男孩教育)</h2>
+            <div class="card">
+                <h3>误区一：“男孩穷养，女孩富养”</h3>
+                <p><strong>辨析</strong>：情感的“富养”对所有孩子都至关重要。对男孩，“穷养”的真谛在于品格与责任的锤炼，而非物质匮乏。性别差异不应成为剥夺或过度满足的理由。母亲应提供情感富足，物质适度，引导正确价值观。</p>
+            </div>
+            <div class="card">
+                <h3>误区二：“男孩子调皮捣蛋才聪明/有出息”</h3>
+                <p><strong>辨析</strong>：需区分正常活力与行为问题。真正的“聪明”和“有出息”需要良好认知、自控、社会适应能力和道德品质。引导能量积极转化，培养规则意识与社会责任感。母亲需洞察行为性质，对破坏性行为及时制止和教育。</p>
+            </div>
+            <div class="card">
+                <h3>误区三：“棍棒底下出孝子”</h3>
+                <p><strong>辨析</strong>：体罚对孩子身心发展有诸多负面影响（情绪行为问题、认知受损、亲子关系破坏）。“孝”源于内心的爱与尊重，需通过言传身教和积极引导培养。积极的纪律方式（设定规则、自然后果、有效沟通）更为有效。母亲应摒弃此观念，用爱与科学方法引导。</p>
+            </div>
+            <div class="card">
+                <h3>文化底蕴与母亲的智慧：塑造刚柔并济的现代男性</h3>
+                <p>客观审视传统男性角色刻板印象，培育“刚柔并济”的现代男性气概：</p>
+                <ul>
+                    <li><strong>“阳刚之气”新内涵</strong>：强健、坚定、担当，更包括正直、诚信、责任心、尊重规则。</li>
+                    <li><strong>“温柔之力”不可或缺</strong>：体贴、善解人意、同情心、共情能力。</li>
+                    <li><strong>情感表达能力是力量而非软弱</strong>：鼓励认识、接纳并恰当表达各种情绪。</li>
+                </ul>
+                <p>母亲作为关键塑造者：言传身教，鼓励多元发展，创造开放沟通环境，肯定其“柔”的一面。</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="chapterBottomNav" class="chapter-bottom-nav-container">
+        <button id="prevChapterBtn" class="chapter-nav-button">
+            <i class="fas fa-arrow-left mr-2"></i>上一章
+        </button>
+        <button id="nextChapterBtn" class="chapter-nav-button">
+            下一章<i class="fas fa-arrow-right ml-2"></i>
+        </button>
+    </div>
+
+    <div id="calmDownModal" class="modal-overlay">
+        <div class="modal-content relative">
+            <i class="fas fa-times modal-close-button" onclick="closeCalmDownModal()"></i>
+            <h2 class="text-2xl font-semibold mb-6 text-[#0f769e]">深呼吸，冷静一下</h2>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-medium mb-3 text-[#1e3a8a]">引导式深呼吸</h3>
+                <div id="breathingCircle" class="breathing-circle">
+                    <span id="breathingText">开始</span>
+                </div>
+                <p id="breathingInstruction" class="text-sm text-gray-600 mt-2">点击下方按钮开始练习 (4秒吸气 - 4秒保持 - 6秒呼气)</p>
+                <button id="startBreathingBtn" class="button-primary mt-3" onclick="startBreathingCycle()">开始练习</button>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-medium mb-3 text-[#1e3a8a]">积极自我暗示</h3>
+                <p id="affirmationText" class="affirmation-text">我可以控制自己的情绪。</p>
+                <button class="button-secondary" onclick="showNextAffirmation()">换一个暗示</button>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-medium mb-3 text-[#1e3a8a]">片刻宁静</h3>
+                <p class="text-gray-700">给自己片刻宁静。深呼吸，从1数到10，然后再回应。</p>
+                <i class="fas fa-feather-alt text-4xl text-sky-300 my-4"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chapterOrder = ['empowerment', 'boysWorld', 'emotionsLearning', 'feedback', 'unconditionalLove', 'selfCare', 'guide', 'myths'];
+        const chapterBottomNav = document.getElementById('chapterBottomNav');
+        const prevChapterBtn = document.getElementById('prevChapterBtn');
+        const nextChapterBtn = document.getElementById('nextChapterBtn');
+
+        // 页面切换函数
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            const activePage = document.getElementById(pageId);
+            if (activePage) {
+                activePage.classList.add('active');
+            }
+
+            const navItemsDesktop = document.querySelectorAll('#desktop-nav .nav-item');
+            navItemsDesktop.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('onclick') === `showPage('${pageId}')`) {
+                    item.classList.add('active');
+                }
+            });
+
+            const navItemsMobile = document.querySelectorAll('#mobile-nav-items .nav-item');
+            navItemsMobile.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(`showPage('${pageId}')`)) {
+                    item.classList.add('active');
+                }
+            });
+            window.scrollTo(0, 0);
+            updateChapterBottomNav(pageId); // Update bottom nav on page change
+        }
+
+        function updateChapterBottomNav(currentPageId) {
+            if (!chapterBottomNav || !prevChapterBtn || !nextChapterBtn) return;
+
+            const currentIndex = chapterOrder.indexOf(currentPageId);
+
+            if (currentIndex === -1 || currentPageId === 'home') { // Not a chapter page or home page
+                chapterBottomNav.classList.remove('visible');
+                return;
+            }
+
+            chapterBottomNav.classList.add('visible');
+
+            // Previous Chapter Button
+            if (currentIndex > 0) {
+                prevChapterBtn.classList.remove('disabled');
+                prevChapterBtn.onclick = () => showPage(chapterOrder[currentIndex - 1]);
+            } else {
+                prevChapterBtn.classList.add('disabled');
+                prevChapterBtn.onclick = null;
+            }
+
+            // Next Chapter Button
+            if (currentIndex < chapterOrder.length - 1) {
+                nextChapterBtn.classList.remove('disabled');
+                nextChapterBtn.onclick = () => showPage(chapterOrder[currentIndex + 1]);
+            } else {
+                nextChapterBtn.classList.add('disabled');
+                nextChapterBtn.onclick = null;
+            }
+        }
+
+
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileNavItems = document.getElementById('mobile-nav-items');
+
+        function toggleMobileMenu() {
+            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+            mobileNavItems.style.display = mobileNavItems.style.display === 'flex' ? 'none' : 'flex';
+            const icon = mobileMenuButton.querySelector('i');
+            if (mobileNavItems.style.display === 'flex') {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        }
+        
+        if (mobileMenuButton) { 
+            mobileMenuButton.addEventListener('click', toggleMobileMenu);
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('home'); // Initial page load
+        });
+
+        // --- 冷静一刻 模态框功能 ---
+        const calmDownModal = document.getElementById('calmDownModal');
+        const breathingCircle = document.getElementById('breathingCircle');
+        const breathingText = document.getElementById('breathingText');
+        const breathingInstruction = document.getElementById('breathingInstruction');
+        const startBreathingBtn = document.getElementById('startBreathingBtn'); // Renamed from startBreathingExercise
+        const affirmationTextElement = document.getElementById('affirmationText');
+
+        const affirmations = [
+            "我可以控制自己的情绪。",
+            "我是一个有爱心和耐心的母亲。",
+            "我的孩子需要我的理解和引导，而不是我的怒火。",
+            "此刻的平静对我、对孩子都好。",
+            "深呼吸，我能感受到内心的平静正在回归。",
+            "我选择用爱和智慧来回应。",
+            "暂停一下，事情会更清晰。"
+        ];
+        let currentAffirmationIndex = 0;
+        let breathingTimeout1, breathingTimeout2, breathingTimeout3, breathingTimeout4; 
+        let audioCtx; 
+        let isBreathingExerciseActive = false; // Flag to control the loop
+
+        // Function to play a simple tone
+        function playTone(frequency, duration, type = 'sine', callback) {
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.warn("Web Audio API is not supported in this browser.");
+                    if (callback) callback(); 
+                    return;
+                }
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(() => {
+                    // console.log("AudioContext resumed successfully for tone.");
+                    _playToneInternal(frequency, duration, type, callback);
+                }).catch(e => {
+                    console.error("Error resuming AudioContext for tone:", e);
+                     if (callback) callback(); 
+                });
+            } else {
+                _playToneInternal(frequency, duration, type, callback);
+            }
+        }
+
+        function _playToneInternal(frequency, duration, type, callback) {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05); 
+            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration - 0.05); 
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + duration);
+            oscillator.onended = () => {
+                if (callback) callback();
+            };
+        }
+
+
+        function openCalmDownModal() {
+            if (calmDownModal) {
+                calmDownModal.classList.add('active');
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume().catch(e => console.error("Error resuming AudioContext on modal open:", e));
+                }
+                resetBreathingExercise(); // This will also set isBreathingExerciseActive to false
+                currentAffirmationIndex = 0;
+                if(affirmationTextElement) {
+                    affirmationTextElement.textContent = affirmations[currentAffirmationIndex];
+                }
+            }
+        }
+
+        function closeCalmDownModal() {
+            if (calmDownModal) {
+                calmDownModal.classList.remove('active');
+                isBreathingExerciseActive = false; // Crucial: stop the loop
+                clearAllBreathingTimeouts();
+                resetBreathingExerciseVisuals(); 
+            }
+        }
+        
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && calmDownModal && calmDownModal.classList.contains('active')) {
+                closeCalmDownModal();
+            }
+        });
+
+        if (calmDownModal) {
+            calmDownModal.addEventListener('click', (event) => {
+                if (event.target === calmDownModal) { 
+                    closeCalmDownModal();
+                }
+            });
+        }
+
+
+        function showNextAffirmation() {
+            currentAffirmationIndex = (currentAffirmationIndex + 1) % affirmations.length;
+            if(affirmationTextElement) {
+                affirmationTextElement.textContent = affirmations[currentAffirmationIndex];
+            }
+        }
+        
+        function clearAllBreathingTimeouts() {
+            clearTimeout(breathingTimeout1);
+            clearTimeout(breathingTimeout2);
+            clearTimeout(breathingTimeout3);
+            clearTimeout(breathingTimeout4);
+        }
+
+        function resetBreathingExerciseVisuals() { // Resets only visuals and button state
+            if (breathingCircle) breathingCircle.classList.remove('inhale', 'exhale');
+            if (breathingText) breathingText.textContent = "开始";
+            if (breathingInstruction) breathingInstruction.textContent = "点击下方按钮开始练习 (4秒吸气 - 4秒保持 - 6秒呼气)";
+            if (startBreathingBtn) {
+                startBreathingBtn.disabled = false;
+                startBreathingBtn.textContent = "开始练习";
+            }
+        }
+
+        function resetBreathingExercise() { // Full reset including stopping the loop
+            isBreathingExerciseActive = false;
+            clearAllBreathingTimeouts();
+            resetBreathingExerciseVisuals();
+        }
+
+        function startBreathingCycle() { // Renamed from startBreathingExercise to avoid confusion
+            if (!isBreathingExerciseActive) { // If called by button click
+                isBreathingExerciseActive = true;
+                if (startBreathingBtn) {
+                    startBreathingBtn.disabled = true;
+                    startBreathingBtn.textContent = "练习中...";
+                }
+            }
+            
+            if (!isBreathingExerciseActive) { // Double check in case modal was closed during a timeout
+                resetBreathingExerciseVisuals();
+                return;
+            }
+
+            if (!breathingCircle || !breathingText || !breathingInstruction) return;
+            
+            clearAllBreathingTimeouts(); 
+
+            breathingInstruction.textContent = "请跟随提示进行...";
+            
+            breathingText.textContent = "";
+            // playTone(300, 0.3, 'triangle'); 
+            breathingCircle.classList.remove('inhale', 'exhale'); 
+
+            breathingTimeout1 = setTimeout(() => {
+                if (!isBreathingExerciseActive) { resetBreathingExerciseVisuals(); return; }
+                breathingText.textContent = "吸气";
+                playTone(440, 0.3, 'sine'); 
+                breathingCircle.classList.add('inhale');
+                breathingCircle.classList.remove('exhale');
+                
+                breathingTimeout2 = setTimeout(() => {
+                    if (!isBreathingExerciseActive) { resetBreathingExerciseVisuals(); return; }
+                    breathingText.textContent = "保持";
+                    playTone(330, 0.3, 'square'); 
+                    
+                    breathingTimeout3 = setTimeout(() => {
+                        if (!isBreathingExerciseActive) { resetBreathingExerciseVisuals(); return; }
+                        breathingText.textContent = "呼气";
+                        playTone(220, 0.3, 'sawtooth'); 
+                        breathingCircle.classList.remove('inhale');
+                        breathingCircle.classList.add('exhale'); 
+                                               
+                        breathingTimeout4 = setTimeout(() => {
+                            if (isBreathingExerciseActive) {
+                                startBreathingCycle(); // Loop back if still active
+                            } else {
+                                resetBreathingExerciseVisuals();
+                            }
+                        }, 6000); 
+                    }, 4000); 
+                }, 4000); 
+            }, 1000); 
+        }
+        // Attach the new cycle starter to the button
+        if (startBreathingBtn) {
+            startBreathingBtn.onclick = startBreathingCycle;
+        }
+
+
+        // --- 全局音频播放器功能 ---
+        const audioElement = document.getElementById('globalAudioPlayer');
+        const audioPlayPauseBtn = document.getElementById('audioPlayPauseBtn');
+        const seekBar = document.getElementById('seekBar');
+        const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+        const totalTimeDisplay = document.getElementById('totalTimeDisplay');
+        const playbackSpeedSelect = document.getElementById('playbackSpeedSelect');
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        if (audioElement && audioPlayPauseBtn && seekBar && currentTimeDisplay && totalTimeDisplay && playbackSpeedSelect) {
+            audioPlayPauseBtn.addEventListener('click', () => {
+                if (audioElement.paused || audioElement.ended) {
+                    audioElement.play().catch(e => console.error("Error playing audio:", e));
+                } else {
+                    audioElement.pause();
+                }
+            });
+
+            audioElement.addEventListener('play', () => {
+                audioPlayPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            });
+            audioElement.addEventListener('pause', () => {
+                audioPlayPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
+            audioElement.addEventListener('ended', () => {
+                audioPlayPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                seekBar.value = 0; 
+                currentTimeDisplay.textContent = formatTime(0);
+            });
+
+            audioElement.addEventListener('loadedmetadata', () => {
+                totalTimeDisplay.textContent = formatTime(audioElement.duration);
+                seekBar.max = audioElement.duration;
+            });
+            audioElement.addEventListener('timeupdate', () => {
+                currentTimeDisplay.textContent = formatTime(audioElement.currentTime);
+                if (!audioElement.seeking) { 
+                    seekBar.value = audioElement.currentTime;
+                }
+            });
+
+            seekBar.addEventListener('input', () => {
+                audioElement.currentTime = seekBar.value;
+            });
+
+            playbackSpeedSelect.addEventListener('change', () => {
+                audioElement.playbackRate = parseFloat(playbackSpeedSelect.value);
+            });
+        } else {
+            console.warn("One or more audio player elements are missing from the DOM.");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乘法简便运算演示器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f9ff; /* Light blue background */
+            color: #075985; /* Darker blue text */
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 0.75rem; /* md */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0f2fe; /* Lighter blue border */
+        }
+        .btn {
+            background-color: #0ea5e9; /* Sky blue */
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem; /* sm */
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            margin: 0.25rem;
+        }
+        .btn:hover {
+            background-color: #0284c7; /* Darker sky blue */
+        }
+        .btn-secondary {
+            background-color: #fbbf24; /* Amber 400 */
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #f59e0b; /* Amber 500 */
+        }
+        .btn-problem-active {
+            background-color: #0369a1; /* Sky 700 */
+            color: white;
+        }
+        .explanation-box {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: #e0f2fe; /* Very light blue */
+            border-radius: 0.5rem; /* sm */
+            border-left: 5px solid #0ea5e9; /* Sky blue accent */
+            min-height: 80px;
+        }
+        .explanation-box p {
+            margin-bottom: 0.5rem;
+            color: #075985;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .calculation-display {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2rem; /* Increased font size */
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            background-color: #f8fafc; /* Slate 50 */
+            border-radius: 0.5rem;
+            text-align: center;
+            min-height: 70px;
+            border: 1px dashed #cbd5e1; /* Slate 300 */
+        }
+        .highlight-term {
+            color: #22c55e; /* Green 500 */
+            font-weight: bold;
+        }
+        .highlight-step {
+            background-color: #fef9c3; /* Yellow 100 */
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .final-answer {
+            color: #ef4444; /* Red 500 */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="container w-full max-w-3xl">
+        <h1 class="text-3xl font-bold text-center mb-6 text-sky-700">乘法简便运算演示器</h1>
+        
+        <div class="text-center mb-6">
+            <button id="problem1Btn" class="btn btn-problem-active">题目 1: 8 × 6.2 × 0.125</button>
+            <button id="problem2Btn" class="btn">题目 2: 2.1 × 7.6 + 2.1 × 5.4 - 2.1 × 3</button>
+        </div>
+
+        <div id="calculationDisplay" class="calculation-display">
+            </div>
+
+        <div id="explanationArea" class="explanation-box">
+            <p class="font-semibold">选择上面的题目，然后点击“下一步”按钮，一步一步学习计算过程。</p>
+        </div>
+        
+        <div class="text-center mt-8">
+            <button id="nextStepBtn" class="btn">下一步</button>
+            <button id="resetBtn" class="btn btn-secondary">重置当前题目</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const problem1Btn = document.getElementById('problem1Btn');
+        const problem2Btn = document.getElementById('problem2Btn');
+        const nextStepBtn = document.getElementById('nextStepBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const explanationArea = document.getElementById('explanationArea');
+        const calculationDisplay = document.getElementById('calculationDisplay');
+
+        let currentProblem = 1; // 1 or 2
+        let currentStep = 0;
+        let steps = [];
+
+        // Steps for Problem 1: 8 * 6.2 * 0.125
+        const problem1Steps = [
+            {
+                expressionHTML: "8 × 6.2 × 0.125",
+                explanation: "这是我们要计算的题目。仔细观察数字，看看有没有什么特点。"
+            },
+            {
+                expressionHTML: "8 × <span class='highlight-term'>0.125</span> × 6.2",
+                explanation: "我们可以用<span class='highlight-step'>乘法交换律 (a × b = b × a)</span> 改变数字的顺序，方便计算。我们把 0.125 移到 8 旁边。"
+            },
+            {
+                expressionHTML: "(<span class='highlight-term'>8 × 0.125</span>) × 6.2",
+                explanation: "然后用<span class='highlight-step'>乘法结合律 ((a × b) × c = a × (b × c))</span>，先把 8 和 0.125 乘起来。"
+            },
+            {
+                expressionHTML: "<span class='highlight-term highlight-step'>1</span> × 6.2",
+                explanation: "哇！<span class='highlight-step'>8 × 0.125 正好等于 1</span>！这是一个非常重要的简便计算技巧，一定要记住哦！"
+            },
+            {
+                expressionHTML: "<span class='final-answer'>6.2</span>",
+                explanation: "最后，1 乘以任何数都等于那个数本身。所以 <span class='highlight-step'>1 × 6.2 = 6.2</span>。答案就是 6.2！"
+            }
+        ];
+
+        // Steps for Problem 2: 2.1 * 7.6 + 2.1 * 5.4 - 2.1 * 3
+        const problem2Steps = [
+            {
+                expressionHTML: "2.1 × 7.6 + 2.1 × 5.4 - 2.1 × 3",
+                explanation: "这道题有乘有加有减。我们找找看有没有共同的数字。"
+            },
+            {
+                expressionHTML: "<span class='highlight-term'>2.1</span> × 7.6 + <span class='highlight-term'>2.1</span> × 5.4 - <span class='highlight-term'>2.1</span> × 3",
+                explanation: "我们发现，每一部分都有一个相同的数 <span class='highlight-step'>2.1</span>。"
+            },
+            {
+                expressionHTML: "<span class='highlight-term'>2.1</span> × (<span class='highlight-step'>7.6 + 5.4 - 3</span>)",
+                explanation: "我们可以用<span class='highlight-step'>乘法分配律 (a×b + a×c - a×d = a×(b+c-d))</span> 把共同的 2.1 提取出来，剩下的放进括号里。"
+            },
+            {
+                expressionHTML: "2.1 × (<span class='highlight-term'>13.0</span> - 3)",
+                explanation: "先计算括号里的 <span class='highlight-step'>7.6 + 5.4</span>，等于 <span class='highlight-term'>13.0</span>。"
+            },
+            {
+                expressionHTML: "2.1 × <span class='highlight-term highlight-step'>10</span>",
+                explanation: "再计算 <span class='highlight-step'>13.0 - 3</span>，等于 <span class='highlight-term'>10</span>。"
+            },
+            {
+                expressionHTML: "<span class='final-answer'>21</span>",
+                explanation: "最后，<span class='highlight-step'>2.1 × 10 = 21</span>。小数点向右移动一位就可以啦！答案是 21！"
+            }
+        ];
+
+        function loadProblem(problemNumber) {
+            currentProblem = problemNumber;
+            currentStep = 0;
+            if (problemNumber === 1) {
+                steps = problem1Steps;
+                problem1Btn.classList.add('btn-problem-active');
+                problem2Btn.classList.remove('btn-problem-active');
+            } else {
+                steps = problem2Steps;
+                problem2Btn.classList.add('btn-problem-active');
+                problem1Btn.classList.remove('btn-problem-active');
+            }
+            displayCurrentStep();
+            nextStepBtn.textContent = '下一步';
+            nextStepBtn.disabled = false;
+        }
+
+        function displayCurrentStep() {
+            if (currentStep < steps.length) {
+                const stepData = steps[currentStep];
+                calculationDisplay.innerHTML = stepData.expressionHTML;
+                explanationArea.innerHTML = `<p>${stepData.explanation}</p>`;
+            }
+        }
+        
+        function handleNextStep() {
+            currentStep++;
+            if (currentStep < steps.length) {
+                displayCurrentStep();
+                if (currentStep === steps.length - 1) {
+                    nextStepBtn.textContent = '演示完毕';
+                }
+            } else {
+                nextStepBtn.disabled = true; // No more steps
+            }
+        }
+
+        function handleReset() {
+            currentStep = 0;
+            displayCurrentStep();
+            nextStepBtn.textContent = '下一步';
+            nextStepBtn.disabled = false;
+             if (steps.length > 0 && currentStep === steps.length -1 && nextStepBtn.textContent === '演示完毕') {
+                // If reset is hit when "演示完毕" is shown, re-enable button
+                 nextStepBtn.disabled = false;
+            }
+        }
+
+        // Event Listeners
+        problem1Btn.addEventListener('click', () => loadProblem(1));
+        problem2Btn.addEventListener('click', () => loadProblem(2));
+        nextStepBtn.addEventListener('click', handleNextStep);
+        resetBtn.addEventListener('click', handleReset);
+
+        // Initial load
+        loadProblem(1); // Load problem 1 by default
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-T">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小数减法动态演示器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f9ff; /* Light blue background */
+            color: #075985; /* Darker blue text */
+        }
+        .calculator-container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 0.75rem; /* md */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0f2fe; /* Lighter blue border */
+        }
+        .input-field {
+            border: 2px solid #7dd3fc; /* Sky blue border */
+            border-radius: 0.5rem; /* sm */
+            padding: 0.75rem 1rem;
+            font-size: 1.125rem; /* lg */
+            color: #0c4a6e; /* Darker sky blue text */
+            background-color: #f0f8ff; /* Alice blue background */
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #0ea5e9; /* Brighter sky blue */
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
+        }
+        .btn-primary {
+            background-color: #0ea5e9; /* Sky blue */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem; /* sm */
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0284c7; /* Darker sky blue */
+        }
+        .calculation-step {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #e0f2fe; /* Very light blue */
+            border-radius: 0.5rem; /* sm */
+            border-left: 4px solid #0ea5e9; /* Sky blue accent */
+        }
+        .calculation-step p {
+            margin-bottom: 0.5rem;
+            color: #075985;
+        }
+        .digit-display {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.875rem; /* 2xl */
+            letter-spacing: 0.1em;
+            padding: 0.5rem;
+            display: inline-block;
+            min-width: 1.5rem; /* Ensure space for digits */
+            text-align: center;
+        }
+        .borrowed {
+            text-decoration: line-through;
+            color: #fb7185; /* Rose */
+            position: relative;
+        }
+        .new-digit {
+            color: #22c55e; /* Green */
+            position: absolute;
+            top: -0.8em;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .current-column {
+            background-color: #bae6fd; /* Lighter sky blue for focus */
+            border-radius: 0.25rem;
+        }
+        .operator {
+            font-size: 1.875rem; /* 2xl */
+            padding-right: 0.5rem;
+        }
+        .result-line {
+            border-top: 2px solid #0c4a6e;
+            margin-top: 0.25rem;
+            padding-top: 0.25rem;
+        }
+        .highlight {
+            color: #0ea5e9;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="calculator-container w-full max-w-2xl">
+        <h1 class="text-3xl font-bold text-center mb-6 text-sky-700">小数减法动态演示器</h1>
+        
+        <p class="mb-6 text-center text-sky-600">
+            小朋友你好！整数减小数，小数点对齐和借位是关键哦。我们一起来看看 14 - 2.79 是怎么算的吧！
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="minuend" class="block text-sm font-medium text-sky-700 mb-1">被减数 (大一点的数):</label>
+                <input type="text" id="minuend" value="14" class="input-field w-full">
+            </div>
+            <div>
+                <label for="subtrahend" class="block text-sm font-medium text-sky-700 mb-1">减数 (小一点的数):</label>
+                <input type="text" id="subtrahend" value="2.79" class="input-field w-full">
+            </div>
+        </div>
+
+        <div class="text-center mb-8">
+            <button id="calculateBtn" class="btn-primary">开始演示 / 下一步</button>
+            <button id="resetBtn" class="ml-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-6 rounded-md transition duration-150 ease-in-out">重置</button>
+        </div>
+
+        <div id="explanationArea" class="calculation-step mb-4">
+            <p class="font-semibold">点击“开始演示 / 下一步”按钮，一步一步学习计算过程。</p>
+        </div>
+        
+        <div id="calculationDisplay" class="text-right pr-4 md:pr-8">
+            </div>
+
+    </div>
+
+    <script>
+        // DOM Elements
+        const minuendInput = document.getElementById('minuend');
+        const subtrahendInput = document.getElementById('subtrahend');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const explanationArea = document.getElementById('explanationArea');
+        const calculationDisplay = document.getElementById('calculationDisplay');
+
+        let currentStep = 0;
+        let steps = [];
+        let minuendStr, subtrahendStr;
+        let minuendDigits = [], subtrahendDigits = [], resultDigits = [];
+
+        // Initialize
+        resetBtn.addEventListener('click', resetCalculation);
+        calculateBtn.addEventListener('click', nextStep);
+
+        function formatNumberString(numStr, totalLength, decimalPos) {
+            // Ensures number string has consistent length and decimal places for display
+            let [integerPart, decimalPart = ''] = numStr.split('.');
+            
+            // Pad decimal part if necessary
+            const requiredDecimalLength = totalLength - decimalPos - 1;
+            decimalPart = decimalPart.padEnd(requiredDecimalLength, '0');
+            
+            // Pad integer part if necessary
+            integerPart = integerPart.padStart(decimalPos, ' '); // Pad with space for alignment
+
+            return `${integerPart}.${decimalPart}`;
+        }
+        
+        function prepareCalculation() {
+            let mInput = minuendInput.value.trim();
+            let sInput = subtrahendInput.value.trim();
+
+            if (isNaN(parseFloat(mInput)) || isNaN(parseFloat(sInput))) {
+                explanationArea.innerHTML = '<p class="text-red-500 font-semibold">请输入有效的数字！</p>';
+                return false;
+            }
+            
+            let minuendVal = parseFloat(mInput);
+            let subtrahendVal = parseFloat(sInput);
+
+            if (subtrahendVal > minuendVal) {
+                explanationArea.innerHTML = '<p class="text-red-500 font-semibold">被减数必须大于或等于减数！</p>';
+                return false;
+            }
+
+
+            // Determine max integer and decimal lengths for formatting
+            let mParts = mInput.split('.');
+            let sParts = sInput.split('.');
+            
+            let maxIntLength = Math.max(mParts[0].length, sParts[0].length);
+            let maxDecLength = Math.max((mParts[1] || '').length, (sParts[1] || '').length);
+
+            // Ensure at least two decimal places for 14 -> 14.00
+            if (mInput === "14" && (sParts[1] || '').length === 2) {
+                 maxDecLength = Math.max(maxDecLength, 2);
+            }
+             if (sInput === "2.79" && (mParts[1] || '').length === 0) {
+                 maxDecLength = Math.max(maxDecLength, 2);
+            }
+
+
+            // Format numbers to have same number of decimal places
+            minuendStr = minuendVal.toFixed(maxDecLength);
+            subtrahendStr = subtrahendVal.toFixed(maxDecLength);
+            
+            // Further align by padding integer part if necessary
+            let mIntActualLength = minuendStr.split('.')[0].length;
+            let sIntActualLength = subtrahendStr.split('.')[0].length;
+            maxIntLength = Math.max(mIntActualLength, sIntActualLength);
+
+            minuendStr = minuendStr.split('.')[0].padStart(maxIntLength, ' ') + '.' + minuendStr.split('.')[1];
+            subtrahendStr = subtrahendStr.split('.')[0].padStart(maxIntLength, ' ') + '.' + subtrahendStr.split('.')[1];
+            
+            minuendDigits = minuendStr.replace(/\s/g, '0').split(''); // Replace leading spaces with 0 for calculation array
+            subtrahendDigits = subtrahendStr.replace(/\s/g, '0').split('');
+            resultDigits = new Array(minuendDigits.length).fill(' ');
+            
+            currentStep = 0;
+            steps = generateSteps(minuendDigits.slice(), subtrahendDigits.slice()); // Use copies for generation
+            return true;
+        }
+
+        function generateSteps(m, s) {
+            const genSteps = [];
+            const numLength = m.length;
+            const decPointIndex = m.indexOf('.');
+            let tempResult = new Array(numLength).fill(' ');
+
+            // Initial state
+            genSteps.push({
+                minuend: m.slice(),
+                subtrahend: s.slice(),
+                result: tempResult.slice(),
+                explanation: `第一步：准备开始！我们先看看数字，确保小数点对齐。被减数是 <span class="highlight">${minuendInput.value}</span>，减数是 <span class="highlight">${subtrahendInput.value}</span>。如果被减数是整数，我们会补上小数点和0，比如14变成14.00。`,
+                columnIndex: -1 
+            });
+            
+            // Ensure minuend has .00 if it's an integer and subtrahend has decimals
+            if (minuendInput.value.indexOf('.') === -1 && subtrahendInput.value.indexOf('.') !== -1) {
+                 const mFormatted = parseFloat(minuendInput.value).toFixed(s.length - s.indexOf('.') - 1);
+                 const mIntLen = mFormatted.split('.')[0].length;
+                 const sIntLen = s.join('').split('.')[0].length;
+                 const targetIntLen = Math.max(mIntLen, sIntLen);
+                 m = (mFormatted.split('.')[0].padStart(targetIntLen, '0') + '.' + mFormatted.split('.')[1]).split('');
+
+                 genSteps.push({
+                    minuend: m.slice(),
+                    subtrahend: s.slice(),
+                    result: tempResult.slice(),
+                    explanation: `为了方便计算，我们将整数 <span class="highlight">${minuendInput.value}</span> 写成 <span class="highlight">${m.join('')}</span>，补足小数位。`,
+                    columnIndex: -1
+                });
+            }
+
+
+            for (let i = numLength - 1; i >= 0; i--) {
+                if (m[i] === '.') {
+                    tempResult[i] = '.';
+                    genSteps.push({
+                        minuend: m.slice(),
+                        subtrahend: s.slice(),
+                        result: tempResult.slice(),
+                        explanation: `遇到小数点啦，我们把它写在结果的对应位置。`,
+                        columnIndex: i
+                    });
+                    continue;
+                }
+
+                let minuendDigit = parseInt(m[i] === ' ' ? 0 : m[i]);
+                let subtrahendDigit = parseInt(s[i] === ' ' ? 0 : s[i]);
+
+                genSteps.push({
+                    minuend: m.slice(),
+                    subtrahend: s.slice(),
+                    result: tempResult.slice(),
+                    explanation: `现在我们计算 <span class="highlight">${getColumnName(i, decPointIndex)}</span>：<span class="highlight">${minuendDigit}</span> 减 <span class="highlight">${subtrahendDigit}</span>。`,
+                    columnIndex: i 
+                });
+
+                if (minuendDigit < subtrahendDigit) {
+                    genSteps.push({
+                        minuend: m.slice(),
+                        subtrahend: s.slice(),
+                        result: tempResult.slice(),
+                        explanation: `<span class="highlight">${minuendDigit}</span> 减 <span class="highlight">${subtrahendDigit}</span> 不够减，需要向前一位借位。`,
+                        columnIndex: i
+                    });
+
+                    let borrowFrom = i - 1;
+                    // Skip decimal point when borrowing
+                    while (borrowFrom >= 0) {
+                        if (m[borrowFrom] === '.') {
+                            borrowFrom--;
+                            continue;
+                        }
+                        if (parseInt(m[borrowFrom]) > 0) {
+                            m[borrowFrom] = (parseInt(m[borrowFrom]) - 1).toString();
+                            genSteps.push({
+                                minuend: m.slice(), // Show minuend after borrowing from this position
+                                subtrahend: s.slice(),
+                                result: tempResult.slice(),
+                                explanation: `从 <span class="highlight">${getColumnName(borrowFrom, decPointIndex)}</span> 借1。${getColumnName(borrowFrom, decPointIndex)}的数字从 <span class="highlight">${parseInt(m[borrowFrom])+1}</span> 变为 <span class="highlight">${m[borrowFrom]}</span>。`,
+                                columnIndex: borrowFrom,
+                                borrowedIndex: borrowFrom 
+                            });
+                            minuendDigit += 10;
+                            m[i] = minuendDigit.toString(); // Temporarily update m[i] for display if needed, though calculation is on minuendDigit
+                             genSteps.push({
+                                minuend: m.slice(), 
+                                subtrahend: s.slice(),
+                                result: tempResult.slice(),
+                                explanation: `借来的1变成了10，加到当前位。所以 <span class="highlight">${getColumnName(i, decPointIndex)}</span> 的被减数从 <span class="highlight">${minuendDigit-10}</span> 变成了 <span class="highlight">${minuendDigit}</span>。`,
+                                columnIndex: i,
+                                newDigitIndex: i, newDigitValue: minuendDigit
+                            });
+                            break; 
+                        } else { // m[borrowFrom] is 0
+                             m[borrowFrom] = '9'; // It becomes 9 after borrowing through it
+                             genSteps.push({
+                                minuend: m.slice(),
+                                subtrahend: s.slice(),
+                                result: tempResult.slice(),
+                                explanation: `<span class="highlight">${getColumnName(borrowFrom, decPointIndex)}</span> 是0，不够借，它会变成9，我们继续向前一位借。`,
+                                columnIndex: borrowFrom,
+                                borrowedIndex: borrowFrom, newDigitIndex: borrowFrom, newDigitValue: 9
+                            });
+                            borrowFrom--;
+                        }
+                    }
+                }
+                tempResult[i] = (minuendDigit - subtrahendDigit).toString();
+                 genSteps.push({
+                    minuend: m.slice(), 
+                    subtrahend: s.slice(),
+                    result: tempResult.slice(),
+                    explanation: `计算结果：<span class="highlight">${minuendDigit}</span> - <span class="highlight">${subtrahendDigit}</span> = <span class="highlight">${tempResult[i]}</span>。把 <span class="highlight">${tempResult[i]}</span> 写在 <span class="highlight">${getColumnName(i, decPointIndex)}</span> 的答案位置。`,
+                    columnIndex: i
+                });
+            }
+            
+            const finalResultStr = tempResult.join('').trim();
+            genSteps.push({
+                minuend: m.slice(),
+                subtrahend: s.slice(),
+                result: tempResult.slice(),
+                explanation: `计算完成！最终答案是 <span class="highlight">${finalResultStr}</span>。你学会了吗？`,
+                columnIndex: -1 
+            });
+            return genSteps;
+        }
+
+        function getColumnName(index, decimalPointIndex) {
+            if (index < decimalPointIndex) {
+                const pos = decimalPointIndex - 1 - index;
+                if (pos === 0) return "个位";
+                if (pos === 1) return "十位";
+                if (pos === 2) return "百位";
+                return (10**pos) + "位";
+            } else if (index > decimalPointIndex) {
+                const pos = index - decimalPointIndex;
+                if (pos === 1) return "十分位";
+                if (pos === 2) return "百分位";
+                if (pos === 3) return "千分位";
+                return `小数点后第${pos}位`;
+            }
+            return ""; // Should not happen for digit columns
+        }
+
+
+        function displayStep(stepData) {
+            explanationArea.innerHTML = `<p>${stepData.explanation}</p>`;
+            
+            let minuendHTML = '';
+            let subtrahendHTML = '';
+            let resultHTML = '';
+
+            const originalMinuendForDisplay = minuendStr.split(''); 
+            const originalSubtrahendForDisplay = subtrahendStr.split('');
+
+            for (let i = 0; i < stepData.minuend.length; i++) {
+                let mClass = 'digit-display';
+                let sClass = 'digit-display';
+                let rClass = 'digit-display';
+                let mDigitContent = originalMinuendForDisplay[i]; // Display original with modifications
+                
+                if (i === stepData.columnIndex) {
+                    mClass += ' current-column';
+                    sClass += ' current-column';
+                    rClass += ' current-column';
+                }
+
+                let newDigitSpan = '';
+                // Check if this digit was borrowed from in this step or previous steps leading to this state
+                if (stepData.minuend[i] !== originalMinuendForDisplay[i] && originalMinuendForDisplay[i] !== ' ' && originalMinuendForDisplay[i] !== '.') {
+                     // If the current step explicitly marks this as borrowed
+                    if (stepData.borrowedIndex === i || (stepData.newDigitIndex === i && stepData.minuend[i] !== stepData.newDigitValue.toString())) {
+                         mDigitContent = `<span class="borrowed">${originalMinuendForDisplay[i]}</span>`;
+                         newDigitSpan = `<span class="new-digit">${stepData.minuend[i]}</span>`;
+                    } else if (stepData.newDigitIndex === i) { // If it's a new digit from borrowing to itself
+                         mDigitContent = `<span class="borrowed">${originalMinuendForDisplay[i]}</span>`; // Show original struck out
+                         newDigitSpan = `<span class="new-digit">${stepData.newDigitValue}</span>`; // Show the new value
+                    } else { // Persist previous borrows
+                        mDigitContent = `<span class="borrowed">${originalMinuendForDisplay[i]}</span>`;
+                        newDigitSpan = `<span class="new-digit">${stepData.minuend[i]}</span>`;
+                    }
+                } else if (stepData.newDigitIndex === i) { // Current digit received a borrow
+                     mDigitContent = `<span class="borrowed">${originalMinuendForDisplay[i]}</span>`;
+                     newDigitSpan = `<span class="new-digit">${stepData.newDigitValue}</span>`;
+                }
+
+
+                minuendHTML += `<span class="${mClass}" style="position: relative;">${mDigitContent}${newDigitSpan}</span>`;
+                subtrahendHTML += `<span class="${sClass}">${originalSubtrahendForDisplay[i]}</span>`;
+                resultHTML += `<span class="${rClass}">${stepData.result[i]}</span>`;
+            }
+
+            calculationDisplay.innerHTML = `
+                <div>${minuendHTML}</div>
+                <div><span class="operator">-</span>${subtrahendHTML}</div>
+                <div class="result-line">${resultHTML}</div>
+            `;
+        }
+        
+        function nextStep() {
+            if (currentStep === 0) {
+                if (!prepareCalculation()) return; // Stop if inputs are invalid
+            }
+
+            if (currentStep < steps.length) {
+                displayStep(steps[currentStep]);
+                currentStep++;
+                if (currentStep === steps.length) {
+                    calculateBtn.textContent = '演示完毕';
+                    calculateBtn.disabled = true;
+                } else {
+                    calculateBtn.textContent = '下一步';
+                }
+            }
+        }
+
+        function resetCalculation() {
+            currentStep = 0;
+            minuendInput.value = "14";
+            subtrahendInput.value = "2.79";
+            explanationArea.innerHTML = '<p class="font-semibold">点击“开始演示 / 下一步”按钮，一步一步学习计算过程。</p>';
+            calculationDisplay.innerHTML = '';
+            calculateBtn.textContent = '开始演示 / 下一步';
+            calculateBtn.disabled = false;
+            steps = [];
+        }
+
+        // Initial call to set up the view
+        resetCalculation();
+    </script>
+
+</body>
+</html>
