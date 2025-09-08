@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>儿童儿歌播放器</title>
+    <title>儿歌播放器</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23FF6B6B'/%3E%3Cstop offset='100%25' stop-color='%234D96FF'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg fill='url(%23g)'%3E%3Ccircle cx='28' cy='46' r='8'/%3E%3Crect x='36' y='12' width='4' height='26' rx='2'/%3E%3Cpath d='M40 12l14-4v8l-14 4z'/%3E%3C/g%3E%3C/svg%3E" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -291,7 +291,7 @@
                 categoryNav.innerHTML = Object.keys(songsData).map((category, index) => {
                     const color = colorPalette[index % colorPalette.length];
                     return `
-                        <a href="#" data-category="${category}" class="nav-link group flex items-center px-4 py-3 text-gray-700 font-medium rounded-lg ${color.bg} ${color.hoverBg} ${color.text} ${color.hoverText} transition-all duration-200 border ${color.border} hover:shadow-sm btn-press">
+                        <a href="#" data-category="${category}" class="nav-link group flex items-center px-4 py-3 text-gray-700 font-medium rounded-lg ${color.bg} ${color.hoverBg} ${color.text} ${color.hoverText} transition-all duration-200 shadow-sm hover:shadow-md ring-1 ring-black/5 hover:-translate-y-0.5 btn-press">
                             <span class="text-lg mr-3">${color.icon}</span>
                             <span class="text-sm">${category}</span>
                         </a>
@@ -354,12 +354,12 @@
 
                             if (hasLink) {
                                 return `
-                                <a href="${song.videoUrl}" target="_blank" rel="noopener noreferrer" class="group block rounded-lg shadow-sm overflow-hidden transition-all duration-200 ${color.bg} ${hoverEffect} btn-press">
+                                <a href="${song.videoUrl}" target="_blank" rel="noopener noreferrer" class="group block rounded-lg shadow-md hover:shadow-lg overflow-hidden transition-all duration-200 ${color.bg} ${hoverEffect} hover:-translate-y-0.5 ring-1 ring-black/5 btn-press">
                                     ${contentHTML}
                                 </a>`;
                             } else {
                                 return `
-                                <div class="block rounded-lg shadow-sm overflow-hidden transition-all duration-200 ${color.bg} opacity-60">
+                                <div class="block rounded-lg shadow-sm hover:shadow-md overflow-hidden transition-all duration-200 ${color.bg} opacity-60 ring-1 ring-black/5">
                                     ${contentHTML}
                                 </div>`;
                             }
