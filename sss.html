@@ -354,12 +354,12 @@
 
                             if (hasLink) {
                                 return `
-                                <a href="${song.videoUrl}" target="_blank" rel="noopener noreferrer" class="group block rounded-lg shadow-sm overflow-hidden transition-all duration-200 bg-white border ${color.border} ${hoverEffect} btn-press">
+                                <a href="${song.videoUrl}" target="_blank" rel="noopener noreferrer" class="group block rounded-lg shadow-sm overflow-hidden transition-all duration-200 ${color.bg} ${hoverEffect} btn-press">
                                     ${contentHTML}
                                 </a>`;
                             } else {
                                 return `
-                                <div class="block rounded-lg shadow-sm overflow-hidden transition-all duration-200 bg-gray-50 border ${color.border} opacity-60">
+                                <div class="block rounded-lg shadow-sm overflow-hidden transition-all duration-200 ${color.bg} opacity-60">
                                     ${contentHTML}
                                 </div>`;
                             }
