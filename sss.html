@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儿童儿歌播放器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans SC', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* 简洁的滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* 确保在小屏幕上，当侧边栏滑出时，主内容区不可滚动 */
+        body.overflow-hidden {
+            overflow: hidden;
+        }
+        @media (min-width: 768px) {
+            body.overflow-hidden {
+                overflow: auto;
+            }
+        }
+        
+        /* 简洁的动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* 按钮效果 */
+        .btn-press {
+            transition: all 0.15s ease;
+        }
+        
+        .btn-press:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <div id="app" class="relative min-h-screen md:flex">
+        
+        <!-- Overlay for mobile menu -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-20 z-20 hidden md:hidden"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white p-6 shrink-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-30 border-r border-gray-200 shadow-sm">
+            <div class="flex items-center mb-8">
+                <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3V4a1 1 0 00-.804-.98z" />
+                    </svg>
+                </div>
+                <h1 class="text-xl font-semibold text-gray-800">
+                    儿歌播放器
+                </h1>
+            </div>
+            <nav id="category-nav" class="space-y-2">
+                <!-- Navigation items will be injected here -->
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto transition-all duration-300">
+            <!-- Mobile Header -->
+            <header class="md:hidden sticky top-0 bg-white z-10 p-4 border-b border-gray-200 flex items-center">
+                 <button id="menu-toggle" class="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg btn-press transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                 </button>
+                 <h2 id="mobile-header-title" class="ml-4 text-lg font-semibold text-gray-800">选择分类</h2>
+            </header>
+            
+            <div class="p-4 sm:p-6 lg:p-8">
+                <div id="song-list-container">
+                    <!-- Song items will be injected here -->
+                </div>
+                 <!-- Welcome Message -->
+                <div id="welcome-message" class="text-center p-8 bg-white rounded-xl shadow-sm border border-gray-200">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3V4a1 1 0 00-.804-.98z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-2">欢迎使用儿歌播放器</h2>
+                    <p class="text-gray-600">请点击左上角菜单按钮选择一个场景分类</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 数据区: 您可以在这里手动添加或修改视频链接 ---
+            const songsData = {
+                "起床听": [
+                    { title_en: "078: Good morning Mr rooster", title_cn: "早上好, 公鸡先生", videoUrl: "https://cn.eudic.net/ting/openArticle?id=5a3091d1-6458-4aaa-a80d-c99111045bed"},
+                    { title_en: "345: Good morning It's such a beautiful day", title_cn: "早上好, 今天是个美丽的日子", videoUrl: "https://cn.eudic.net/ting/openArticle?id=89318cb3-98d4-48aa-9076-2e64d3e3bb8f"},
+                    { title_en: "140: This is the way we get dressed", title_cn: "我们一起穿衣服吧", videoUrl: "https://cn.eudic.net/ting/openArticle?id=980a7298-d9a7-48d5-b8f0-9c47ed8c77bf" },
+                    { title_en: "273: First we wash your hands", title_cn: "洗手歌", videoUrl: "https://cn.eudic.net/ting/openArticle?id=8d3e05f3-eb2f-4a1f-b140-70ff8fb85051" },
+                    { title_en: "335: The hand washing song", title_cn: "洗手歌", videoUrl: "https://cn.eudic.net/ting/openArticle?id=92adf544-13ec-4664-8b14-cf984389fbcb" },
+                    { title_en: "111: Brush your teeth", title_cn: "刷牙歌", videoUrl: "https://cn.eudic.net/ting/openArticle?id=6de01adf-305e-4697-b35b-34e4f976c0aa" },
+                    { title_en: "274: Brush your teeth (Finny the Shark)", title_cn: "刷牙歌", videoUrl: "https://cn.eudic.net/ting/openArticle?id=a2e67920-3ae9-4d89-b302-ac933cd2de9c" },
+                    { title_en: "336: Brush your teeth (Pals)", title_cn: "刷牙歌", videoUrl: "https://cn.eudic.net/ting/openArticle?id=0b503490-6099-4c6c-b544-6df4be49ea87" },
+                    { title_en: "141: Are you hungry?", title_cn: "你饿吗", videoUrl: "https://cn.eudic.net/ting/openArticle?id=692d7a0f-e68a-481b-b301-7e2a9b07abe2" },
+                    { title_en: "228: Are you hungry? (Finny the Shark)", title_cn: "你饿吗", videoUrl: "https://cn.eudic.net/ting/openArticle?id=44a793d3-4eb8-4d59-b093-f3d80986b548" },
+                    { title_en: "275: Are you hungry? (Featuring)", title_cn: "你饿吗", videoUrl: "https://cn.eudic.net/ting/openArticle?id=f9f5392e-bdca-4770-a2c5-d0dc77767807" },
+                    { title_en: "380: Are you hungry? (Pals)", title_cn: "你饿吗", videoUrl: "https://cn.eudic.net/ting/openArticle?id=d8bdc0ed-b69c-4ffc-8106-e8aec943a9b1" },
+                    { title_en: "Breakfast song", title_cn: "早餐歌", videoUrl: "https://cn.eudic.net/ting/openArticle?id=43d6f7c2-eb9a-40ae-8bda-3c34a0f3255f" },
+                    { title_en: "055: Do you like Spaghetti Yoghurt", title_cn: "你喜欢吃意大利面酸奶吗?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=d2deaffb-02ef-477b-9903-65ae6f096b16" }
+                ],
+                "出门/交通听": [
+                    { title_en: "039: Put on your shoes", title_cn: "穿上鞋子", videoUrl: "https://cn.eudic.net/ting/openArticle?id=285cdbcf-3bdb-4262-8408-48520a10d163" },
+                    { title_en: "371: Put on your shoes (Pals)", title_cn: "穿上鞋子", videoUrl: "https://cn.eudic.net/ting/openArticle?id=1cf838be-3605-4f8e-95d4-e24054de69b6" },
+                    { title_en: "021: How's the weather?", title_cn: "天气怎么样", videoUrl: "https://cn.eudic.net/ting/openArticle?id=64498eac-c6e6-403c-a2f3-58e7b4a014ba" },
+                    { title_en: "240: How's the weather? (featuring)", title_cn: "天气怎么样", videoUrl: "https://cn.eudic.net/ting/openArticle?id=120fed19-762b-4573-b14d-9dbef760c754" },
+                    { title_en: "403: How's the weather? (featuring 2)", title_cn: "天气怎么样", videoUrl: "https://cn.eudic.net/ting/openArticle?id=3f73f6b1-76f9-4575-947e-d4a05216d434" },
+                    { title_en: "431: How's the weather? (Pals)", title_cn: "天气怎么样", videoUrl: "https://cn.eudic.net/ting/openArticle?id=7509a7e7-9eb3-4c07-885e-fb9e322d6fc0" },
+                    { title_en: "105: Mr.Golden sun", title_cn: "金灿灿的太阳", videoUrl: "https://cn.eudic.net/ting/openArticle?id=14eb2396-ca74-4086-b5f5-3529ed0d3acf" },
+                    { title_en: "278: Mr.Golden sun (Finny the Shark)", title_cn: "金灿灿的太阳", videoUrl: "https://cn.eudic.net/ting/openArticle?id=2fc3797e-81e7-4cc5-92b4-ee66ea7c00c1" },
+                    { title_en: "052: Rain Rain Go Away", title_cn: "大雨 大雨 快走开", videoUrl: "https://cn.eudic.net/ting/openArticle?id=772bc1eb-e1eb-4c38-9d51-4dcefbd94b23" },
+                    { title_en: "03: Little Snowflakes", title_cn: "小雪花", videoUrl: "https://cn.eudic.net/ting/openArticle?id=eed09c3a-6e5f-420b-b7bc-c3003858b141" },
+                    { title_en: "092: Walking walking", title_cn: "走啊走", videoUrl: "https://cn.eudic.net/ting/openArticle?id=94f9b949-3907-41c9-8a87-eb63ba7c9721" },
+                    { title_en: "113: The ants go marching", title_cn: "蚂蚁行军", videoUrl: "https://cn.eudic.net/ting/openArticle?id=20d9226d-45fb-42ad-b537-2b99e5023bd5" },
+                    { title_en: "163: The ants go marching 2", title_cn: "蚂蚁行军", videoUrl: "https://cn.eudic.net/ting/openArticle?id=dc607e98-e9fd-492c-bdd5-6a97a2127001" },
+                    { title_en: "154: Red light, green Light", title_cn: "红灯 绿灯", videoUrl: "https://cn.eudic.net/ting/openArticle?id=5cdb116f-8f46-4328-96ab-c42e05e570c9" },
+                    { title_en: "224: Red light, green Light", title_cn: "红灯 绿灯", videoUrl: "https://cn.eudic.net/ting/openArticle?id=c09a0b5a-31f8-4e3e-9325-fa15c94b6ac8" },
+                    { title_en: "341: Red light, green Light", title_cn: "红灯 绿灯", videoUrl: "https://cn.eudic.net/ting/openArticle?id=c8a7a2b4-e54f-4177-96d1-31334493e025" },
+                    { title_en: "174: The wheels on the bus (Pals)", title_cn: "公共汽车的轮子", videoUrl: "https://cn.eudic.net/ting/openArticle?id=09817350-a41a-4af6-a82c-7b8ebd37c4fb" },
+                    { title_en: "206: The wheels on the bus (Car)", title_cn: "公共汽车的轮子", videoUrl: "https://cn.eudic.net/ting/openArticle?id=7c8e03ce-f9fa-4d6f-9b99-56f44cc77469" },
+                    { title_en: "228: The wheels on the bus (Monkey)", title_cn: "公共汽车的轮子", videoUrl: "https://cn.eudic.net/ting/openArticle?id=fd62a5c1-17dc-4b14-9e1d-ef0d5db629f1" },
+                    { title_en: "142: Let's take the subway", title_cn: "我们搭地铁哦", videoUrl: "https://cn.eudic.net/ting/openArticle?id=f5e9eeb3-bec8-4482-a73e-98d6ec81f120" }
+                ],
+                "玩耍听": [
+                    { title_en: "079: Hello Hello", title_cn: "你好", videoUrl: "https://cn.eudic.net/ting/openArticle?id=ffc51ca7-2aac-4d97-b13f-441f2a27b524" },
+                    { title_en: "080: Hello Hello", title_cn: "你好", videoUrl: "https://cn.eudic.net/ting/openArticle?id=016fd319-e2ee-404e-a601-ebd47a5dbd8e" },
+                    { title_en: "360: Hello Hello", title_cn: "你好", videoUrl: "https://cn.eudic.net/ting/openArticle?id=40d8ae1b-bf79-477f-886d-780727881439" },
+                    { title_en: "230: What'Your name", title_cn: "你叫什么名字?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=03477463-63d8-40dc-bace-3969a0268cb4" },
+                    { title_en: "231: What'Your name", title_cn: "你叫什么名字?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=dbfd3fc1-633a-43fd-8b52-309ad5bd0e47" },
+                    { title_en: "292: What'Your name", title_cn: "你叫什么名字?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=2acf5b1e-3a7e-41f0-bb2b-55d9c52242ee" },
+                    { title_en: "If you are happy?", title_cn: "幸福拍手歌", videoUrl: "https://cn.eudic.net/ting/openArticle?id=c6946b03-7571-4c40-a8c6-1660d95b5b6a" },
+                    { title_en: "122: What do you like to do?", title_cn: "你喜欢做什么", videoUrl: "https://cn.eudic.net/ting/openArticle?id=a0afd9b8-7428-4670-bbe2-e89c239e82d6" },
+                    { title_en: "327: What do you like to do?", title_cn: "你喜欢做什么", videoUrl: "https://cn.eudic.net/ting/openArticle?id=10f698a0-314e-4d6d-8fc9-b3f702b44ee8" },
+                    { title_en: "032: Can you make a happy face?", title_cn: "你能扮个笑脸吗?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=418c1b4e-bb3a-4373-8f1d-3cf006407e74" }
+                ],
+                "学习听": [
+                    { title_en: "176: Head shoulders knees and toes", title_cn: "头 肩膀 膝盖和脚趾", videoUrl: "https://cn.eudic.net/ting/openArticle?id=15ab12be-a85e-4839-ae0a-805d1cd574bb" },
+                    { title_en: "101: How many fingers / One little finger", title_cn: "一个小手指", videoUrl: "https://cn.eudic.net/ting/openArticle?id=a215e7a9-21da-4a95-9553-e808cb19deff" },
+                    { title_en: "166: Where is thumbkin?", title_cn: "大拇指在哪里?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=acc5ea65-8ca6-455a-a521-0a549e1bb58b" },
+                    { title_en: "301: I see something pink", title_cn: "我看见粉色的东西", videoUrl: "https://cn.eudic.net/ting/openArticle?id=646b433f-4f82-43ba-93c1-a6b944ef494c" },
+                    { title_en: "151: What's Your favorite color?", title_cn: "你最喜欢什么颜色?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=6a9a0a6e-47e0-46a5-8182-7f7e65bf7fac" },
+                    { title_en: "023: Counting bananas", title_cn: "数香蕉", videoUrl: "https://cn.eudic.net/ting/openArticle?id=58e280ce-09f7-4d75-b9cf-a769fa7ab095" },
+                    { title_en: "263: Counting bananas", title_cn: "数香蕉", videoUrl: "https://cn.eudic.net/ting/openArticle?id=bafc34c1-fa4e-489d-9789-393ece308a1e" },
+                    { title_en: "099: Five little ducks", title_cn: "五只小鸭子", videoUrl: "https://cn.eudic.net/ting/openArticle?id=85f86add-2e83-4d86-856b-633dddaefb93" },
+                    { title_en: "091: Seven steps", title_cn: "", videoUrl: "https://cn.eudic.net/ting/openArticle?id=2b278c49-727d-4fd7-88bd-a24288cfeeae" },
+                    { title_en: "027: Let's go to the zoo", title_cn: "我们一起去动物园", videoUrl: "https://cn.eudic.net/ting/openArticle?id=cb3b4047-0290-48ef-90dc-b52e918e2a8b" },
+                    { title_en: "017: The animals on the farm", title_cn: "农场的动物们", videoUrl: "https://cn.eudic.net/ting/openArticle?id=4fd5b602-57e0-4003-9a7d-b1dca376a058" },
+                    { title_en: "048: Yes I can", title_cn: "我会 我会", videoUrl: "https://cn.eudic.net/ting/openArticle?id=c52df581-a272-4dd8-8dde-ebd7f0721a84" }
+                ],
+                "晚间活动听": [
+                    { title_en: "077: Bye Bye Goodbye", title_cn: "拜拜 再见", videoUrl: "https://cn.eudic.net/ting/openArticle?id=96215ff1-183b-4aaf-9a3a-a233e9b16bfc" },
+                    { title_en: "398: Bye Bye Goodbye", title_cn: "拜拜 再见", videoUrl: "https://cn.eudic.net/ting/openArticle?id=9663379b-e3b4-43df-856b-cabe1a1f41bd" },
+                    { title_en: "074: See you late alligator", title_cn: "一会儿见鳄鱼", videoUrl: "https://cn.eudic.net/ting/openArticle?id=974c8084-6d97-4216-afd1-061035182c41" },
+                    { title_en: "075: See you late alligator", title_cn: "一会儿见鳄鱼", videoUrl: "https://cn.eudic.net/ting/openArticle?id=585fe6e2-01db-438a-ab01-981b08271d9a" },
+                    { title_en: "250: See you late alligator", title_cn: "一会儿见鳄鱼", videoUrl: "https://cn.eudic.net/ting/openArticle?id=973b8a2a-af84-4f92-9090-831867bf198d" },
+                    { title_en: "060: Who took the cookie", title_cn: "谁拿走了饼干?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=33ebdd15-089e-4d2c-9747-ce5369120a12" },
+                    { title_en: "150: Who took the cookie", title_cn: "谁拿走了饼干?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=f6dda203-b6f7-419a-9936-7c877c085490" },
+                    { title_en: "236: Who took the cookie", title_cn: "谁拿走了饼干?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=ad6b2c89-f512-4c71-af95-1d85e76fff71" },
+                    { title_en: "053: Rock scissors paper", title_cn: "剪刀石头布?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=c09fbf57-f53e-418c-8ca5-f1dc6bd5dccc" },
+                    { title_en: "057: Rock scissors paper", title_cn: "剪刀石头布?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=cd3ef175-0667-4850-bfe0-d8b0c3244556" },
+                    { title_en: "115: Rock scissors paper", title_cn: "剪刀石头布?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=411b9c08-3f31-4d86-973a-11d37efbcadd" },
+                    { title_en: "129: Rock scissors paper", title_cn: "剪刀石头布?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=9d21bfcb-4db5-4861-b2de-1ebbde317345" },
+                    { title_en: "397: Rock scissors paper", title_cn: "剪刀石头布?", videoUrl: "https://cn.eudic.net/ting/openArticle?id=3226c3c7-d1be-40f7-a403-f1899969a4d2" },
+                    { title_en: "137: Follow me", title_cn: "跟我做", videoUrl: "https://cn.eudic.net/ting/openArticle?id=b2b71101-8d2f-4d33-bcb8-2e4d593fe622" },
+                    { title_en: "366: Follow me", title_cn: "跟我做", videoUrl: "https://cn.eudic.net/ting/openArticle?id=b51ff036-78ce-4217-89fc-7b4b76ec61b1" },
+                    { title_en: "059: Bath song", title_cn: "洗澡歌", videoUrl: "https://cn.eudic.net/ting/openArticle?id=1c9cda4a-c5bb-41aa-8c76-7002c34ba02b" }
+                ],
+                "睡觉听": [
+                    { title_en: "001: Five little monkeys jumping on the bed", title_cn: "五只小猴子床上跳", videoUrl: "https://cn.eudic.net/ting/openArticle?id=cdd03869-ab56-4ce2-9565-a54e6f9beb18" },
+                    { title_en: "004: Row row row your boat", title_cn: "划呀, 划呀, 划小船", videoUrl: "https://cn.eudic.net/ting/openArticle?id=9268767b-5015-4b7c-a1b7-76ca8ea30535" },
+                    { title_en: "348: Row row row your boat", title_cn: "划呀, 划呀, 划小船", videoUrl: "https://cn.eudic.net/ting/openArticle?id=ee14c8c1-d567-4767-83ae-fbe0be60a35b" },
+                    { title_en: "152: This is the way we go to bed", title_cn: "我们上床睡觉吧", videoUrl: "https://cn.eudic.net/ting/openArticle?id=76d8fb2f-ae8c-4e90-b2ac-b3710b7a772f" },
+                    { title_en: "002: Twinkle twinkle little star", title_cn: "一闪一闪亮晶晶", videoUrl: "https://cn.eudic.net/ting/openArticle?id=c1ee39f1-8ddd-44ca-8268-df20febc0a0f" },
+                    { title_en: "208: Twinkle twinkle little star", title_cn: "一闪一闪亮晶晶", videoUrl: "https://cn.eudic.net/ting/openArticle?id=076c597b-04e9-4d80-b8e4-7a6be1a981be" },
+                    { title_en: "258: Twinkle twinkle little star", title_cn: "一闪一闪亮晶晶", videoUrl: "https://cn.eudic.net/ting/openArticle?id=224b584c-abbc-43dd-aab7-0439eaf3c9c5" },
+                    { title_en: "354: Good night song", title_cn: "晚安歌", videoUrl: "https://cn.eudic.net/ting/openArticle?id=87a869a5-aa13-4506-a89c-d95f229dfc0f" },
+                    { title_en: "014: Sweet dreams", title_cn: "好梦", videoUrl: "https://cn.eudic.net/ting/openArticle?id=de57e9ed-38b3-48f6-832a-96307253bf25" }
+                ]
+            };
+
+            const colorPalette = [
+                { 
+                    bg: 'bg-orange-50', 
+                    hoverBg: 'hover:bg-orange-100', 
+                    text: 'text-orange-600', 
+                    hoverText: 'group-hover:text-orange-700',
+                    border: 'border-orange-200',
+                    icon: '☀️'
+                },
+                { 
+                    bg: 'bg-blue-50', 
+                    hoverBg: 'hover:bg-blue-100', 
+                    text: 'text-blue-600', 
+                    hoverText: 'group-hover:text-blue-700',
+                    border: 'border-blue-200',
+                    icon: '🚗'
+                },
+                { 
+                    bg: 'bg-green-50', 
+                    hoverBg: 'hover:bg-green-100', 
+                    text: 'text-green-600', 
+                    hoverText: 'group-hover:text-green-700',
+                    border: 'border-green-200',
+                    icon: '🤸'
+                },
+                { 
+                    bg: 'bg-purple-50', 
+                    hoverBg: 'hover:bg-purple-100', 
+                    text: 'text-purple-600', 
+                    hoverText: 'group-hover:text-purple-700',
+                    border: 'border-purple-200',
+                    icon: '📚'
+                },
+                { 
+                    bg: 'bg-indigo-50', 
+                    hoverBg: 'hover:bg-indigo-100', 
+                    text: 'text-indigo-600', 
+                    hoverText: 'group-hover:text-indigo-700',
+                    border: 'border-indigo-200',
+                    icon: '🌙'
+                },
+                { 
+                    bg: 'bg-gray-50', 
+                    hoverBg: 'hover:bg-gray-100', 
+                    text: 'text-gray-600', 
+                    hoverText: 'group-hover:text-gray-700',
+                    border: 'border-gray-200',
+                    icon: '😴'
+                },
+            ];
+            
+            // --- Elements ---
+            const body = document.body;
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const menuToggle = document.getElementById('menu-toggle');
+            const categoryNav = document.getElementById('category-nav');
+            const songListContainer = document.getElementById('song-list-container');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const mobileHeaderTitle = document.getElementById('mobile-header-title');
+
+            // --- Functions ---
+            const toggleSidebar = () => {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+                body.classList.toggle('overflow-hidden');
+            };
+
+            function renderNav() {
+                categoryNav.innerHTML = Object.keys(songsData).map((category, index) => {
+                    const color = colorPalette[index % colorPalette.length];
+                    return `
+                        <a href="#" data-category="${category}" class="nav-link group flex items-center px-4 py-3 text-gray-700 font-medium rounded-lg ${color.bg} ${color.hoverBg} ${color.text} ${color.hoverText} transition-all duration-200 border ${color.border} hover:shadow-sm btn-press">
+                            <span class="text-lg mr-3">${color.icon}</span>
+                            <span class="text-sm">${category}</span>
+                        </a>
+                    `;
+                }).join('');
+            }
+            
+            function renderSongs(category) {
+                const songs = songsData[category];
+                if (!songs) return;
+
+                welcomeMessage.classList.add('hidden');
+                mobileHeaderTitle.textContent = category;
+                
+                // 获取分类对应的颜色主题
+                const categoryIndex = Object.keys(songsData).indexOf(category);
+                const categoryColor = colorPalette[categoryIndex % colorPalette.length];
+                
+                songListContainer.innerHTML = `
+                    <div class="mb-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 ${categoryColor.bg} rounded-lg flex items-center justify-center mr-3">
+                                <span class="text-lg">${categoryColor.icon}</span>
+                            </div>
+                            <h2 class="text-2xl font-semibold ${categoryColor.text} hidden md:block">${category}</h2>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        ${songs.map((song, index) => {
+                            const hasLink = song.videoUrl && song.videoUrl.trim() !== '';
+                            const color = colorPalette[index % colorPalette.length];
+                            
+                            const hoverEffect = hasLink ? `hover:shadow-md hover:-translate-y-1` : '';
+                            const titleColor = hasLink ? `${color.hoverText}` : '';
+
+                            const contentHTML = `
+                                <div class="p-4 flex items-center space-x-4">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-lg ${color.bg} flex items-center justify-center ${color.text}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3V4a1 1 0 00-.804-.98z" />
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-semibold text-gray-800 truncate ${titleColor} transition-colors">${song.title_en}</h3>
+                                        <p class="text-sm text-gray-600 truncate ${titleColor} transition-colors">${song.title_cn || '&nbsp;'}</p>
+                                    </div>
+                                    ${hasLink ? `
+                                    <div class="text-gray-400 ${color.hoverText} transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                    </div>` : `
+                                    <div class="text-gray-300">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>`}
+                                </div>
+                            `;
+
+                            if (hasLink) {
+                                return `
+                                <a href="${song.videoUrl}" target="_blank" rel="noopener noreferrer" class="group block rounded-lg shadow-sm overflow-hidden transition-all duration-200 bg-white border ${color.border} ${hoverEffect} btn-press">
+                                    ${contentHTML}
+                                </a>`;
+                            } else {
+                                return `
+                                <div class="block rounded-lg shadow-sm overflow-hidden transition-all duration-200 bg-gray-50 border ${color.border} opacity-60">
+                                    ${contentHTML}
+                                </div>`;
+                            }
+                        }).join('')}
+                    </div>
+                `;
+            }
+
+            // --- Event Listeners ---
+            menuToggle.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', toggleSidebar);
+            
+            categoryNav.addEventListener('click', e => {
+                e.preventDefault();
+                const link = e.target.closest('.nav-link');
+                if (link) {
+                    const category = link.dataset.category;
+                    
+                    // 移除所有激活状态
+                    document.querySelectorAll('.nav-link').forEach(nav => {
+                        nav.classList.remove('bg-blue-100', 'text-blue-700', 'border-blue-300');
+                    });
+                    
+                    // 添加激活状态
+                    link.classList.add('bg-blue-100', 'text-blue-700', 'border-blue-300');
+                    
+                    renderSongs(category);
+                    
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth < 768) {
+                        toggleSidebar();
+                    }
+                }
+            });
+            
+            // --- Initialization ---
+            renderNav();
+        });
+    </script>
+</body>
+</html>
+
