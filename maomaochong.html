@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Word Cards - 词汇卡片</title>
+<meta name="description" content="Interactive word cards with English and Chinese translations">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #FFFFFFFF 0%, #E1E1E1FF 100%);
+  min-height: 100vh;
+  color: #333;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem 0;
+}
+
+.title-section {
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  margin: 0.5rem 0 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.search-section {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-container {
+  flex: 1;
+  min-width: 300px;
+  position: relative;
+}
+
+#search {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 50px;
+  outline: none;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+#search:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: #f8f9fa;
+  color: #495057;
+  border: 1px solid #dee2e6;
+}
+
+.btn-secondary:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat {
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 15px;
+  min-width: 100px;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+main {
+  padding: 2rem 0;
+  min-height: 60vh;
+}
+
+#cards {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+.card-id {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 15px;
+}
+
+.card-content {
+  line-height: 1.6;
+}
+
+.card-content p {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.card-content p:last-child {
+  margin-bottom: 0;
+}
+
+.translation {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+  margin-top: 1rem;
+}
+
+.no-results {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
+}
+
+.no-results-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.no-results h3 {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.no-results p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.loading::after {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .search-section {
+    flex-direction: column;
+  }
+  
+  .search-container {
+    min-width: auto;
+  }
+  
+  #cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+  
+  .stats {
+    gap: 1rem;
+  }
+  
+  .stat {
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    padding: 1rem 0;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  #search {
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+  }
+  
+  .btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+  }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>📚 Word Cards</h1>
+        <p class="subtitle">毛毛虫词汇卡片 - 英语启蒙助手</p>
+      </div>
+      
+      <div class="search-section">
+        <div class="search-container">
+          <input id="search" type="text" placeholder="输入编号 (比如: 1936) 或者内容 (比如: 特斯拉)">
+        </div>
+        <div class="search-buttons">
+          <button class="btn btn-primary" onclick="showRandomCard()">🎲 随机卡片</button>
+          <button class="btn btn-secondary" onclick="clearSearch()">🗑️ 清空</button>
+        </div>
+      </div>
+      
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-number">151</div>
+          <div class="stat-label">总卡片数</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number" id="displayed-count">0</div>
+          <div class="stat-label">已显示</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div id="cards"></div>
+    <div id="no-results" class="no-results" style="display: none;">
+      <div class="no-results-icon">🔍</div>
+      <h3>未找到匹配的卡片</h3>
+      <p>请尝试输入不同的数字编号 (比如: 1936) 或者内容 (比如: 特斯拉)，或点击"随机卡片"按钮</p>
+    </div>
+  </div>
+</main>
+
+<script>
+const CHUNK_SIZE = 100;
+const CHUNKS = [[{"id":"1801","id_num":"1801","html":"<p>Cement Mixer. A cement mixer! Round and round it goes. Mixing the cement for the buildings we know.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Cement Mixer. A cement mixer! Round and round it goes. Mixing the cement for the buildings we know. [翻译失败 - 无响应]","chinese":""},{"id":"1802","id_num":"1802","html":"<p>Tanker Truck. A tanker truck! Vroom, vroom, vroom. Carrying gasoline to make cars zoom!</p>\n<p>翻译（简体中文）:\n油罐车。一辆油罐车！轰隆隆，轰隆隆，轰隆隆。运送汽油，让汽车飞驰！</p>","english":"Tanker Truck. A tanker truck! Vroom, vroom, vroom. Carrying gasoline to make cars zoom! 油罐车。一辆油罐车！轰隆隆，轰隆隆，轰隆隆。运送汽油，让汽车飞驰！","chinese":""},{"id":"1803","id_num":"1803","html":"<p>Street Sweeper. A street sweeper! Whirr, whirr, whirr. Cleaning the streets with its big, round brush.</p>\n<p>翻译（简体中文）:\n扫街车。一辆扫街车！嗡嗡嗡。用它又大又圆的刷子清扫街道。</p>","english":"Street Sweeper. A street sweeper! Whirr, whirr, whirr. Cleaning the streets with its big, round brush. 扫街车。一辆扫街车！嗡嗡嗡。用它又大又圆的刷子清扫街道。","chinese":""},{"id":"1804","id_num":"1804","html":"<p>Garbage Truck. A garbage truck! Beep, beep, beep. It takes the trash away while you sleep.</p>\n<p>翻译（简体中文）:\n垃圾车。一辆垃圾车！嘀嘀嘀。它在你睡觉的时候把垃圾运走。</p>","english":"Garbage Truck. A garbage truck! Beep, beep, beep. It takes the trash away while you sleep. 垃圾车。一辆垃圾车！嘀嘀嘀。它在你睡觉的时候把垃圾运走。","chinese":""},{"id":"1805","id_num":"1805","html":"<p>Water Truck. A water truck! Splish, splash, splosh. It sprays the water to wash, wash, wash.</p>\n<p>翻译（简体中文）:\n洒水车。一辆洒水车！哗啦啦。它喷洒水来冲洗，冲洗，冲洗。</p>","english":"Water Truck. A water truck! Splish, splash, splosh. It sprays the water to wash, wash, wash. 洒水车。一辆洒水车！哗啦啦。它喷洒水来冲洗，冲洗，冲洗。","chinese":""},{"id":"1806","id_num":"1806","html":"<p>Car Carrier. A car carrier! Long and strong. It carries little cars all day long.</p>\n<p>翻译（简体中文）:\n汽车运输船。一艘汽车运输船！又长又结实。它整天运送小汽车。</p>","english":"Car Carrier. A car carrier! Long and strong. It carries little cars all day long. 汽车运输船。一艘汽车运输船！又长又结实。它整天运送小汽车。","chinese":""},{"id":"1807","id_num":"1807","html":"<p>Scale. (short pause) Up and down, what's the number?</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Scale. (short pause) Up and down, what's the number? [翻译失败 - 无响应]","chinese":""},{"id":"1808","id_num":"1808","html":"<p>Fire Truck. (short pause) Wee-woo, wee-woo. (short pause) The fire truck is here to help.</p>\n<p>翻译（简体中文）:\n消防车。呜哇，呜哇。消防车来帮忙了。</p>","english":"Fire Truck. (short pause) Wee-woo, wee-woo. (short pause) The fire truck is here to help. 消防车。呜哇，呜哇。消防车来帮忙了。","chinese":""},{"id":"1809","id_num":"1809","html":"<p>Long Bus. (short pause) A long, long bus. (short pause) It can bend.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Long Bus. (short pause) A long, long bus. (short pause) It can bend. [翻译失败 - 无响应]","chinese":""},{"id":"1810","id_num":"1810","html":"<p>Container Truck. (short pause) A big container truck, (short pause) carrying many things.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Container Truck. (short pause) A big container truck, (short pause) carrying many things. [翻译失败 - 无响应]","chinese":""},{"id":"1811","id_num":"1811","html":"<p>Police Car. (short pause) Wee-woo, wee-woo. (short pause) Here comes the police car.</p>\n<p>翻译（简体中文）:\n警车。呜呜，呜呜。警车来了。</p>","english":"Police Car. (short pause) Wee-woo, wee-woo. (short pause) Here comes the police car. 警车。呜呜，呜呜。警车来了。","chinese":""},{"id":"1812","id_num":"1812","html":"<p>Bus. (short pause) Beep, beep, says the bus. (short pause) The wheels go round and round.</p>\n<p>翻译（简体中文）:\n巴士。\n嘀嘀，巴士说。\n轮子转啊转。</p>","english":"Bus. (short pause) Beep, beep, says the bus. (short pause) The wheels go round and round. 巴士。 嘀嘀，巴士说。 轮子转啊转。","chinese":""},{"id":"1813","id_num":"1813","html":"<p>Rabbit Car. (short pause) Look, a rabbit car. (short pause) Hop, hop, let's race.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Rabbit Car. (short pause) Look, a rabbit car. (short pause) Hop, hop, let's race. [翻译失败 - 无响应]","chinese":""},{"id":"1814","id_num":"1814","html":"<p>Big Race Car. (short pause) A big race car. (short pause) It's super fast. Go, go, go.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Big Race Car. (short pause) A big race car. (short pause) It's super fast. Go, go, go. [翻译失败 - 无响应]","chinese":""},{"id":"1815","id_num":"1815","html":"<p>Carrot Tank. (short pause) A yummy carrot tank. (short pause) Healthy and strong.</p>\n<p>翻译（简体中文）:\n[翻译失败]</p>","english":"Carrot Tank. (short pause) A yummy carrot tank. (short pause) Healthy and strong. [翻译失败]","chinese":""},{"id":"1816","id_num":"1816","html":"<p>SUV. (short pause) A big, strong SUV. (short pause) Let's all ride along.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"SUV. (short pause) A big, strong SUV. (short pause) Let's all ride along. [翻译失败 - 无响应]","chinese":""},{"id":"1817","id_num":"1817","html":"<p>Pickup Truck. (short pause) A pickup truck. (short pause) Let's load it up in the back.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Pickup Truck. (short pause) A pickup truck. (short pause) Let's load it up in the back. [翻译失败 - 无响应]","chinese":""},{"id":"1818","id_num":"1818","html":"<p>Classic Car. (short pause) A classic car. (short pause) What a cool, round shape.</p>\n<p>翻译（简体中文）:\n经典汽车。一辆经典汽车。多么酷炫、圆润的造型啊！</p>","english":"Classic Car. (short pause) A classic car. (short pause) What a cool, round shape. 经典汽车。一辆经典汽车。多么酷炫、圆润的造型啊！","chinese":""},{"id":"1819","id_num":"1819","html":"<p>Sports Car. (short pause) A sports car. (short pause) Sleek and low, ready to go.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Sports Car. (short pause) A sports car. (short pause) Sleek and low, ready to go. [翻译失败 - 无响应]","chinese":""},{"id":"1820","id_num":"1820","html":"<p>Desk. (short pause) This is a desk. I can draw at my desk.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Desk. (short pause) This is a desk. I can draw at my desk. [翻译失败 - 无响应]","chinese":""},{"id":"1821","id_num":"1821","html":"<p>Chair. (short pause) This is a chair. A little chair for me.</p>\n<p>翻译（简体中文）:\n椅子。(短暂停顿)这是一把椅子。一把小椅子，给我的。</p>","english":"Chair. (short pause) This is a chair. A little chair for me. 椅子。(短暂停顿)这是一把椅子。一把小椅子，给我的。","chinese":""},{"id":"1822","id_num":"1822","html":"<p>Milk powder. (short pause) Scoop the milk powder to make yummy milk.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Milk powder. (short pause) Scoop the milk powder to make yummy milk. [翻译失败 - 无响应]","chinese":""},{"id":"1823","id_num":"1823","html":"<p>Baby bottle. (short pause) My baby bottle is full of milk.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Baby bottle. (short pause) My baby bottle is full of milk. [翻译失败 - 无响应]","chinese":""},{"id":"1824","id_num":"1824","html":"<p>Water dispenser. (short pause) Get some water from the water dispenser.</p>\n<p>翻译（简体中文）:\n饮水机。从饮水机接水。</p>","english":"Water dispenser. (short pause) Get some water from the water dispenser. 饮水机。从饮水机接水。","chinese":""},{"id":"1825","id_num":"1825","html":"<p>Door. (short pause) Open the door. Close the door. Peek-a-boo.</p>\n<p>翻译（简体中文）:\n门。开门。关门。躲猫猫。</p>","english":"Door. (short pause) Open the door. Close the door. Peek-a-boo. 门。开门。关门。躲猫猫。","chinese":""},{"id":"1826","id_num":"1826","html":"<p>Sofa. (short pause) Let's sit on the sofa. So comfy.</p>\n<p>翻译（简体中文）:\n沙发。咱们坐在沙发上吧。好舒服。</p>","english":"Sofa. (short pause) Let's sit on the sofa. So comfy. 沙发。咱们坐在沙发上吧。好舒服。","chinese":""},{"id":"1827","id_num":"1827","html":"<p>Yoga mat. (short pause) Stretch like a kitty on the yoga mat.</p>\n<p>翻译（简体中文）:\n瑜伽垫。像小猫一样在瑜伽垫上伸展。</p>","english":"Yoga mat. (short pause) Stretch like a kitty on the yoga mat. 瑜伽垫。像小猫一样在瑜伽垫上伸展。","chinese":""},{"id":"1828","id_num":"1828","html":"<p>Bed. (short pause) Time for bed, sleepy head.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Bed. (short pause) Time for bed, sleepy head. [翻译失败 - 无响应]","chinese":""},{"id":"1829","id_num":"1829","html":"<p>Toothbrush. (short pause) Brush, brush, brush your teeth with a toothbrush.</p>\n<p>翻译（简体中文）:\n牙刷。刷刷刷，用</p>","english":"Toothbrush. (short pause) Brush, brush, brush your teeth with a toothbrush. 牙刷。刷刷刷，用","chinese":""},{"id":"1830","id_num":"1830","html":"<p>Rinsing cup. (short pause) Fill the rinsing cup with water.</p>\n<p>翻译（简体中文）:\n漱口杯。把漱口杯倒满水。</p>","english":"Rinsing cup. (short pause) Fill the rinsing cup with water. 漱口杯。把漱口杯倒满水。","chinese":""},{"id":"1831","id_num":"1831","html":"<p>Mahjong. (short pause) Click-clack. Let's stack the mahjong tiles.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Mahjong. (short pause) Click-clack. Let's stack the mahjong tiles. [翻译失败 - 无响应]","chinese":""},{"id":"1832","id_num":"1832","html":"<p>TV. (short pause) Let's watch cartoons on the TV.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"TV. (short pause) Let's watch cartoons on the TV. [翻译失败 - 无响应]","chinese":""},{"id":"1833","id_num":"1833","html":"<p>Keys. (short pause) Jingle, jangle, go the keys.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Keys. (short pause) Jingle, jangle, go the keys. [翻译失败 - 无响应]","chinese":""},{"id":"1834","id_num":"1834","html":"<p>Soy milk maker. (short pause) Whirrr. The soy milk maker is working.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Soy milk maker. (short pause) Whirrr. The soy milk maker is working. [翻译失败 - 无响应]","chinese":""},{"id":"1835","id_num":"1835","html":"<p>Air fryer. (short pause) The air fryer makes crispy, yummy food.</p>\n<p>翻译（简体中文）:\n空气炸锅。空气炸锅能做出酥脆美味的食物。</p>","english":"Air fryer. (short pause) The air fryer makes crispy, yummy food. 空气炸锅。空气炸锅能做出酥脆美味的食物。","chinese":""},{"id":"1836","id_num":"1836","html":"<p>Window. (short pause) Look through the window. What do you see?</p>\n<p>翻译（简体中文）:\n窗。往窗外看。你看到了什么？</p>","english":"Window. (short pause) Look through the window. What do you see? 窗。往窗外看。你看到了什么？","chinese":""},{"id":"1837","id_num":"1837","html":"<p>Bedside table. (short pause) My lamp is on the bedside table.</p>\n<p>翻译（简体中文）:\n床头柜。我的灯在床头柜上。</p>","english":"Bedside table. (short pause) My lamp is on the bedside table. 床头柜。我的灯在床头柜上。","chinese":""},{"id":"1838","id_num":"1838","html":"<p>Whiteboard. (short pause) Let's draw on the whiteboard.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Whiteboard. (short pause) Let's draw on the whiteboard. [翻译失败 - 无响应]","chinese":""},{"id":"1839","id_num":"1839","html":"<p>Fridge. (short pause) Open the fridge. Let's find some yummy snacks.</p>\n<p>翻译（简体中文）:\n冰箱。打开冰箱。咱们找点好吃的零食吧。</p>","english":"Fridge. (short pause) Open the fridge. Let's find some yummy snacks. 冰箱。打开冰箱。咱们找点好吃的零食吧。","chinese":""},{"id":"1840","id_num":"1840","html":"<p>Kitchen cabinet. (short pause) Open the kitchen cabinet. What's inside?</p>\n<p>翻译（简体中文）:\n厨房橱柜。打开厨房橱柜。里面有什么？</p>","english":"Kitchen cabinet. (short pause) Open the kitchen cabinet. What's inside? 厨房橱柜。打开厨房橱柜。里面有什么？","chinese":""},{"id":"1841","id_num":"1841","html":"<p>Oven. (short pause) Let's bake a cake in the oven.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Oven. (short pause) Let's bake a cake in the oven. [翻译失败 - 无响应]","chinese":""},{"id":"1842","id_num":"1842","html":"<p>Stove. (short pause) The stove is hot. Be careful.</p>\n<p>翻译（简体中文）:\n炉子。炉子很</p>","english":"Stove. (short pause) The stove is hot. Be careful. 炉子。炉子很","chinese":""},{"id":"1843","id_num":"1843","html":"<p>Shoe cabinet. (short pause) Put your shoes in the shoe cabinet.</p>\n<p>翻译（简体中文）:\n鞋柜。把鞋放鞋柜里。</p>","english":"Shoe cabinet. (short pause) Put your shoes in the shoe cabinet. 鞋柜。把鞋放鞋柜里。","chinese":""},{"id":"1844","id_num":"1844","html":"<p>Closet. (short pause) My clothes are in the closet.</p>\n<p>翻译（简体中文）:\n衣柜。我的衣服在衣柜里。</p>","english":"Closet. (short pause) My clothes are in the closet. 衣柜。我的衣服在衣柜里。","chinese":""},{"id":"1845","id_num":"1845","html":"<p>Trash can. (short pause) In the trash can it goes.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Trash can. (short pause) In the trash can it goes. [翻译失败 - 无响应]","chinese":""},{"id":"1846","id_num":"1846","html":"<p>Potty. (short pause) I can use my potty. I'm a big boy.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Potty. (short pause) I can use my potty. I'm a big boy. [翻译失败 - 无响应]","chinese":""},{"id":"1847","id_num":"1847","html":"<p>Toilet. (short pause) Flush the toilet. Whoosh.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Toilet. (short pause) Flush the toilet. Whoosh. [翻译失败 - 无响应]","chinese":""},{"id":"1848","id_num":"1848","html":"<p>Shower. (short pause) It's raining in the shower. Splash, splash.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Shower. (short pause) It's raining in the shower. Splash, splash. [翻译失败 - 无响应]","chinese":""},{"id":"1849","id_num":"1849","html":"<p>Bathtub. (short pause) Let's play in the bathtub.</p>\n<p>翻译（简体中文）:\n浴缸。我们来浴缸里玩吧。</p>","english":"Bathtub. (short pause) Let's play in the bathtub. 浴缸。我们来浴缸里玩吧。","chinese":""},{"id":"1850","id_num":"1850","html":"<p>Remote control. (short pause) Click, click, with the remote control.</p>\n<p>翻译（简体中文）:\n遥控器。(短暂停顿) 咔嗒，咔嗒，用遥控器。</p>","english":"Remote control. (short pause) Click, click, with the remote control. 遥控器。(短暂停顿) 咔嗒，咔嗒，用遥控器。","chinese":""},{"id":"1851","id_num":"1851","html":"<p>Tissue box. (short pause) Achoo. I need a tissue from the tissue box.</p>\n<p>翻译（简体中文）:\n纸巾盒。阿嚏。我需要从纸巾盒里拿一张纸巾。</p>","english":"Tissue box. (short pause) Achoo. I need a tissue from the tissue box. 纸巾盒。阿嚏。我需要从纸巾盒里拿一张纸巾。","chinese":""},{"id":"1852","id_num":"1852","html":"<p>Dining table. (short pause) Time to eat at the dining table.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Dining table. (short pause) Time to eat at the dining table. [翻译失败 - 无响应]","chinese":""},{"id":"1853","id_num":"1853","html":"<p>Dining chair. (short pause) Sit on the dining chair. Yummy, yummy.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Dining chair. (short pause) Sit on the dining chair. Yummy, yummy. [翻译失败 - 无响应]","chinese":""},{"id":"1854","id_num":"1854","html":"<p>Stroller. (short pause) Let's go for a ride in the stroller.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Stroller. (short pause) Let's go for a ride in the stroller. [翻译失败 - 无响应]","chinese":""},{"id":"1855","id_num":"1855","html":"<p>Balance bike. (short pause) I can ride my balance bike. Vroom, vroom.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Balance bike. (short pause) I can ride my balance bike. Vroom, vroom. [翻译失败 - 无响应]","chinese":""},{"id":"1856","id_num":"1856","html":"<p>Toaster (short pause) Pop. Goes the toast from the toaster.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Toaster (short pause) Pop. Goes the toast from the toaster. [翻译失败 - 无响应]","chinese":""},{"id":"1857","id_num":"1857","html":"<p>Wukong Robot. (short pause) Hello, Wukong Robot. Can you dance for me?</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Wukong Robot. (short pause) Hello, Wukong Robot. Can you dance for me? [翻译失败 - 无响应]","chinese":""},{"id":"1858","id_num":"1858","html":"<p>Wiggle car. (short pause) Wiggle, wiggle, on my wiggle car.</p>\n<p>翻译（简体中文）:\n扭扭车。扭啊扭，在我的扭扭车上。</p>","english":"Wiggle car. (short pause) Wiggle, wiggle, on my wiggle car. 扭扭车。扭啊扭，在我的扭扭车上。","chinese":""},{"id":"1859","id_num":"1859","html":"<p>Suitcase. (short pause) Wheels on the suitcase go round and round.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Suitcase. (short pause) Wheels on the suitcase go round and round. [翻译失败 - 无响应]","chinese":""},{"id":"1860","id_num":"1860","html":"<p>Backpack. (short pause) Put my toys in the backpack.</p>\n<p>翻译（简体中文）:\n背包。把我的玩具放进背包里。</p>","english":"Backpack. (short pause) Put my toys in the backpack. 背包。把我的玩具放进背包里。","chinese":""},{"id":"1861","id_num":"1861","html":"<p>Cup. (short pause) I can drink from my cup.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Cup. (short pause) I can drink from my cup. [翻译失败 - 无响应]","chinese":""},{"id":"1862","id_num":"1862","html":"<p>Teacup. (short pause) A little teacup for my tea party.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Teacup. (short pause) A little teacup for my tea party. [翻译失败 - 无响应]","chinese":""},{"id":"1863","id_num":"1863","html":"<p>Sterilizer. (short pause) The sterilizer keeps my bottles clean.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Sterilizer. (short pause) The sterilizer keeps my bottles clean. [翻译失败 - 无响应]","chinese":""},{"id":"1864","id_num":"1864","html":"<p>Bowl. (short pause) My rice is in the bowl. Yummy.</p>\n<p>翻译（简体中文）:\n碗。我的米饭在碗里。好吃。</p>","english":"Bowl. (short pause) My rice is in the bowl. Yummy. 碗。我的米饭在碗里。好吃。","chinese":""},{"id":"1865","id_num":"1865","html":"<p>Plate. (short pause) Food on my plate. It looks great.</p>\n<p>翻译（简体中文）:\n盘子。我的盘子里有食物。看起来很棒。</p>","english":"Plate. (short pause) Food on my plate. It looks great. 盘子。我的盘子里有食物。看起来很棒。","chinese":""},{"id":"1866","id_num":"1866","html":"<p>Chopsticks. (short pause) Click, clack, go the chopsticks.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Chopsticks. (short pause) Click, clack, go the chopsticks. [翻译失败 - 无响应]","chinese":""},{"id":"1867","id_num":"1867","html":"<p>Spoon. (short pause) A spoon for my soup. Slurp, slurp.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Spoon. (short pause) A spoon for my soup. Slurp, slurp. [翻译失败 - 无响应]","chinese":""},{"id":"1868","id_num":"1868","html":"<p>Fork. (short pause) I can eat with a fork.</p>\n<p>翻译（简体中文）:\n叉子。我可以用叉子吃饭。</p>","english":"Fork. (short pause) I can eat with a fork. 叉子。我可以用叉子吃饭。","chinese":""},{"id":"1869","id_num":"1869","html":"<p>Knife. (short pause) A knife can cut. Be careful.</p>\n<p>翻译（简体中文）:\n刀。刀会伤人。小心。</p>","english":"Knife. (short pause) A knife can cut. Be careful. 刀。刀会伤人。小心。","chinese":""},{"id":"1870","id_num":"1870","html":"<p>Eraser. (short pause) Let's wipe the board with the eraser.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Eraser. (short pause) Let's wipe the board with the eraser. [翻译失败 - 无响应]","chinese":""},{"id":"1871","id_num":"1871","html":"<p>Faucet. (short pause) Turn on the faucet. Wash, wash, wash your hands.</p>\n<p>翻译（简体中文）:\n水龙头。打开水龙头。洗手，洗手，洗手。</p>","english":"Faucet. (short pause) Turn on the faucet. Wash, wash, wash your hands. 水龙头。打开水龙头。洗手，洗手，洗手。","chinese":""},{"id":"1872","id_num":"1872","html":"<p>Shampoo. (short pause) Bubbles in my hair from the shampoo.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Shampoo. (short pause) Bubbles in my hair from the shampoo. [翻译失败 - 无响应]","chinese":""},{"id":"1873","id_num":"1873","html":"<p>Body wash. (short pause) Lots of bubbles with the body wash.</p>\n<p>翻译（简体中文）:\n沐浴露。泡沫丰富。</p>","english":"Body wash. (short pause) Lots of bubbles with the body wash. 沐浴露。泡沫丰富。","chinese":""},{"id":"1874","id_num":"1874","html":"<p>Rice cooker. (short pause) The rice cooker is making fluffy rice.</p>\n<p>翻译（简体中文）:\n电饭锅。电饭锅正在煮松软的米饭。</p>","english":"Rice cooker. (short pause) The rice cooker is making fluffy rice. 电饭锅。电饭锅正在煮松软的米饭。","chinese":""},{"id":"1875","id_num":"1875","html":"<p>Bed rail. (short pause) The bed rail keeps me safe at night.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Bed rail. (short pause) The bed rail keeps me safe at night. [翻译失败 - 无响应]","chinese":""},{"id":"1876","id_num":"1876","html":"<p>Pillow. (short pause) My head is soft on the pillow.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Pillow. (short pause) My head is soft on the pillow. [翻译失败 - 无响应]","chinese":""},{"id":"1877","id_num":"1877","html":"<p>Blanket. (short pause) Snuggle under the warm blanket.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Blanket. (short pause) Snuggle under the warm blanket. [翻译失败 - 无响应]","chinese":""},{"id":"1878","id_num":"1878","html":"<p>Motorcycle. A motorcycle has two big wheels. Let's go for a ride.</p>\n<p>翻译（简体中文）:\n摩托车。摩托车有两个大轮子。我们去兜风吧。</p>","english":"Motorcycle. A motorcycle has two big wheels. Let's go for a ride. 摩托车。摩托车有两个大轮子。我们去兜风吧。","chinese":""},{"id":"1879","id_num":"1879","html":"<p>Shoes. (short pause) Let's put on our shoes and go outside.</p>\n<p>翻译（简体中文）:\n鞋子。咱们穿上鞋子出去吧。</p>","english":"Shoes. (short pause) Let's put on our shoes and go outside. 鞋子。咱们穿上鞋子出去吧。","chinese":""},{"id":"1880","id_num":"1880","html":"<p>Drawer. (short pause) Open the drawer. Close the drawer.</p>\n<p>翻译（简体中文）:\n抽屉。打开抽屉。关上抽屉。</p>","english":"Drawer. (short pause) Open the drawer. Close the drawer. 抽屉。打开抽屉。关上抽屉。","chinese":""},{"id":"1881","id_num":"1881","html":"<p>Light switch. (short pause) Click. Turn the light on with the light switch.</p>\n<p>翻译（简体中文）:\n灯开关。咔哒。用灯开关把灯打开。</p>","english":"Light switch. (short pause) Click. Turn the light on with the light switch. 灯开关。咔哒。用灯开关把灯打开。","chinese":""},{"id":"1882","id_num":"1882","html":"<p>Air conditioner. (short pause) Cool air from the air conditioner. Brrr.</p>\n<p>翻译（简体中文）:\n空调。(短暂停顿)空调吹出的冷气。好冷啊。</p>","english":"Air conditioner. (short pause) Cool air from the air conditioner. Brrr. 空调。(短暂停顿)空调吹出的冷气。好冷啊。","chinese":""},{"id":"1883","id_num":"1883","html":"<p>Motorcycle. (short pause) Vroom, vroom. Goes the motorcycle.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Motorcycle. (short pause) Vroom, vroom. Goes the motorcycle. [翻译失败 - 无响应]","chinese":""},{"id":"1884","id_num":"1884","html":"<p>Range hood. (short pause) The range hood helps clear the air.</p>\n<p>翻译（简体中文）:\n抽油烟机。抽油烟机有助于净化空气。</p>","english":"Range hood. (short pause) The range hood helps clear the air. 抽油烟机。抽油烟机有助于净化空气。","chinese":""},{"id":"1885","id_num":"1885","html":"<p>Cutting board. (short pause) Chop, chop, on the cutting board.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Cutting board. (short pause) Chop, chop, on the cutting board. [翻译失败 - 无响应]","chinese":""},{"id":"1886","id_num":"1886","html":"<p>Broom. (short pause) Sweep, sweep, sweep with the broom.</p>\n<p>翻译（简体中文）:\n扫帚。用扫帚扫啊扫啊扫。</p>","english":"Broom. (short pause) Sweep, sweep, sweep with the broom. 扫帚。用扫帚扫啊扫啊扫。","chinese":""},{"id":"1887","id_num":"1887","html":"<p>Dustpan. (short pause) Sweep the dust into the dustpan.</p>\n<p>翻译（简体中文）:\n簸箕。把灰尘扫进簸箕里。</p>","english":"Dustpan. (short pause) Sweep the dust into the dustpan. 簸箕。把灰尘扫进簸箕里。","chinese":""},{"id":"1888","id_num":"1888","html":"<p>High chair. (short pause) Sit in my high chair. It's time to eat.</p>\n<p>翻译（简体中文）:\n餐椅。坐到我的餐椅上。该吃饭了。</p>","english":"High chair. (short pause) Sit in my high chair. It's time to eat. 餐椅。坐到我的餐椅上。该吃饭了。","chinese":""},{"id":"1889","id_num":"1889","html":"<p>Scale. (short pause) Let's see how big I am on the scale.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Scale. (short pause) Let's see how big I am on the scale. [翻译失败 - 无响应]","chinese":""},{"id":"1890","id_num":"1890","html":"<p>Umbrella. (short pause) Open the umbrella when it starts to rain.</p>\n<p>翻译（简体中文）:\n伞。下雨的时候打开伞。</p>","english":"Umbrella. (short pause) Open the umbrella when it starts to rain. 伞。下雨的时候打开伞。","chinese":""},{"id":"1891","id_num":"1891","html":"<p>Missile launcher truck. (short pause) A big missile launcher truck. It can point way up to the sky.</p>\n<p>翻译（简体中文）:\n导弹发射车。一辆大型导弹发射车。它可以指向高高的天空。</p>","english":"Missile launcher truck. (short pause) A big missile launcher truck. It can point way up to the sky. 导弹发射车。一辆大型导弹发射车。它可以指向高高的天空。","chinese":""},{"id":"1892","id_num":"1892","html":"<p>Navy ship. (short pause) A big navy ship. It sails on the great big sea.</p>\n<p>翻译（简体中文）:\n军舰。一艘大军舰。它在浩瀚的大海上航行。</p>","english":"Navy ship. (short pause) A big navy ship. It sails on the great big sea. 军舰。一艘大军舰。它在浩瀚的大海上航行。","chinese":""},{"id":"1893","id_num":"1893","html":"<p>Armored car. (short pause) An armored car. So strong and tough.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Armored car. (short pause) An armored car. So strong and tough. [翻译失败 - 无响应]","chinese":""},{"id":"1894","id_num":"1894","html":"<p>Radar truck. (short pause) A radar truck. The dish goes round and round.</p>\n<p>翻译（简体中文）:\n雷达车。一辆雷达车。碟形天线转啊转。</p>","english":"Radar truck. (short pause) A radar truck. The dish goes round and round. 雷达车。一辆雷达车。碟形天线转啊转。","chinese":""},{"id":"1895","id_num":"1895","html":"<p>Signal truck. (short pause) A signal truck. Sending signals, beep beep beep.</p>\n<p>翻译（简体中文）:\n信号车。信号车。发送信号，嘀嘀嘀。</p>","english":"Signal truck. (short pause) A signal truck. Sending signals, beep beep beep. 信号车。信号车。发送信号，嘀嘀嘀。","chinese":""},{"id":"1896","id_num":"1896","html":"<p>Airplane. (short pause) An airplane in the sky. Flying way up high.</p>\n<p>翻译（简体中文）:\n飞机。天空中有一架飞机。飞得很高很高。</p>","english":"Airplane. (short pause) An airplane in the sky. Flying way up high. 飞机。天空中有一架飞机。飞得很高很高。","chinese":""},{"id":"1897","id_num":"1897","html":"<p>Ladder truck. (short pause) A ladder truck. The ladder goes up, up, up to the rescue.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Ladder truck. (short pause) A ladder truck. The ladder goes up, up, up to the rescue. [翻译失败 - 无响应]","chinese":""},{"id":"1898","id_num":"1898","html":"<p>Loader. (short pause) A loader can scoop and lift. Scoop up the dirt.</p>\n<p>翻译（简体中文）:\n装载机。装载机可以铲起和举升。铲起泥土。</p>","english":"Loader. (short pause) A loader can scoop and lift. Scoop up the dirt. 装载机。装载机可以铲起和举升。铲起泥土。","chinese":""},{"id":"1899","id_num":"1899","html":"<p>Digger. (short pause) I'm a digger, big and strong. Dig, dig, dig all day long.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Digger. (short pause) I'm a digger, big and strong. Dig, dig, dig all day long. [翻译失败 - 无响应]","chinese":""},{"id":"1900","id_num":"1900","html":"<p>Lint roller. (short pause) A sticky lint roller. Roll, roll, roll on my clothes.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Lint roller. (short pause) A sticky lint roller. Roll, roll, roll on my clothes. [翻译失败 - 无响应]","chinese":""}],[{"id":"1901","id_num":"1901","html":"<p>Toy box. (short pause) It's clean-up time. Put your toys in the toy box.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Toy box. (short pause) It's clean-up time. Put your toys in the toy box. [翻译失败 - 无响应]","chinese":""},{"id":"1902","id_num":"1902","html":"<p>Vase. (short pause) A vase for the flowers. So pretty.</p>\n<p>翻译（简体中文）:\n花瓶。一个插花的花瓶。真漂亮。</p>","english":"Vase. (short pause) A vase for the flowers. So pretty. 花瓶。一个插花的花瓶。真漂亮。","chinese":""},{"id":"1903","id_num":"1903","html":"<p>一 (yī). 一个。 我有一个气球。</p>\n<p>翻译（简体中文）:\n一 (yī). 一个。 我有一个气球。</p>","english":"一 (yī). 一个。 我有一个气球。 一 (yī). 一个。 我有一个气球。","chinese":""},{"id":"1904","id_num":"1904","html":"<p>二 (èr). 二胡。 爷爷教我拉二胡。</p>\n<p>翻译（简体中文）:\n二 (èr). 二胡。 爷爷教我拉二胡。</p>","english":"二 (èr). 二胡。 爷爷教我拉二胡。 二 (èr). 二胡。 爷爷教我拉二胡。","chinese":""},{"id":"1905","id_num":"1905","html":"<p>三 (sān). 三个。 小兔子采了三个蘑菇。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"三 (sān). 三个。 小兔子采了三个蘑菇。 [翻译失败 - 无响应]","chinese":""},{"id":"1906","id_num":"1906","html":"<p>四 (sì). 四朵花。 这里有四朵花。</p>\n<p>翻译（简体中文）:\n四 (sì). 四朵花。 这里有四朵花。</p>","english":"四 (sì). 四朵花。 这里有四朵花。 四 (sì). 四朵花。 这里有四朵花。","chinese":""},{"id":"1907","id_num":"1907","html":"<p>五 (wǔ). 五只。 花园里有五只蝴蝶。</p>\n<p>翻译（简体中文）:\n五 (wǔ). 五只。 花园里有五只蝴蝶。</p>","english":"五 (wǔ). 五只。 花园里有五只蝴蝶。 五 (wǔ). 五只。 花园里有五只蝴蝶。","chinese":""},{"id":"1908","id_num":"1908","html":"<p>六 (liù). 六个。 妹妹吃了六个草莓。</p>\n<p>翻译（简体中文）:\n六。六个。妹妹吃了六个草莓。</p>","english":"六 (liù). 六个。 妹妹吃了六个草莓。 六。六个。妹妹吃了六个草莓。","chinese":""},{"id":"1909","id_num":"1909","html":"<p>七 (qī). 七个。 妈妈做了七个蛋糕。</p>\n<p>翻译（简体中文）:\n七 (qī). 七个。 妈妈做了七个蛋糕。</p>","english":"七 (qī). 七个。 妈妈做了七个蛋糕。 七 (qī). 七个。 妈妈做了七个蛋糕。","chinese":""},{"id":"1910","id_num":"1910","html":"<p>八 (bā). 八个。 爸爸栽了八棵树。</p>\n<p>翻译（简体中文）:\n八。\n八个。\n爸爸栽了八棵树。</p>","english":"八 (bā). 八个。 爸爸栽了八棵树。 八。 八个。 爸爸栽了八棵树。","chinese":""},{"id":"1911","id_num":"1911","html":"<p>九 (jiǔ). 九块糖果。 妹妹有九块糖果。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"九 (jiǔ). 九块糖果。 妹妹有九块糖果。 [翻译失败 - 无响应]","chinese":""},{"id":"1912","id_num":"1912","html":"<p>十 (shí). 十本。 书架上有十本漫画书。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"十 (shí). 十本。 书架上有十本漫画书。 [翻译失败 - 无响应]","chinese":""},{"id":"1913","id_num":"1913","html":"<p>日 (rì). 日出。周末爸爸带我去看日出。</p>\n<p>翻译（简体中文）:\n日 (rì). 日出。周末爸爸带我去看日出。</p>","english":"日 (rì). 日出。周末爸爸带我去看日出。 日 (rì). 日出。周末爸爸带我去看日出。","chinese":""},{"id":"1914","id_num":"1914","html":"<p>月 (yuè). 月光。月光透过窗户照进了我家。</p>\n<p>翻译（简体中文）:\n月 (yuè)。月光。月光透过窗户照进了我家。</p>","english":"月 (yuè). 月光。月光透过窗户照进了我家。 月 (yuè)。月光。月光透过窗户照进了我家。","chinese":""},{"id":"1915","id_num":"1915","html":"<p>大 (dà). 大象。大象的鼻子长又长。</p>\n<p>翻译（简体中文）:\n大 (dà). 大象。大象的鼻子长又长。</p>","english":"大 (dà). 大象。大象的鼻子长又长。 大 (dà). 大象。大象的鼻子长又长。","chinese":""},{"id":"1916","id_num":"1916","html":"<p>小 (xiǎo). 矮小。老鼠的个头很矮小。</p>\n<p>翻译（简体中文）:\n小 (xiǎo). 矮小。老</p>","english":"小 (xiǎo). 矮小。老鼠的个头很矮小。 小 (xiǎo). 矮小。老","chinese":""},{"id":"1917","id_num":"1917","html":"<p>水 (shuǐ). 泉水。泉水很清澈。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"水 (shuǐ). 泉水。泉水很清澈。 [翻译失败 - 无响应]","chinese":""},{"id":"1918","id_num":"1918","html":"<p>火 (huǒ). 火苗。火苗很危险，我们要远离。</p>\n<p>翻译（简体中文）:\n火 (huǒ)。火苗。火苗很危险，我们要远离。</p>","english":"火 (huǒ). 火苗。火苗很危险，我们要远离。 火 (huǒ)。火苗。火苗很危险，我们要远离。","chinese":""},{"id":"1919","id_num":"1919","html":"<p>上 (shàng). 上学。今天是爸爸送我上学。</p>\n<p>翻译（简体中文）:\n上 (shàng). 上学。今天是爸爸送我上学。</p>","english":"上 (shàng). 上学。今天是爸爸送我上学。 上 (shàng). 上学。今天是爸爸送我上学。","chinese":""},{"id":"1920","id_num":"1920","html":"<p>下 (xià). 脚下。小熊把皮球放在脚下。</p>\n<p>翻译（简体中文）:\n下 (xià). 脚下。小熊把皮球放在脚下。</p>","english":"下 (xià). 脚下。小熊把皮球放在脚下。 下 (xià). 脚下。小熊把皮球放在脚下。","chinese":""},{"id":"1921","id_num":"1921","html":"<p>山 (shān). 山顶。我和爸爸爬到了山顶。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"山 (shān). 山顶。我和爸爸爬到了山顶。 [翻译失败 - 无响应]","chinese":""},{"id":"1922","id_num":"1922","html":"<p>田 (tián). 农田。农田里面种着水稻。</p>\n<p>翻译（简体中文）:\n田 (tián)。农田。农田里面种着水稻。</p>","english":"田 (tián). 农田。农田里面种着水稻。 田 (tián)。农田。农田里面种着水稻。","chinese":""},{"id":"1923","id_num":"1923","html":"<p>里 (lǐ). 里面。小熊在房子里面。</p>\n<p>翻译（简体中文）:\n里。里面。小熊在房子里面。</p>","english":"里 (lǐ). 里面。小熊在房子里面。 里。里面。小熊在房子里面。","chinese":""},{"id":"1924","id_num":"1924","html":"<p>外 (wài). 外面。小熊站在房子外面。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"外 (wài). 外面。小熊站在房子外面。 [翻译失败 - 无响应]","chinese":""},{"id":"1925","id_num":"1925","html":"<p>石 (shí). 石头。山上有很多石头。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"石 (shí). 石头。山上有很多石头。 [翻译失败 - 无响应]","chinese":""},{"id":"1926","id_num":"1926","html":"<p>土 (tǔ). 泥土。我会用泥土捏娃娃。</p>\n<p>翻译（简体中文）:\n土 (tǔ). 泥土。我会用泥土捏娃娃。</p>","english":"土 (tǔ). 泥土。我会用泥土捏娃娃。 土 (tǔ). 泥土。我会用泥土捏娃娃。","chinese":""},{"id":"1927","id_num":"1927","html":"<p>来 (lái). 回来了。妈妈下班回来了。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"来 (lái). 回来了。妈妈下班回来了。 [翻译失败 - 无响应]","chinese":""},{"id":"1928","id_num":"1928","html":"<p>去 (qù). 回去了。哥哥放学回去了。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"去 (qù). 回去了。哥哥放学回去了。 [翻译失败 - 无响应]","chinese":""},{"id":"1929","id_num":"1929","html":"<p>木 (mù). 木头。这座房子是用木头做的。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"木 (mù). 木头。这座房子是用木头做的。 [翻译失败 - 无响应]","chinese":""},{"id":"1930","id_num":"1930","html":"<p>正 (zhèng). 正在。老师正在教我们组词。</p>\n<p>翻译（简体中文）:\n正 (zhèng). 正在。老师正在教我们组词。</p>","english":"正 (zhèng). 正在。老师正在教我们组词。 正 (zhèng). 正在。老师正在教我们组词。","chinese":""},{"id":"1931","id_num":"1931","html":"<p>反 (fǎn). 反义词。今天我学会了反义词。</p>\n<p>翻译（简体中文）:\n反 (fǎn)。反义词。今天我学会了反义词。</p>","english":"反 (fǎn). 反义词。今天我学会了反义词。 反 (fǎn)。反义词。今天我学会了反义词。","chinese":""},{"id":"1934","id_num":"1934","html":"<p>人 (rén). 工人。我的爸爸是工人。</p>\n<p>翻译（简体中文）:\n人 (rén). 工人。我的爸爸是工人。</p>","english":"人 (rén). 工人。我的爸爸是工人。 人 (rén). 工人。我的爸爸是工人。","chinese":""},{"id":"1935","id_num":"1935","html":"<p>口 (kǒu). 口才。球球的口才很棒。</p>\n<p>翻译（简体中文）:\n口 (kǒu)。口才。球球的口才很棒。</p>","english":"口 (kǒu). 口才。球球的口才很棒。 口 (kǒu)。口才。球球的口才很棒。","chinese":""},{"id":"1936","id_num":"1936","html":"<p>分 (fēn). 满分。球球考试得了满分。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"分 (fēn). 满分。球球考试得了满分。 [翻译失败 - 无响应]","chinese":""},{"id":"1937","id_num":"1937","html":"<p>合 (hé). 合作。两只小蚂蚁在合作搬豆豆。</p>\n<p>翻译（简体中文）:\n合 (hé). 合作。两只小蚂蚁在合作搬豆豆。</p>","english":"合 (hé). 合作。两只小蚂蚁在合作搬豆豆。 合 (hé). 合作。两只小蚂蚁在合作搬豆豆。","chinese":""},{"id":"1938","id_num":"1938","html":"<p>手 (shǒu). 手指。姐姐的手指非常漂亮。</p>\n<p>翻译（简体中文）:\n手。手指。姐姐的手指非常漂亮。</p>","english":"手 (shǒu). 手指。姐姐的手指非常漂亮。 手。手指。姐姐的手指非常漂亮。","chinese":""},{"id":"1939","id_num":"1939","html":"<p>耳 (ěr). 耳朵。耳朵用来听声音。</p>\n<p>翻译（简体中文）:\n耳 (ěr)。耳朵。耳朵用来听声音。</p>","english":"耳 (ěr). 耳朵。耳朵用来听声音。 耳 (ěr)。耳朵。耳朵用来听声音。","chinese":""},{"id":"1940","id_num":"1940","html":"<p>多 (duō). 很多。公园里有很多蝴蝶。</p>\n<p>翻译（简体中文）:\n多 (duō). 很多。公园里有很多蝴蝶。</p>","english":"多 (duō). 很多。公园里有很多蝴蝶。 多 (duō). 很多。公园里有很多蝴蝶。","chinese":""},{"id":"1941","id_num":"1941","html":"<p>少 (shǎo). 少数民族。苗族是我国少数民族之一。</p>\n<p>翻译（简体中文）:\n少 (shǎo). 少数民族。苗族是我国少数民族之一。</p>","english":"少 (shǎo). 少数民族。苗族是我国少数民族之一。 少 (shǎo). 少数民族。苗族是我国少数民族之一。","chinese":""},{"id":"1942","id_num":"1942","html":"<p>目 (mù). 目光。奶奶的目光很慈祥。</p>\n<p>翻译（简体中文）:\n目 (mù). 目光。奶奶的目光很慈祥。</p>","english":"目 (mù). 目光。奶奶的目光很慈祥。 目 (mù). 目光。奶奶的目光很慈祥。","chinese":""},{"id":"1943","id_num":"1943","html":"<p>足 (zú). 足球。哥哥喜欢踢足球。</p>\n<p>翻译（简体中文）:\n足 (zú). 足球。哥哥喜欢踢足球。</p>","english":"足 (zú). 足球。哥哥喜欢踢足球。 足 (zú). 足球。哥哥喜欢踢足球。","chinese":""},{"id":"1944","id_num":"1944","html":"<p>远 (yuǎn). 远方。狮子坐在石头上眺望远方。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"远 (yuǎn). 远方。狮子坐在石头上眺望远方。 [翻译失败 - 无响应]","chinese":""},{"id":"1945","id_num":"1945","html":"<p>近 (jìn). 近视。躺着看书眼睛容易近视。</p>\n<p>翻译（简体中文）:\n近 (jìn)。近视。躺着看书眼睛容易近视。</p>","english":"近 (jìn). 近视。躺着看书眼睛容易近视。 近 (jìn)。近视。躺着看书眼睛容易近视。","chinese":""},{"id":"1946","id_num":"1946","html":"<p>舌 (shé). 舌头。医生在帮我检查舌头。</p>\n<p>翻译（简体中文）:\n舌 (shé).</p>","english":"舌 (shé). 舌头。医生在帮我检查舌头。 舌 (shé).","chinese":""},{"id":"1947","id_num":"1947","html":"<p>牙 (yá). 刷牙。认真刷牙可以预防蛀牙。</p>\n<p>翻译（简体中文）:\n牙 (yá). 刷牙。认真刷牙可以预防蛀牙。</p>","english":"牙 (yá). 刷牙。认真刷牙可以预防蛀牙。 牙 (yá). 刷牙。认真刷牙可以预防蛀牙。","chinese":""},{"id":"1948","id_num":"1948","html":"<p>有 (yǒu). 只有。树上只有一只小鸟。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"有 (yǒu). 只有。树上只有一只小鸟。 [翻译失败 - 无响应]","chinese":""},{"id":"1949","id_num":"1949","html":"<p>无 (wú). 无边。小船在无边的大海上漂荡。</p>\n<p>翻译（简体中文）:\n无 (wú). 无边。小船在无边的大海上漂荡。</p>","english":"无 (wú). 无边。小船在无边的大海上漂荡。 无 (wú). 无边。小船在无边的大海上漂荡。","chinese":""},{"id":"1950","id_num":"1950","html":"<p>头 (tóu). 头痛。发烧会引起头痛。</p>\n<p>翻译（简体中文）:\n头 (tóu). 头痛。发烧会引起头痛。</p>","english":"头 (tóu). 头痛。发烧会引起头痛。 头 (tóu). 头痛。发烧会引起头痛。","chinese":""},{"id":"1951","id_num":"1951","html":"<p>发 (fà). 白发。爷爷满头白发。</p>\n<p>翻译（简体中文）:\n发 (fà). 白发。爷爷满头白发。</p>","english":"发 (fà). 白发。爷爷满头白发。 发 (fà). 白发。爷爷满头白发。","chinese":""},{"id":"1952","id_num":"1952","html":"<p>Tesla Model Y. Wow, a Tesla Model Y. It's electric, quiet and quick.</p>\n<p>翻译（简体中文）:\n特斯拉 Model Y。哇，一辆特斯拉 Model Y。它是电动的，安静又快速。</p>","english":"Tesla Model Y. Wow, a Tesla Model Y. It's electric, quiet and quick. 特斯拉 Model Y。哇，一辆特斯拉 Model Y。它是电动的，安静又快速。","chinese":""},{"id":"1953","id_num":"1953","html":"<p>Excavator. Look, an excavator! It can dig, dig, dig with its big scoop.</p>\n<p>翻译（简体中文）:\n挖掘机。看，一台挖掘机！它能用它的大铲斗挖呀挖呀挖。</p>","english":"Excavator. Look, an excavator! It can dig, dig, dig with its big scoop. 挖掘机。看，一台挖掘机！它能用它的大铲斗挖呀挖呀挖。","chinese":""}]];
+const ALL_CARDS = [{"id":"1801","id_num":"1801","html":"<p>Cement Mixer. A cement mixer! Round and round it goes. Mixing the cement for the buildings we know.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Cement Mixer. A cement mixer! Round and round it goes. Mixing the cement for the buildings we know. [翻译失败 - 无响应]","chinese":""},{"id":"1802","id_num":"1802","html":"<p>Tanker Truck. A tanker truck! Vroom, vroom, vroom. Carrying gasoline to make cars zoom!</p>\n<p>翻译（简体中文）:\n油罐车。一辆油罐车！轰隆隆，轰隆隆，轰隆隆。运送汽油，让汽车飞驰！</p>","english":"Tanker Truck. A tanker truck! Vroom, vroom, vroom. Carrying gasoline to make cars zoom! 油罐车。一辆油罐车！轰隆隆，轰隆隆，轰隆隆。运送汽油，让汽车飞驰！","chinese":""},{"id":"1803","id_num":"1803","html":"<p>Street Sweeper. A street sweeper! Whirr, whirr, whirr. Cleaning the streets with its big, round brush.</p>\n<p>翻译（简体中文）:\n扫街车。一辆扫街车！嗡嗡嗡。用它又大又圆的刷子清扫街道。</p>","english":"Street Sweeper. A street sweeper! Whirr, whirr, whirr. Cleaning the streets with its big, round brush. 扫街车。一辆扫街车！嗡嗡嗡。用它又大又圆的刷子清扫街道。","chinese":""},{"id":"1804","id_num":"1804","html":"<p>Garbage Truck. A garbage truck! Beep, beep, beep. It takes the trash away while you sleep.</p>\n<p>翻译（简体中文）:\n垃圾车。一辆垃圾车！嘀嘀嘀。它在你睡觉的时候把垃圾运走。</p>","english":"Garbage Truck. A garbage truck! Beep, beep, beep. It takes the trash away while you sleep. 垃圾车。一辆垃圾车！嘀嘀嘀。它在你睡觉的时候把垃圾运走。","chinese":""},{"id":"1805","id_num":"1805","html":"<p>Water Truck. A water truck! Splish, splash, splosh. It sprays the water to wash, wash, wash.</p>\n<p>翻译（简体中文）:\n洒水车。一辆洒水车！哗啦啦。它喷洒水来冲洗，冲洗，冲洗。</p>","english":"Water Truck. A water truck! Splish, splash, splosh. It sprays the water to wash, wash, wash. 洒水车。一辆洒水车！哗啦啦。它喷洒水来冲洗，冲洗，冲洗。","chinese":""},{"id":"1806","id_num":"1806","html":"<p>Car Carrier. A car carrier! Long and strong. It carries little cars all day long.</p>\n<p>翻译（简体中文）:\n汽车运输船。一艘汽车运输船！又长又结实。它整天运送小汽车。</p>","english":"Car Carrier. A car carrier! Long and strong. It carries little cars all day long. 汽车运输船。一艘汽车运输船！又长又结实。它整天运送小汽车。","chinese":""},{"id":"1807","id_num":"1807","html":"<p>Scale. (short pause) Up and down, what's the number?</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Scale. (short pause) Up and down, what's the number? [翻译失败 - 无响应]","chinese":""},{"id":"1808","id_num":"1808","html":"<p>Fire Truck. (short pause) Wee-woo, wee-woo. (short pause) The fire truck is here to help.</p>\n<p>翻译（简体中文）:\n消防车。呜哇，呜哇。消防车来帮忙了。</p>","english":"Fire Truck. (short pause) Wee-woo, wee-woo. (short pause) The fire truck is here to help. 消防车。呜哇，呜哇。消防车来帮忙了。","chinese":""},{"id":"1809","id_num":"1809","html":"<p>Long Bus. (short pause) A long, long bus. (short pause) It can bend.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Long Bus. (short pause) A long, long bus. (short pause) It can bend. [翻译失败 - 无响应]","chinese":""},{"id":"1810","id_num":"1810","html":"<p>Container Truck. (short pause) A big container truck, (short pause) carrying many things.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Container Truck. (short pause) A big container truck, (short pause) carrying many things. [翻译失败 - 无响应]","chinese":""},{"id":"1811","id_num":"1811","html":"<p>Police Car. (short pause) Wee-woo, wee-woo. (short pause) Here comes the police car.</p>\n<p>翻译（简体中文）:\n警车。呜呜，呜呜。警车来了。</p>","english":"Police Car. (short pause) Wee-woo, wee-woo. (short pause) Here comes the police car. 警车。呜呜，呜呜。警车来了。","chinese":""},{"id":"1812","id_num":"1812","html":"<p>Bus. (short pause) Beep, beep, says the bus. (short pause) The wheels go round and round.</p>\n<p>翻译（简体中文）:\n巴士。\n嘀嘀，巴士说。\n轮子转啊转。</p>","english":"Bus. (short pause) Beep, beep, says the bus. (short pause) The wheels go round and round. 巴士。 嘀嘀，巴士说。 轮子转啊转。","chinese":""},{"id":"1813","id_num":"1813","html":"<p>Rabbit Car. (short pause) Look, a rabbit car. (short pause) Hop, hop, let's race.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Rabbit Car. (short pause) Look, a rabbit car. (short pause) Hop, hop, let's race. [翻译失败 - 无响应]","chinese":""},{"id":"1814","id_num":"1814","html":"<p>Big Race Car. (short pause) A big race car. (short pause) It's super fast. Go, go, go.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Big Race Car. (short pause) A big race car. (short pause) It's super fast. Go, go, go. [翻译失败 - 无响应]","chinese":""},{"id":"1815","id_num":"1815","html":"<p>Carrot Tank. (short pause) A yummy carrot tank. (short pause) Healthy and strong.</p>\n<p>翻译（简体中文）:\n[翻译失败]</p>","english":"Carrot Tank. (short pause) A yummy carrot tank. (short pause) Healthy and strong. [翻译失败]","chinese":""},{"id":"1816","id_num":"1816","html":"<p>SUV. (short pause) A big, strong SUV. (short pause) Let's all ride along.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"SUV. (short pause) A big, strong SUV. (short pause) Let's all ride along. [翻译失败 - 无响应]","chinese":""},{"id":"1817","id_num":"1817","html":"<p>Pickup Truck. (short pause) A pickup truck. (short pause) Let's load it up in the back.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Pickup Truck. (short pause) A pickup truck. (short pause) Let's load it up in the back. [翻译失败 - 无响应]","chinese":""},{"id":"1818","id_num":"1818","html":"<p>Classic Car. (short pause) A classic car. (short pause) What a cool, round shape.</p>\n<p>翻译（简体中文）:\n经典汽车。一辆经典汽车。多么酷炫、圆润的造型啊！</p>","english":"Classic Car. (short pause) A classic car. (short pause) What a cool, round shape. 经典汽车。一辆经典汽车。多么酷炫、圆润的造型啊！","chinese":""},{"id":"1819","id_num":"1819","html":"<p>Sports Car. (short pause) A sports car. (short pause) Sleek and low, ready to go.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Sports Car. (short pause) A sports car. (short pause) Sleek and low, ready to go. [翻译失败 - 无响应]","chinese":""},{"id":"1820","id_num":"1820","html":"<p>Desk. (short pause) This is a desk. I can draw at my desk.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Desk. (short pause) This is a desk. I can draw at my desk. [翻译失败 - 无响应]","chinese":""},{"id":"1821","id_num":"1821","html":"<p>Chair. (short pause) This is a chair. A little chair for me.</p>\n<p>翻译（简体中文）:\n椅子。(短暂停顿)这是一把椅子。一把小椅子，给我的。</p>","english":"Chair. (short pause) This is a chair. A little chair for me. 椅子。(短暂停顿)这是一把椅子。一把小椅子，给我的。","chinese":""},{"id":"1822","id_num":"1822","html":"<p>Milk powder. (short pause) Scoop the milk powder to make yummy milk.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Milk powder. (short pause) Scoop the milk powder to make yummy milk. [翻译失败 - 无响应]","chinese":""},{"id":"1823","id_num":"1823","html":"<p>Baby bottle. (short pause) My baby bottle is full of milk.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Baby bottle. (short pause) My baby bottle is full of milk. [翻译失败 - 无响应]","chinese":""},{"id":"1824","id_num":"1824","html":"<p>Water dispenser. (short pause) Get some water from the water dispenser.</p>\n<p>翻译（简体中文）:\n饮水机。从饮水机接水。</p>","english":"Water dispenser. (short pause) Get some water from the water dispenser. 饮水机。从饮水机接水。","chinese":""},{"id":"1825","id_num":"1825","html":"<p>Door. (short pause) Open the door. Close the door. Peek-a-boo.</p>\n<p>翻译（简体中文）:\n门。开门。关门。躲猫猫。</p>","english":"Door. (short pause) Open the door. Close the door. Peek-a-boo. 门。开门。关门。躲猫猫。","chinese":""},{"id":"1826","id_num":"1826","html":"<p>Sofa. (short pause) Let's sit on the sofa. So comfy.</p>\n<p>翻译（简体中文）:\n沙发。咱们坐在沙发上吧。好舒服。</p>","english":"Sofa. (short pause) Let's sit on the sofa. So comfy. 沙发。咱们坐在沙发上吧。好舒服。","chinese":""},{"id":"1827","id_num":"1827","html":"<p>Yoga mat. (short pause) Stretch like a kitty on the yoga mat.</p>\n<p>翻译（简体中文）:\n瑜伽垫。像小猫一样在瑜伽垫上伸展。</p>","english":"Yoga mat. (short pause) Stretch like a kitty on the yoga mat. 瑜伽垫。像小猫一样在瑜伽垫上伸展。","chinese":""},{"id":"1828","id_num":"1828","html":"<p>Bed. (short pause) Time for bed, sleepy head.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Bed. (short pause) Time for bed, sleepy head. [翻译失败 - 无响应]","chinese":""},{"id":"1829","id_num":"1829","html":"<p>Toothbrush. (short pause) Brush, brush, brush your teeth with a toothbrush.</p>\n<p>翻译（简体中文）:\n牙刷。刷刷刷，用</p>","english":"Toothbrush. (short pause) Brush, brush, brush your teeth with a toothbrush. 牙刷。刷刷刷，用","chinese":""},{"id":"1830","id_num":"1830","html":"<p>Rinsing cup. (short pause) Fill the rinsing cup with water.</p>\n<p>翻译（简体中文）:\n漱口杯。把漱口杯倒满水。</p>","english":"Rinsing cup. (short pause) Fill the rinsing cup with water. 漱口杯。把漱口杯倒满水。","chinese":""},{"id":"1831","id_num":"1831","html":"<p>Mahjong. (short pause) Click-clack. Let's stack the mahjong tiles.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Mahjong. (short pause) Click-clack. Let's stack the mahjong tiles. [翻译失败 - 无响应]","chinese":""},{"id":"1832","id_num":"1832","html":"<p>TV. (short pause) Let's watch cartoons on the TV.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"TV. (short pause) Let's watch cartoons on the TV. [翻译失败 - 无响应]","chinese":""},{"id":"1833","id_num":"1833","html":"<p>Keys. (short pause) Jingle, jangle, go the keys.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Keys. (short pause) Jingle, jangle, go the keys. [翻译失败 - 无响应]","chinese":""},{"id":"1834","id_num":"1834","html":"<p>Soy milk maker. (short pause) Whirrr. The soy milk maker is working.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Soy milk maker. (short pause) Whirrr. The soy milk maker is working. [翻译失败 - 无响应]","chinese":""},{"id":"1835","id_num":"1835","html":"<p>Air fryer. (short pause) The air fryer makes crispy, yummy food.</p>\n<p>翻译（简体中文）:\n空气炸锅。空气炸锅能做出酥脆美味的食物。</p>","english":"Air fryer. (short pause) The air fryer makes crispy, yummy food. 空气炸锅。空气炸锅能做出酥脆美味的食物。","chinese":""},{"id":"1836","id_num":"1836","html":"<p>Window. (short pause) Look through the window. What do you see?</p>\n<p>翻译（简体中文）:\n窗。往窗外看。你看到了什么？</p>","english":"Window. (short pause) Look through the window. What do you see? 窗。往窗外看。你看到了什么？","chinese":""},{"id":"1837","id_num":"1837","html":"<p>Bedside table. (short pause) My lamp is on the bedside table.</p>\n<p>翻译（简体中文）:\n床头柜。我的灯在床头柜上。</p>","english":"Bedside table. (short pause) My lamp is on the bedside table. 床头柜。我的灯在床头柜上。","chinese":""},{"id":"1838","id_num":"1838","html":"<p>Whiteboard. (short pause) Let's draw on the whiteboard.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Whiteboard. (short pause) Let's draw on the whiteboard. [翻译失败 - 无响应]","chinese":""},{"id":"1839","id_num":"1839","html":"<p>Fridge. (short pause) Open the fridge. Let's find some yummy snacks.</p>\n<p>翻译（简体中文）:\n冰箱。打开冰箱。咱们找点好吃的零食吧。</p>","english":"Fridge. (short pause) Open the fridge. Let's find some yummy snacks. 冰箱。打开冰箱。咱们找点好吃的零食吧。","chinese":""},{"id":"1840","id_num":"1840","html":"<p>Kitchen cabinet. (short pause) Open the kitchen cabinet. What's inside?</p>\n<p>翻译（简体中文）:\n厨房橱柜。打开厨房橱柜。里面有什么？</p>","english":"Kitchen cabinet. (short pause) Open the kitchen cabinet. What's inside? 厨房橱柜。打开厨房橱柜。里面有什么？","chinese":""},{"id":"1841","id_num":"1841","html":"<p>Oven. (short pause) Let's bake a cake in the oven.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Oven. (short pause) Let's bake a cake in the oven. [翻译失败 - 无响应]","chinese":""},{"id":"1842","id_num":"1842","html":"<p>Stove. (short pause) The stove is hot. Be careful.</p>\n<p>翻译（简体中文）:\n炉子。炉子很</p>","english":"Stove. (short pause) The stove is hot. Be careful. 炉子。炉子很","chinese":""},{"id":"1843","id_num":"1843","html":"<p>Shoe cabinet. (short pause) Put your shoes in the shoe cabinet.</p>\n<p>翻译（简体中文）:\n鞋柜。把鞋放鞋柜里。</p>","english":"Shoe cabinet. (short pause) Put your shoes in the shoe cabinet. 鞋柜。把鞋放鞋柜里。","chinese":""},{"id":"1844","id_num":"1844","html":"<p>Closet. (short pause) My clothes are in the closet.</p>\n<p>翻译（简体中文）:\n衣柜。我的衣服在衣柜里。</p>","english":"Closet. (short pause) My clothes are in the closet. 衣柜。我的衣服在衣柜里。","chinese":""},{"id":"1845","id_num":"1845","html":"<p>Trash can. (short pause) In the trash can it goes.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Trash can. (short pause) In the trash can it goes. [翻译失败 - 无响应]","chinese":""},{"id":"1846","id_num":"1846","html":"<p>Potty. (short pause) I can use my potty. I'm a big boy.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Potty. (short pause) I can use my potty. I'm a big boy. [翻译失败 - 无响应]","chinese":""},{"id":"1847","id_num":"1847","html":"<p>Toilet. (short pause) Flush the toilet. Whoosh.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Toilet. (short pause) Flush the toilet. Whoosh. [翻译失败 - 无响应]","chinese":""},{"id":"1848","id_num":"1848","html":"<p>Shower. (short pause) It's raining in the shower. Splash, splash.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Shower. (short pause) It's raining in the shower. Splash, splash. [翻译失败 - 无响应]","chinese":""},{"id":"1849","id_num":"1849","html":"<p>Bathtub. (short pause) Let's play in the bathtub.</p>\n<p>翻译（简体中文）:\n浴缸。我们来浴缸里玩吧。</p>","english":"Bathtub. (short pause) Let's play in the bathtub. 浴缸。我们来浴缸里玩吧。","chinese":""},{"id":"1850","id_num":"1850","html":"<p>Remote control. (short pause) Click, click, with the remote control.</p>\n<p>翻译（简体中文）:\n遥控器。(短暂停顿) 咔嗒，咔嗒，用遥控器。</p>","english":"Remote control. (short pause) Click, click, with the remote control. 遥控器。(短暂停顿) 咔嗒，咔嗒，用遥控器。","chinese":""},{"id":"1851","id_num":"1851","html":"<p>Tissue box. (short pause) Achoo. I need a tissue from the tissue box.</p>\n<p>翻译（简体中文）:\n纸巾盒。阿嚏。我需要从纸巾盒里拿一张纸巾。</p>","english":"Tissue box. (short pause) Achoo. I need a tissue from the tissue box. 纸巾盒。阿嚏。我需要从纸巾盒里拿一张纸巾。","chinese":""},{"id":"1852","id_num":"1852","html":"<p>Dining table. (short pause) Time to eat at the dining table.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Dining table. (short pause) Time to eat at the dining table. [翻译失败 - 无响应]","chinese":""},{"id":"1853","id_num":"1853","html":"<p>Dining chair. (short pause) Sit on the dining chair. Yummy, yummy.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Dining chair. (short pause) Sit on the dining chair. Yummy, yummy. [翻译失败 - 无响应]","chinese":""},{"id":"1854","id_num":"1854","html":"<p>Stroller. (short pause) Let's go for a ride in the stroller.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Stroller. (short pause) Let's go for a ride in the stroller. [翻译失败 - 无响应]","chinese":""},{"id":"1855","id_num":"1855","html":"<p>Balance bike. (short pause) I can ride my balance bike. Vroom, vroom.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Balance bike. (short pause) I can ride my balance bike. Vroom, vroom. [翻译失败 - 无响应]","chinese":""},{"id":"1856","id_num":"1856","html":"<p>Toaster (short pause) Pop. Goes the toast from the toaster.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Toaster (short pause) Pop. Goes the toast from the toaster. [翻译失败 - 无响应]","chinese":""},{"id":"1857","id_num":"1857","html":"<p>Wukong Robot. (short pause) Hello, Wukong Robot. Can you dance for me?</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Wukong Robot. (short pause) Hello, Wukong Robot. Can you dance for me? [翻译失败 - 无响应]","chinese":""},{"id":"1858","id_num":"1858","html":"<p>Wiggle car. (short pause) Wiggle, wiggle, on my wiggle car.</p>\n<p>翻译（简体中文）:\n扭扭车。扭啊扭，在我的扭扭车上。</p>","english":"Wiggle car. (short pause) Wiggle, wiggle, on my wiggle car. 扭扭车。扭啊扭，在我的扭扭车上。","chinese":""},{"id":"1859","id_num":"1859","html":"<p>Suitcase. (short pause) Wheels on the suitcase go round and round.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Suitcase. (short pause) Wheels on the suitcase go round and round. [翻译失败 - 无响应]","chinese":""},{"id":"1860","id_num":"1860","html":"<p>Backpack. (short pause) Put my toys in the backpack.</p>\n<p>翻译（简体中文）:\n背包。把我的玩具放进背包里。</p>","english":"Backpack. (short pause) Put my toys in the backpack. 背包。把我的玩具放进背包里。","chinese":""},{"id":"1861","id_num":"1861","html":"<p>Cup. (short pause) I can drink from my cup.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Cup. (short pause) I can drink from my cup. [翻译失败 - 无响应]","chinese":""},{"id":"1862","id_num":"1862","html":"<p>Teacup. (short pause) A little teacup for my tea party.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Teacup. (short pause) A little teacup for my tea party. [翻译失败 - 无响应]","chinese":""},{"id":"1863","id_num":"1863","html":"<p>Sterilizer. (short pause) The sterilizer keeps my bottles clean.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Sterilizer. (short pause) The sterilizer keeps my bottles clean. [翻译失败 - 无响应]","chinese":""},{"id":"1864","id_num":"1864","html":"<p>Bowl. (short pause) My rice is in the bowl. Yummy.</p>\n<p>翻译（简体中文）:\n碗。我的米饭在碗里。好吃。</p>","english":"Bowl. (short pause) My rice is in the bowl. Yummy. 碗。我的米饭在碗里。好吃。","chinese":""},{"id":"1865","id_num":"1865","html":"<p>Plate. (short pause) Food on my plate. It looks great.</p>\n<p>翻译（简体中文）:\n盘子。我的盘子里有食物。看起来很棒。</p>","english":"Plate. (short pause) Food on my plate. It looks great. 盘子。我的盘子里有食物。看起来很棒。","chinese":""},{"id":"1866","id_num":"1866","html":"<p>Chopsticks. (short pause) Click, clack, go the chopsticks.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Chopsticks. (short pause) Click, clack, go the chopsticks. [翻译失败 - 无响应]","chinese":""},{"id":"1867","id_num":"1867","html":"<p>Spoon. (short pause) A spoon for my soup. Slurp, slurp.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Spoon. (short pause) A spoon for my soup. Slurp, slurp. [翻译失败 - 无响应]","chinese":""},{"id":"1868","id_num":"1868","html":"<p>Fork. (short pause) I can eat with a fork.</p>\n<p>翻译（简体中文）:\n叉子。我可以用叉子吃饭。</p>","english":"Fork. (short pause) I can eat with a fork. 叉子。我可以用叉子吃饭。","chinese":""},{"id":"1869","id_num":"1869","html":"<p>Knife. (short pause) A knife can cut. Be careful.</p>\n<p>翻译（简体中文）:\n刀。刀会伤人。小心。</p>","english":"Knife. (short pause) A knife can cut. Be careful. 刀。刀会伤人。小心。","chinese":""},{"id":"1870","id_num":"1870","html":"<p>Eraser. (short pause) Let's wipe the board with the eraser.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Eraser. (short pause) Let's wipe the board with the eraser. [翻译失败 - 无响应]","chinese":""},{"id":"1871","id_num":"1871","html":"<p>Faucet. (short pause) Turn on the faucet. Wash, wash, wash your hands.</p>\n<p>翻译（简体中文）:\n水龙头。打开水龙头。洗手，洗手，洗手。</p>","english":"Faucet. (short pause) Turn on the faucet. Wash, wash, wash your hands. 水龙头。打开水龙头。洗手，洗手，洗手。","chinese":""},{"id":"1872","id_num":"1872","html":"<p>Shampoo. (short pause) Bubbles in my hair from the shampoo.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Shampoo. (short pause) Bubbles in my hair from the shampoo. [翻译失败 - 无响应]","chinese":""},{"id":"1873","id_num":"1873","html":"<p>Body wash. (short pause) Lots of bubbles with the body wash.</p>\n<p>翻译（简体中文）:\n沐浴露。泡沫丰富。</p>","english":"Body wash. (short pause) Lots of bubbles with the body wash. 沐浴露。泡沫丰富。","chinese":""},{"id":"1874","id_num":"1874","html":"<p>Rice cooker. (short pause) The rice cooker is making fluffy rice.</p>\n<p>翻译（简体中文）:\n电饭锅。电饭锅正在煮松软的米饭。</p>","english":"Rice cooker. (short pause) The rice cooker is making fluffy rice. 电饭锅。电饭锅正在煮松软的米饭。","chinese":""},{"id":"1875","id_num":"1875","html":"<p>Bed rail. (short pause) The bed rail keeps me safe at night.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Bed rail. (short pause) The bed rail keeps me safe at night. [翻译失败 - 无响应]","chinese":""},{"id":"1876","id_num":"1876","html":"<p>Pillow. (short pause) My head is soft on the pillow.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Pillow. (short pause) My head is soft on the pillow. [翻译失败 - 无响应]","chinese":""},{"id":"1877","id_num":"1877","html":"<p>Blanket. (short pause) Snuggle under the warm blanket.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Blanket. (short pause) Snuggle under the warm blanket. [翻译失败 - 无响应]","chinese":""},{"id":"1878","id_num":"1878","html":"<p>Motorcycle. A motorcycle has two big wheels. Let's go for a ride.</p>\n<p>翻译（简体中文）:\n摩托车。摩托车有两个大轮子。我们去兜风吧。</p>","english":"Motorcycle. A motorcycle has two big wheels. Let's go for a ride. 摩托车。摩托车有两个大轮子。我们去兜风吧。","chinese":""},{"id":"1879","id_num":"1879","html":"<p>Shoes. (short pause) Let's put on our shoes and go outside.</p>\n<p>翻译（简体中文）:\n鞋子。咱们穿上鞋子出去吧。</p>","english":"Shoes. (short pause) Let's put on our shoes and go outside. 鞋子。咱们穿上鞋子出去吧。","chinese":""},{"id":"1880","id_num":"1880","html":"<p>Drawer. (short pause) Open the drawer. Close the drawer.</p>\n<p>翻译（简体中文）:\n抽屉。打开抽屉。关上抽屉。</p>","english":"Drawer. (short pause) Open the drawer. Close the drawer. 抽屉。打开抽屉。关上抽屉。","chinese":""},{"id":"1881","id_num":"1881","html":"<p>Light switch. (short pause) Click. Turn the light on with the light switch.</p>\n<p>翻译（简体中文）:\n灯开关。咔哒。用灯开关把灯打开。</p>","english":"Light switch. (short pause) Click. Turn the light on with the light switch. 灯开关。咔哒。用灯开关把灯打开。","chinese":""},{"id":"1882","id_num":"1882","html":"<p>Air conditioner. (short pause) Cool air from the air conditioner. Brrr.</p>\n<p>翻译（简体中文）:\n空调。(短暂停顿)空调吹出的冷气。好冷啊。</p>","english":"Air conditioner. (short pause) Cool air from the air conditioner. Brrr. 空调。(短暂停顿)空调吹出的冷气。好冷啊。","chinese":""},{"id":"1883","id_num":"1883","html":"<p>Motorcycle. (short pause) Vroom, vroom. Goes the motorcycle.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Motorcycle. (short pause) Vroom, vroom. Goes the motorcycle. [翻译失败 - 无响应]","chinese":""},{"id":"1884","id_num":"1884","html":"<p>Range hood. (short pause) The range hood helps clear the air.</p>\n<p>翻译（简体中文）:\n抽油烟机。抽油烟机有助于净化空气。</p>","english":"Range hood. (short pause) The range hood helps clear the air. 抽油烟机。抽油烟机有助于净化空气。","chinese":""},{"id":"1885","id_num":"1885","html":"<p>Cutting board. (short pause) Chop, chop, on the cutting board.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Cutting board. (short pause) Chop, chop, on the cutting board. [翻译失败 - 无响应]","chinese":""},{"id":"1886","id_num":"1886","html":"<p>Broom. (short pause) Sweep, sweep, sweep with the broom.</p>\n<p>翻译（简体中文）:\n扫帚。用扫帚扫啊扫啊扫。</p>","english":"Broom. (short pause) Sweep, sweep, sweep with the broom. 扫帚。用扫帚扫啊扫啊扫。","chinese":""},{"id":"1887","id_num":"1887","html":"<p>Dustpan. (short pause) Sweep the dust into the dustpan.</p>\n<p>翻译（简体中文）:\n簸箕。把灰尘扫进簸箕里。</p>","english":"Dustpan. (short pause) Sweep the dust into the dustpan. 簸箕。把灰尘扫进簸箕里。","chinese":""},{"id":"1888","id_num":"1888","html":"<p>High chair. (short pause) Sit in my high chair. It's time to eat.</p>\n<p>翻译（简体中文）:\n餐椅。坐到我的餐椅上。该吃饭了。</p>","english":"High chair. (short pause) Sit in my high chair. It's time to eat. 餐椅。坐到我的餐椅上。该吃饭了。","chinese":""},{"id":"1889","id_num":"1889","html":"<p>Scale. (short pause) Let's see how big I am on the scale.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Scale. (short pause) Let's see how big I am on the scale. [翻译失败 - 无响应]","chinese":""},{"id":"1890","id_num":"1890","html":"<p>Umbrella. (short pause) Open the umbrella when it starts to rain.</p>\n<p>翻译（简体中文）:\n伞。下雨的时候打开伞。</p>","english":"Umbrella. (short pause) Open the umbrella when it starts to rain. 伞。下雨的时候打开伞。","chinese":""},{"id":"1891","id_num":"1891","html":"<p>Missile launcher truck. (short pause) A big missile launcher truck. It can point way up to the sky.</p>\n<p>翻译（简体中文）:\n导弹发射车。一辆大型导弹发射车。它可以指向高高的天空。</p>","english":"Missile launcher truck. (short pause) A big missile launcher truck. It can point way up to the sky. 导弹发射车。一辆大型导弹发射车。它可以指向高高的天空。","chinese":""},{"id":"1892","id_num":"1892","html":"<p>Navy ship. (short pause) A big navy ship. It sails on the great big sea.</p>\n<p>翻译（简体中文）:\n军舰。一艘大军舰。它在浩瀚的大海上航行。</p>","english":"Navy ship. (short pause) A big navy ship. It sails on the great big sea. 军舰。一艘大军舰。它在浩瀚的大海上航行。","chinese":""},{"id":"1893","id_num":"1893","html":"<p>Armored car. (short pause) An armored car. So strong and tough.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Armored car. (short pause) An armored car. So strong and tough. [翻译失败 - 无响应]","chinese":""},{"id":"1894","id_num":"1894","html":"<p>Radar truck. (short pause) A radar truck. The dish goes round and round.</p>\n<p>翻译（简体中文）:\n雷达车。一辆雷达车。碟形天线转啊转。</p>","english":"Radar truck. (short pause) A radar truck. The dish goes round and round. 雷达车。一辆雷达车。碟形天线转啊转。","chinese":""},{"id":"1895","id_num":"1895","html":"<p>Signal truck. (short pause) A signal truck. Sending signals, beep beep beep.</p>\n<p>翻译（简体中文）:\n信号车。信号车。发送信号，嘀嘀嘀。</p>","english":"Signal truck. (short pause) A signal truck. Sending signals, beep beep beep. 信号车。信号车。发送信号，嘀嘀嘀。","chinese":""},{"id":"1896","id_num":"1896","html":"<p>Airplane. (short pause) An airplane in the sky. Flying way up high.</p>\n<p>翻译（简体中文）:\n飞机。天空中有一架飞机。飞得很高很高。</p>","english":"Airplane. (short pause) An airplane in the sky. Flying way up high. 飞机。天空中有一架飞机。飞得很高很高。","chinese":""},{"id":"1897","id_num":"1897","html":"<p>Ladder truck. (short pause) A ladder truck. The ladder goes up, up, up to the rescue.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Ladder truck. (short pause) A ladder truck. The ladder goes up, up, up to the rescue. [翻译失败 - 无响应]","chinese":""},{"id":"1898","id_num":"1898","html":"<p>Loader. (short pause) A loader can scoop and lift. Scoop up the dirt.</p>\n<p>翻译（简体中文）:\n装载机。装载机可以铲起和举升。铲起泥土。</p>","english":"Loader. (short pause) A loader can scoop and lift. Scoop up the dirt. 装载机。装载机可以铲起和举升。铲起泥土。","chinese":""},{"id":"1899","id_num":"1899","html":"<p>Digger. (short pause) I'm a digger, big and strong. Dig, dig, dig all day long.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Digger. (short pause) I'm a digger, big and strong. Dig, dig, dig all day long. [翻译失败 - 无响应]","chinese":""},{"id":"1900","id_num":"1900","html":"<p>Lint roller. (short pause) A sticky lint roller. Roll, roll, roll on my clothes.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Lint roller. (short pause) A sticky lint roller. Roll, roll, roll on my clothes. [翻译失败 - 无响应]","chinese":""},{"id":"1901","id_num":"1901","html":"<p>Toy box. (short pause) It's clean-up time. Put your toys in the toy box.</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"Toy box. (short pause) It's clean-up time. Put your toys in the toy box. [翻译失败 - 无响应]","chinese":""},{"id":"1902","id_num":"1902","html":"<p>Vase. (short pause) A vase for the flowers. So pretty.</p>\n<p>翻译（简体中文）:\n花瓶。一个插花的花瓶。真漂亮。</p>","english":"Vase. (short pause) A vase for the flowers. So pretty. 花瓶。一个插花的花瓶。真漂亮。","chinese":""},{"id":"1903","id_num":"1903","html":"<p>一 (yī). 一个。 我有一个气球。</p>\n<p>翻译（简体中文）:\n一 (yī). 一个。 我有一个气球。</p>","english":"一 (yī). 一个。 我有一个气球。 一 (yī). 一个。 我有一个气球。","chinese":""},{"id":"1904","id_num":"1904","html":"<p>二 (èr). 二胡。 爷爷教我拉二胡。</p>\n<p>翻译（简体中文）:\n二 (èr). 二胡。 爷爷教我拉二胡。</p>","english":"二 (èr). 二胡。 爷爷教我拉二胡。 二 (èr). 二胡。 爷爷教我拉二胡。","chinese":""},{"id":"1905","id_num":"1905","html":"<p>三 (sān). 三个。 小兔子采了三个蘑菇。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"三 (sān). 三个。 小兔子采了三个蘑菇。 [翻译失败 - 无响应]","chinese":""},{"id":"1906","id_num":"1906","html":"<p>四 (sì). 四朵花。 这里有四朵花。</p>\n<p>翻译（简体中文）:\n四 (sì). 四朵花。 这里有四朵花。</p>","english":"四 (sì). 四朵花。 这里有四朵花。 四 (sì). 四朵花。 这里有四朵花。","chinese":""},{"id":"1907","id_num":"1907","html":"<p>五 (wǔ). 五只。 花园里有五只蝴蝶。</p>\n<p>翻译（简体中文）:\n五 (wǔ). 五只。 花园里有五只蝴蝶。</p>","english":"五 (wǔ). 五只。 花园里有五只蝴蝶。 五 (wǔ). 五只。 花园里有五只蝴蝶。","chinese":""},{"id":"1908","id_num":"1908","html":"<p>六 (liù). 六个。 妹妹吃了六个草莓。</p>\n<p>翻译（简体中文）:\n六。六个。妹妹吃了六个草莓。</p>","english":"六 (liù). 六个。 妹妹吃了六个草莓。 六。六个。妹妹吃了六个草莓。","chinese":""},{"id":"1909","id_num":"1909","html":"<p>七 (qī). 七个。 妈妈做了七个蛋糕。</p>\n<p>翻译（简体中文）:\n七 (qī). 七个。 妈妈做了七个蛋糕。</p>","english":"七 (qī). 七个。 妈妈做了七个蛋糕。 七 (qī). 七个。 妈妈做了七个蛋糕。","chinese":""},{"id":"1910","id_num":"1910","html":"<p>八 (bā). 八个。 爸爸栽了八棵树。</p>\n<p>翻译（简体中文）:\n八。\n八个。\n爸爸栽了八棵树。</p>","english":"八 (bā). 八个。 爸爸栽了八棵树。 八。 八个。 爸爸栽了八棵树。","chinese":""},{"id":"1911","id_num":"1911","html":"<p>九 (jiǔ). 九块糖果。 妹妹有九块糖果。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"九 (jiǔ). 九块糖果。 妹妹有九块糖果。 [翻译失败 - 无响应]","chinese":""},{"id":"1912","id_num":"1912","html":"<p>十 (shí). 十本。 书架上有十本漫画书。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"十 (shí). 十本。 书架上有十本漫画书。 [翻译失败 - 无响应]","chinese":""},{"id":"1913","id_num":"1913","html":"<p>日 (rì). 日出。周末爸爸带我去看日出。</p>\n<p>翻译（简体中文）:\n日 (rì). 日出。周末爸爸带我去看日出。</p>","english":"日 (rì). 日出。周末爸爸带我去看日出。 日 (rì). 日出。周末爸爸带我去看日出。","chinese":""},{"id":"1914","id_num":"1914","html":"<p>月 (yuè). 月光。月光透过窗户照进了我家。</p>\n<p>翻译（简体中文）:\n月 (yuè)。月光。月光透过窗户照进了我家。</p>","english":"月 (yuè). 月光。月光透过窗户照进了我家。 月 (yuè)。月光。月光透过窗户照进了我家。","chinese":""},{"id":"1915","id_num":"1915","html":"<p>大 (dà). 大象。大象的鼻子长又长。</p>\n<p>翻译（简体中文）:\n大 (dà). 大象。大象的鼻子长又长。</p>","english":"大 (dà). 大象。大象的鼻子长又长。 大 (dà). 大象。大象的鼻子长又长。","chinese":""},{"id":"1916","id_num":"1916","html":"<p>小 (xiǎo). 矮小。老鼠的个头很矮小。</p>\n<p>翻译（简体中文）:\n小 (xiǎo). 矮小。老</p>","english":"小 (xiǎo). 矮小。老鼠的个头很矮小。 小 (xiǎo). 矮小。老","chinese":""},{"id":"1917","id_num":"1917","html":"<p>水 (shuǐ). 泉水。泉水很清澈。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"水 (shuǐ). 泉水。泉水很清澈。 [翻译失败 - 无响应]","chinese":""},{"id":"1918","id_num":"1918","html":"<p>火 (huǒ). 火苗。火苗很危险，我们要远离。</p>\n<p>翻译（简体中文）:\n火 (huǒ)。火苗。火苗很危险，我们要远离。</p>","english":"火 (huǒ). 火苗。火苗很危险，我们要远离。 火 (huǒ)。火苗。火苗很危险，我们要远离。","chinese":""},{"id":"1919","id_num":"1919","html":"<p>上 (shàng). 上学。今天是爸爸送我上学。</p>\n<p>翻译（简体中文）:\n上 (shàng). 上学。今天是爸爸送我上学。</p>","english":"上 (shàng). 上学。今天是爸爸送我上学。 上 (shàng). 上学。今天是爸爸送我上学。","chinese":""},{"id":"1920","id_num":"1920","html":"<p>下 (xià). 脚下。小熊把皮球放在脚下。</p>\n<p>翻译（简体中文）:\n下 (xià). 脚下。小熊把皮球放在脚下。</p>","english":"下 (xià). 脚下。小熊把皮球放在脚下。 下 (xià). 脚下。小熊把皮球放在脚下。","chinese":""},{"id":"1921","id_num":"1921","html":"<p>山 (shān). 山顶。我和爸爸爬到了山顶。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"山 (shān). 山顶。我和爸爸爬到了山顶。 [翻译失败 - 无响应]","chinese":""},{"id":"1922","id_num":"1922","html":"<p>田 (tián). 农田。农田里面种着水稻。</p>\n<p>翻译（简体中文）:\n田 (tián)。农田。农田里面种着水稻。</p>","english":"田 (tián). 农田。农田里面种着水稻。 田 (tián)。农田。农田里面种着水稻。","chinese":""},{"id":"1923","id_num":"1923","html":"<p>里 (lǐ). 里面。小熊在房子里面。</p>\n<p>翻译（简体中文）:\n里。里面。小熊在房子里面。</p>","english":"里 (lǐ). 里面。小熊在房子里面。 里。里面。小熊在房子里面。","chinese":""},{"id":"1924","id_num":"1924","html":"<p>外 (wài). 外面。小熊站在房子外面。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"外 (wài). 外面。小熊站在房子外面。 [翻译失败 - 无响应]","chinese":""},{"id":"1925","id_num":"1925","html":"<p>石 (shí). 石头。山上有很多石头。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"石 (shí). 石头。山上有很多石头。 [翻译失败 - 无响应]","chinese":""},{"id":"1926","id_num":"1926","html":"<p>土 (tǔ). 泥土。我会用泥土捏娃娃。</p>\n<p>翻译（简体中文）:\n土 (tǔ). 泥土。我会用泥土捏娃娃。</p>","english":"土 (tǔ). 泥土。我会用泥土捏娃娃。 土 (tǔ). 泥土。我会用泥土捏娃娃。","chinese":""},{"id":"1927","id_num":"1927","html":"<p>来 (lái). 回来了。妈妈下班回来了。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"来 (lái). 回来了。妈妈下班回来了。 [翻译失败 - 无响应]","chinese":""},{"id":"1928","id_num":"1928","html":"<p>去 (qù). 回去了。哥哥放学回去了。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"去 (qù). 回去了。哥哥放学回去了。 [翻译失败 - 无响应]","chinese":""},{"id":"1929","id_num":"1929","html":"<p>木 (mù). 木头。这座房子是用木头做的。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"木 (mù). 木头。这座房子是用木头做的。 [翻译失败 - 无响应]","chinese":""},{"id":"1930","id_num":"1930","html":"<p>正 (zhèng). 正在。老师正在教我们组词。</p>\n<p>翻译（简体中文）:\n正 (zhèng). 正在。老师正在教我们组词。</p>","english":"正 (zhèng). 正在。老师正在教我们组词。 正 (zhèng). 正在。老师正在教我们组词。","chinese":""},{"id":"1931","id_num":"1931","html":"<p>反 (fǎn). 反义词。今天我学会了反义词。</p>\n<p>翻译（简体中文）:\n反 (fǎn)。反义词。今天我学会了反义词。</p>","english":"反 (fǎn). 反义词。今天我学会了反义词。 反 (fǎn)。反义词。今天我学会了反义词。","chinese":""},{"id":"1934","id_num":"1934","html":"<p>人 (rén). 工人。我的爸爸是工人。</p>\n<p>翻译（简体中文）:\n人 (rén). 工人。我的爸爸是工人。</p>","english":"人 (rén). 工人。我的爸爸是工人。 人 (rén). 工人。我的爸爸是工人。","chinese":""},{"id":"1935","id_num":"1935","html":"<p>口 (kǒu). 口才。球球的口才很棒。</p>\n<p>翻译（简体中文）:\n口 (kǒu)。口才。球球的口才很棒。</p>","english":"口 (kǒu). 口才。球球的口才很棒。 口 (kǒu)。口才。球球的口才很棒。","chinese":""},{"id":"1936","id_num":"1936","html":"<p>分 (fēn). 满分。球球考试得了满分。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"分 (fēn). 满分。球球考试得了满分。 [翻译失败 - 无响应]","chinese":""},{"id":"1937","id_num":"1937","html":"<p>合 (hé). 合作。两只小蚂蚁在合作搬豆豆。</p>\n<p>翻译（简体中文）:\n合 (hé). 合作。两只小蚂蚁在合作搬豆豆。</p>","english":"合 (hé). 合作。两只小蚂蚁在合作搬豆豆。 合 (hé). 合作。两只小蚂蚁在合作搬豆豆。","chinese":""},{"id":"1938","id_num":"1938","html":"<p>手 (shǒu). 手指。姐姐的手指非常漂亮。</p>\n<p>翻译（简体中文）:\n手。手指。姐姐的手指非常漂亮。</p>","english":"手 (shǒu). 手指。姐姐的手指非常漂亮。 手。手指。姐姐的手指非常漂亮。","chinese":""},{"id":"1939","id_num":"1939","html":"<p>耳 (ěr). 耳朵。耳朵用来听声音。</p>\n<p>翻译（简体中文）:\n耳 (ěr)。耳朵。耳朵用来听声音。</p>","english":"耳 (ěr). 耳朵。耳朵用来听声音。 耳 (ěr)。耳朵。耳朵用来听声音。","chinese":""},{"id":"1940","id_num":"1940","html":"<p>多 (duō). 很多。公园里有很多蝴蝶。</p>\n<p>翻译（简体中文）:\n多 (duō). 很多。公园里有很多蝴蝶。</p>","english":"多 (duō). 很多。公园里有很多蝴蝶。 多 (duō). 很多。公园里有很多蝴蝶。","chinese":""},{"id":"1941","id_num":"1941","html":"<p>少 (shǎo). 少数民族。苗族是我国少数民族之一。</p>\n<p>翻译（简体中文）:\n少 (shǎo). 少数民族。苗族是我国少数民族之一。</p>","english":"少 (shǎo). 少数民族。苗族是我国少数民族之一。 少 (shǎo). 少数民族。苗族是我国少数民族之一。","chinese":""},{"id":"1942","id_num":"1942","html":"<p>目 (mù). 目光。奶奶的目光很慈祥。</p>\n<p>翻译（简体中文）:\n目 (mù). 目光。奶奶的目光很慈祥。</p>","english":"目 (mù). 目光。奶奶的目光很慈祥。 目 (mù). 目光。奶奶的目光很慈祥。","chinese":""},{"id":"1943","id_num":"1943","html":"<p>足 (zú). 足球。哥哥喜欢踢足球。</p>\n<p>翻译（简体中文）:\n足 (zú). 足球。哥哥喜欢踢足球。</p>","english":"足 (zú). 足球。哥哥喜欢踢足球。 足 (zú). 足球。哥哥喜欢踢足球。","chinese":""},{"id":"1944","id_num":"1944","html":"<p>远 (yuǎn). 远方。狮子坐在石头上眺望远方。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"远 (yuǎn). 远方。狮子坐在石头上眺望远方。 [翻译失败 - 无响应]","chinese":""},{"id":"1945","id_num":"1945","html":"<p>近 (jìn). 近视。躺着看书眼睛容易近视。</p>\n<p>翻译（简体中文）:\n近 (jìn)。近视。躺着看书眼睛容易近视。</p>","english":"近 (jìn). 近视。躺着看书眼睛容易近视。 近 (jìn)。近视。躺着看书眼睛容易近视。","chinese":""},{"id":"1946","id_num":"1946","html":"<p>舌 (shé). 舌头。医生在帮我检查舌头。</p>\n<p>翻译（简体中文）:\n舌 (shé).</p>","english":"舌 (shé). 舌头。医生在帮我检查舌头。 舌 (shé).","chinese":""},{"id":"1947","id_num":"1947","html":"<p>牙 (yá). 刷牙。认真刷牙可以预防蛀牙。</p>\n<p>翻译（简体中文）:\n牙 (yá). 刷牙。认真刷牙可以预防蛀牙。</p>","english":"牙 (yá). 刷牙。认真刷牙可以预防蛀牙。 牙 (yá). 刷牙。认真刷牙可以预防蛀牙。","chinese":""},{"id":"1948","id_num":"1948","html":"<p>有 (yǒu). 只有。树上只有一只小鸟。</p>\n<p>翻译（简体中文）:\n[翻译失败 - 无响应]</p>","english":"有 (yǒu). 只有。树上只有一只小鸟。 [翻译失败 - 无响应]","chinese":""},{"id":"1949","id_num":"1949","html":"<p>无 (wú). 无边。小船在无边的大海上漂荡。</p>\n<p>翻译（简体中文）:\n无 (wú). 无边。小船在无边的大海上漂荡。</p>","english":"无 (wú). 无边。小船在无边的大海上漂荡。 无 (wú). 无边。小船在无边的大海上漂荡。","chinese":""},{"id":"1950","id_num":"1950","html":"<p>头 (tóu). 头痛。发烧会引起头痛。</p>\n<p>翻译（简体中文）:\n头 (tóu). 头痛。发烧会引起头痛。</p>","english":"头 (tóu). 头痛。发烧会引起头痛。 头 (tóu). 头痛。发烧会引起头痛。","chinese":""},{"id":"1951","id_num":"1951","html":"<p>发 (fà). 白发。爷爷满头白发。</p>\n<p>翻译（简体中文）:\n发 (fà). 白发。爷爷满头白发。</p>","english":"发 (fà). 白发。爷爷满头白发。 发 (fà). 白发。爷爷满头白发。","chinese":""},{"id":"1952","id_num":"1952","html":"<p>Tesla Model Y. Wow, a Tesla Model Y. It's electric, quiet and quick.</p>\n<p>翻译（简体中文）:\n特斯拉 Model Y。哇，一辆特斯拉 Model Y。它是电动的，安静又快速。</p>","english":"Tesla Model Y. Wow, a Tesla Model Y. It's electric, quiet and quick. 特斯拉 Model Y。哇，一辆特斯拉 Model Y。它是电动的，安静又快速。","chinese":""},{"id":"1953","id_num":"1953","html":"<p>Excavator. Look, an excavator! It can dig, dig, dig with its big scoop.</p>\n<p>翻译（简体中文）:\n挖掘机。看，一台挖掘机！它能用它的大铲斗挖呀挖呀挖。</p>","english":"Excavator. Look, an excavator! It can dig, dig, dig with its big scoop. 挖掘机。看，一台挖掘机！它能用它的大铲斗挖呀挖呀挖。","chinese":""}];
+
+const main = document.getElementById("cards");
+const searchBox = document.getElementById("search");
+const noResults = document.getElementById("no-results");
+const displayedCount = document.getElementById("displayed-count");
+const searchTime = document.getElementById("search-time");
+
+let searchTimeout;
+
+// Initialize
+updateDisplayedCount(0);
+
+searchBox.addEventListener("input", function() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(doSearch, 150); // Debounce search
+});
+
+searchBox.addEventListener("keypress", function(e) {
+  if (e.key === 'Enter') {
+    doSearch();
+  }
+});
+
+function doSearch() {
+  const startTime = performance.now();
+  const query = searchBox.value.trim();
+  
+  main.innerHTML = "";
+  noResults.style.display = "none";
+  
+  if (!query) {
+    updateDisplayedCount(0);
+    updateSearchTime(0);
+    return;
+  }
+  
+  // Enhanced search: supports both exact ID and partial text search
+  const results = searchCards(query);
+  
+  if (results.length === 0) {
+    noResults.style.display = "block";
+    updateDisplayedCount(0);
+  } else {
+    results.forEach(card => render(card));
+    updateDisplayedCount(results.length);
+  }
+  
+  const endTime = performance.now();
+  updateSearchTime(Math.round(endTime - startTime));
+}
+
+function searchCards(query) {
+  const results = [];
+  const normalizedQuery = query.toLowerCase();
+  
+  // First try exact ID match
+  const exactMatch = ALL_CARDS.find(card => 
+    card.id === query || card.id_num === query.replace(/^0+/, '') || query.replace(/^0+/, '') === "0"
+  );
+  
+  if (exactMatch) {
+    return [exactMatch];
+  }
+  
+  // Then try partial text search
+  for (const card of ALL_CARDS) {
+    if (card.english.toLowerCase().includes(normalizedQuery) || 
+        card.chinese.toLowerCase().includes(normalizedQuery) ||
+        card.id.includes(query) ||
+        card.id_num.includes(query)) {
+      results.push(card);
+    }
+  }
+  
+  return results;
+}
+
+function render(card) {
+  const div = document.createElement("div");
+  div.className = "card";
+  
+  const englishContent = card.html.split('<p>翻译（简体中文）:')[0];
+  const chineseContent = card.html.split('<p>翻译（简体中文）:')[1] || '';
+  
+  div.innerHTML = `
+    <div class="card-header">
+      <div class="card-id">P` + card.id + `</div>
+    </div>
+    <div class="card-content">
+      ` + englishContent + `
+      ` + (chineseContent ? `<div class="translation">` + chineseContent + `</div>` : '') + `
+    </div>
+  `;
+  
+  main.appendChild(div);
+}
+
+function showRandomCard() {
+  const randomCard = ALL_CARDS[Math.floor(Math.random() * ALL_CARDS.length)];
+  searchBox.value = randomCard.id;
+  doSearch();
+}
+
+function clearSearch() {
+  searchBox.value = "";
+  doSearch();
+}
+
+function updateDisplayedCount(count) {
+  displayedCount.textContent = count;
+}
+
+function updateSearchTime(time) {
+  searchTime.textContent = time;
+}
+
+// Add some keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey || e.metaKey) {
+    switch(e.key) {
+      case 'k':
+        e.preventDefault();
+        searchBox.focus();
+        break;
+      case 'r':
+        e.preventDefault();
+        showRandomCard();
+        break;
+    }
+  }
+});
+
+// Show welcome message on first load
+window.addEventListener('load', function() {
+  if (searchBox.value === '') {
+    const welcomeDiv = document.createElement('div');
+    welcomeDiv.className = 'no-results';
+    welcomeDiv.innerHTML = `
+      <div class="no-results-icon">👋</div>
+      <h3>欢迎使用毛毛虫词汇卡片！</h3>
+      <p>在搜索框中输入数字编号 (比如: 1936) 或者内容 (比如: 特斯拉) 开始浏览，或点击"随机卡片"按钮探索内容</p>
+    `;
+    main.appendChild(welcomeDiv);
+  }
+});
+</script>
+</body></html>
