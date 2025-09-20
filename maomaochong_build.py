@@ -44,7 +44,7 @@ html_doc = f"""<!DOCTYPE html>
 <html lang="zh-CN"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Word Cards - 词汇卡片</title>
+<title>毛毛虫词汇卡片</title>
 <meta name="description" content="Interactive word cards with English and Chinese translations">
 <style>
 * {{
